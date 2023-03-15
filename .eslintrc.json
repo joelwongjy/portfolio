@@ -1,3 +1,4 @@
 {
-  "extends": "next/core-web-vitals"
+  "plugins": ["eslint-plugin-simple-import-sort"],
+  "extends": ["next/core-web-vitals", "prettier"]
 }
