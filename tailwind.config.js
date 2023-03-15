@@ -9,7 +9,7 @@ module.exports = {
   ],
   theme: {
     fontFamily: {
-      'sans': ['Plus Jakarta Sans', ...defaultTheme.fontFamily.sans],
+      'sans': ['"Plus Jakarta Sans"', ...defaultTheme.fontFamily.sans],
     },
     extend: {},
   },
