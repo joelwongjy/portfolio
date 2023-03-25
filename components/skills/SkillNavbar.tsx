@@ -19,7 +19,7 @@ export const SkillNavbar = ({
 }: SkillNavbarProps): ReactElement<SkillNavbarProps, "div"> => {
   const textMotion: Variants = {
     hover: {
-      x: 20,
+      x: "2rem",
       transition: { duration: 0.25, type: "tween" },
     },
   };
@@ -31,19 +31,36 @@ export const SkillNavbar = ({
     },
   };
 
+  const isSelected = (index: number) => {
+    return selectedSection === index;
+  };
+
+  console.log(selectedSection);
   return (
-    <div className={`flex overflow-scroll gap-4 md:grid md:grid-cols-${sections.length}`}>
+    <div
+      className={`flex gap-4 overflow-scroll md:grid md:grid-cols-${sections.length}`}
+    >
       {sections.map((section, index) => {
         return (
           <motion.button
             key={index}
-            className="cursor-pointer h-12 bg-indigo-100 max-md:hover:bg-indigo-50 dark:bg-indigo-900 max-md:hover:dark:bg-indigo-700 p-4 rounded-lg md:bg-transparent md:rounded-none md:h-24 mb-8 md:mb-0 md:border-b-2 text-sm md:text-xl font-medium flex items-center"
+            className={`${
+              isSelected(index)
+                ? "max-md:bg-indigo-200 max-md:dark:bg-indigo-700"
+                : ""
+            } mb-8 flex h-12 cursor-pointer items-center rounded-lg bg-indigo-50 p-4 text-sm font-medium dark:bg-indigo-900  md:mb-0 md:h-24 md:rounded-none md:border-b-2 md:bg-transparent md:text-xl`}
             onClick={() => setSelectedSection(index)}
             variants={buttonMotion}
             whileHover="hover"
           >
-            <motion.div variants={textMotion} className="flex items-center max-md:!transform-none">
-              <section.icon className="h-6 md:h-8 text-indigo-300 mr-2" />
+            <motion.div
+              variants={textMotion}
+              transition={{ duration: 0.25, type: "tween" }}
+              className={`flex items-center max-md:!transform-none ${
+                isSelected(index) ? "!translate-x-8" : ""
+              }`}
+            >
+              <section.icon className="mr-2 h-6 text-indigo-500 dark:text-indigo-300 md:h-8" />
               {section.title}
             </motion.div>
           </motion.button>
