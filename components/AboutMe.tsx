@@ -1,10 +1,13 @@
 import React, { ReactElement } from "react";
-import { SectionHeading } from "./section/SectionHeader";
+import { SectionWrapper } from "./section/SectionWrapper";
+import { SectionHeading } from "./section/SectionHeading";
+import { aboutMe } from "@/data/aboutMe";
 
 export const AboutMe = (): ReactElement<"div"> => {
   return (
-    <div className="pt-12 md:pt-24 flex flex-col">
-      <SectionHeading title="about me" />
-    </div>
+    <SectionWrapper>
+      <SectionHeading title={aboutMe.title} />
+      <span className="md:text-xl">{aboutMe.body[1]}</span>
+    </SectionWrapper>
   );
 };

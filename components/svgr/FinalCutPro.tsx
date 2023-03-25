@@ -2,12 +2,7 @@ import { ReactElement } from "react";
 
 const FinalCutPro = (): ReactElement<void, "svg"> => {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 48 48"
-      width="240px"
-      height="240px"
-    >
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
       <path
         fill="#cfd8dc"
         d="M42.17,40.159l-24.004,3.754l-6.656,1.045c-1.831,0.288-3.555-0.934-3.846-2.731L3.573,17.118 l37.293-5.839l4.092,25.108C45.249,38.185,44.001,39.871,42.17,40.159z"

@@ -12,8 +12,11 @@ export const SkillCard = ({
   const Svgr = getSvgrFromSkill(skill);
 
   return (
-    <div className="border-2 border-stone-100">
-      <Svgr />
+    <div className="flex flex-row items-center w-64 h-16 bg-gray-50 rounded-lg px-2 py-4">
+      <div className="w-8 h-8 mx-2">
+        <Svgr />
+      </div>
+      <h3 className=" font-medium">{skill}</h3>
     </div>
   );
 };

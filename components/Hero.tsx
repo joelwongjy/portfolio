@@ -1,8 +1,9 @@
 import React, { ReactElement } from "react";
 import { easeOut, motion, Variants } from "framer-motion";
-import { aboutMe } from "@/data/aboutMe";
+import { hero } from "@/data/hero";
 import Image from "next/image";
 import profilePic from "../public/hero.jpg";
+import { Button } from "./buttons/Button";
 
 export const Hero = (): ReactElement<"div"> => {
   const itemUp: Variants = {
@@ -51,24 +52,27 @@ export const Hero = (): ReactElement<"div"> => {
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, amount: 0.8 }}
-      className="pt-20 md:pt-12"
+      className="pt-20 md:pt-6"
     >
-      <div className="flex flex-col items-center md:flex-row md:items-end">
+      <div className="flex flex-col items-center md:flex-row md:items-end md:justify-between">
         <motion.div
           variants={itemUp}
-          className="md:w-2/3 flex flex-col items-center md:items-start"
+          className="flex flex-col items-center md:items-start"
         >
-          <h1 className="text-5xl md:text-7xl font-extrabold">Joel Wong</h1>
+          <h1 className="text-6xl md:text-7xl font-extrabold flex flex-col items-center md:items-start">
+            <span>Joel</span>
+            <span>Wong</span>
+          </h1>
           <h2 className="text-3xl md:text-5xl tracking-wide font-extralight pt-4">
             Frontend Developer
           </h2>
         </motion.div>
-        <motion.p
-          variants={itemLeft}
-          className="leading-7 pt-12 text-center font-light w-2/3 md:text-lg md:w-1/3 md:text-small md:text-left"
-        >
-          {aboutMe.body[0]}
-        </motion.p>
+        <motion.div variants={itemLeft} className="w-80 mt-10 md:mt-0">
+          <p className="leading-7 font-light mb-4 text-small md:text-lg text-center md:text-left">
+            {hero.body}
+          </p>
+          <Button label="Download Resume" />
+        </motion.div>
       </div>
       <motion.div variants={itemHalfUp}>
         <Image

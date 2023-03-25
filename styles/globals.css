@@ -4,10 +4,22 @@
 
 @layer base {
   body {
-    @apply md:px-36 px-10 dark:bg-[#00050f] dark:text-white text-gray-900 border-white;
+    @apply max-w-7xl md:w-5/6 px-10 m-auto dark:bg-[#00050f] dark:text-white text-gray-900 border-white box-border;
   }
 
-  p, h2 {
+  h2, p, span {
     @apply dark:text-slate-300
+  }
+
+  p {
+    @apply text-lg
+  }
+
+  h2 {
+    @apply text-xl
+  }
+  
+  h1 {
+    @apply text-4xl
   }
 }
