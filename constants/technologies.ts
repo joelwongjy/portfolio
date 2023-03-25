@@ -31,6 +31,7 @@ export enum Skills {
   MATERIAL_UI = "Material-UI",
   MERCURIAL = "Mercurial",
   MYSQL = "MySQL",
+  NEXT_JS = "Next.js",
   NODE_JS = "Node.js",
   PHOTOSHOP = "Photoshop",
   POSTGRES = "PostgreSQL",

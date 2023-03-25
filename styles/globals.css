@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply max-w-7xl md:w-5/6 px-10 m-auto dark:bg-[#00050f] dark:text-white text-gray-900 border-white box-border;
+    @apply max-w-7xl md:w-5/6 px-8 m-auto dark:bg-[#00050f] dark:text-white text-gray-900 border-white box-border;
   }
 
   h2, p, span {

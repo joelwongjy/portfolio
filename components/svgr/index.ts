@@ -1,4 +1,5 @@
 export { default as Bulma } from "./Bulma";
+export { default as C } from "./C";
 export { default as Chevron } from "./Chevron";
 export { default as Docker } from "./Docker";
 export { default as Express } from "./Express";
@@ -14,6 +15,7 @@ export { default as JavaScript } from "./JavaScript";
 export { default as Laravel } from "./Laravel";
 export { default as MaterialUI } from "./MaterialUI";
 export { default as MySQL } from "./MySQL";
+export { default as NextJS } from "./NextJS";
 export { default as Node } from "./Node";
 export { default as Postgres } from "./Postgres";
 export { default as Python } from "./Python";

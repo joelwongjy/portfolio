@@ -7,6 +7,8 @@ export const getSvgrFromSkill = (
   switch (skill) {
     case Skills.BULMA:
       return skills.Bulma;
+    case Skills.C:
+      return skills.C;
     case Skills.DOCKER:
       return skills.Docker;
     case Skills.EXPRESS:
@@ -35,6 +37,8 @@ export const getSvgrFromSkill = (
       return skills.MaterialUI;
     case Skills.MYSQL:
       return skills.MySQL;
+    case Skills.NEXT_JS:
+      return skills.NextJS;
     case Skills.NODE_JS:
       return skills.Node;
     case Skills.POSTGRES:
