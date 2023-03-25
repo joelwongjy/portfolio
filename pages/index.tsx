@@ -3,6 +3,7 @@ import { Navbar } from "@/components/navbar/Navbar";
 import { Hero } from "@/components/Hero";
 import { AboutMe } from "@/components/AboutMe";
 import { Skills } from "@/components/Skills";
+import { Experience } from "@/components/Experience";
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
         <Hero />
         <AboutMe />
         <Skills />
+        <Experience />
       </main>
     </>
   );
