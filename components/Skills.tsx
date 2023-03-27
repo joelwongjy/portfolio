@@ -12,7 +12,7 @@ export const Skills = (): ReactElement<typeof SectionWrapper> => {
   return (
     <SectionWrapper className="h-128 md:h-full">
       <SectionHeading title={title} />
-      <div className="md:grid md:grid-cols-2 md:items-center gap-12">
+      <div className="gap-12 md:grid md:grid-cols-2 md:items-center">
         <SkillNavbar
           sections={sections}
           selectedSection={selectedSection}

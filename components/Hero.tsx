@@ -54,21 +54,18 @@ export const Hero = (): ReactElement<"div"> => {
       viewport={{ once: true, amount: 0.8 }}
       className="pt-20 md:pt-6"
     >
-      <div className="flex flex-col items-center md:flex-row md:items-end md:justify-between">
-        <motion.div
-          variants={itemUp}
-          className="flex flex-col items-center md:items-start"
-        >
-          <h1 className="text-6xl md:text-7xl font-extrabold flex flex-col items-center md:items-start">
+      <div className="flex flex-col md:flex-row md:justify-between">
+        <motion.div variants={itemUp} className="flex flex-col ">
+          <h1 className="flex flex-col text-6xl font-extrabold md:text-7xl">
             <span>Joel</span>
             <span>Wong</span>
           </h1>
-          <h2 className="text-3xl md:text-5xl tracking-wide font-extralight pt-4">
+          <h2 className="pt-4 text-3xl font-extralight tracking-wide md:text-5xl">
             Frontend Developer
           </h2>
         </motion.div>
-        <motion.div variants={itemLeft} className="w-80 mt-10 md:mt-0">
-          <p className="leading-7 font-light mb-4 text-small md:text-lg text-center md:text-left">
+        <motion.div variants={itemLeft} className="mt-10 w-80 md:mt-0">
+          <p className="text-small mb-4 font-light leading-7 md:text-left md:text-lg">
             {hero.body}
           </p>
           <Button label="Download Resume" />
@@ -78,7 +75,7 @@ export const Hero = (): ReactElement<"div"> => {
         <Image
           src={profilePic}
           alt="Profile picture"
-          className="mt-16 h-72 md:h-96 object-cover rounded-3xl"
+          className="mt-16 h-72 rounded-3xl object-cover md:h-96"
         ></Image>
       </motion.div>
     </motion.div>

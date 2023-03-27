@@ -44,6 +44,7 @@ export enum Skills {
   REALM = "Realm",
   REDUX = "Redux",
   RUBY = "Ruby",
+  SALESFORCE = "Salesforce",
   SASS = "Sass",
   SOCKET_IO = "Socket.IO",
   SPEECH_TO_TEXT = "Speech-to-Text",

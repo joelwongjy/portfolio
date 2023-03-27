@@ -19,17 +19,36 @@ export const experience: {
   title: string;
   experiences: Experience[];
 } = {
-  title: "Experience",
+  title: "experience",
   experiences: [
     {
-      start: "May 2022",
+      start: "Aug 2022",
       end: "Present",
+      title: "Software Engineer Intern",
+      organisation: "propel",
+      organisationLink: "https://www.propelsoftware.com/",
+      description: "Product Lifecycle Management (PLM) Software",
+      points: [
+        "Build first iteration of the new Product Information Management platform in Salesforce Lightning Web Components (LWC) and Apex",
+        "Migration of features from React and Redux to LWC in core Product Lifecycle Management app",
+      ],
+      stacks: [
+        {
+          title: "Tech Stack",
+          skills: [Skills.SALESFORCE, Skills.REACT, Skills.REDUX],
+        },
+      ],
+    },
+    {
+      start: "May 2022",
+      end: "Aug 2022",
       title: "Software Engineer Intern",
       organisation: "shopee",
       organisationLink: "https://shopee.sg/",
       description: "Largest e-commerce platform in Southeast Asia",
       points: [
-        "Build features and perform fixes for the Web Frontend Orders team",
+        "Frontend Engineer in the Orders Team",
+        "Build features for the Product Detail Page in React, Redux, Sass and Typescript",
       ],
       stacks: [
         {
@@ -44,16 +63,16 @@ export const experience: {
       title: "Software Engineer Intern",
       organisation: "bantu",
       organisationLink: "https://bantu.life/",
-      description: "A social enterprise startup",
+      description: "Volunteer Management System for Social Enterprises",
       points: [
-        "Initiated a complete overhaul of community portal bantu.life for over 15,000 unique users.",
-        "Singlehandedly redesigned user interface and coded new website within one month.",
-        "Performed fixes and improvements for the main product, bantu Workspace.",
+        "Initiated an overhaul of the Volunteer Management Platform bantu.life",
+        "Singlehandedly redesigned user interface and coded new website within one month",
+        "Performed fixes and improvements for the main product, bantu Workspace",
       ],
       stacks: [
         {
           title: "Tech Stack",
-          skills: [Skills.REACT, Skills.VUE, Skills.LARAVEL],
+          skills: [Skills.REACT, Skills.VUE, Skills.LARAVEL, Skills.TAILWIND],
         },
       ],
     },
@@ -66,9 +85,9 @@ export const experience: {
         "https://gdsc.community.dev/national-university-of-singapore/",
       description: "A #TechForGood club supported by Google Developers",
       points: [
-        "Leading a team of 74 members to build technology solutions for the community and harness tech for social good.",
-        "Oversaw 3 new software development projects for Non-Profit Organizations in Singapore.",
-        "Built a team to conduct technology workshops and organize a Hackathon to inspire students to build generative skills in tech.",
+        "Led a team of 74 members to build tech solutions for the community",
+        "Started 3 new software development projects for Non-Profit Organizations in Singapore",
+        "Spearheaded technology workshops and a Hackathon to build generative skills in tech in students",
       ],
       stacks: [],
     },
@@ -79,13 +98,10 @@ export const experience: {
       organisation: "gdsc",
       organisationLink:
         "https://gdsc.community.dev/national-university-of-singapore/",
-      description:
-        "Building an app for CampusImpact, a Non-Profit Organization in Singapore",
+      description: "Building apps for Non-Profits in Singapore",
       points: [
-        "One of five Software Engineers developing a full-stack Progressive Web App.",
-        "Worked closely alongside Product Designers and Product Managers to ensure client's needs are met.",
-        "Built a questionnaire module for teachers to create regular feedback loops.",
-        "Developed a gamified student experience alongside admin console for the children.",
+        "Developed a web application with five web developers for CampusImpact, non-profit organization targeting youths",
+        "Year-long project to create a questionnaire and analytics module for teachers to build feedback loops",
       ],
       stacks: [
         {

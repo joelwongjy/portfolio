@@ -49,6 +49,8 @@ export const getSvgrFromSkill = (
       return skills.ReactIcon;
     case Skills.REDUX:
       return skills.Redux;
+    case Skills.SALESFORCE:
+      return skills.Salesforce;
     case Skills.SASS:
       return skills.Sass;
     case Skills.SWIFT:

@@ -21,6 +21,7 @@ export { default as Postgres } from "./Postgres";
 export { default as Python } from "./Python";
 export { default as ReactIcon } from "./ReactIcon";
 export { default as Redux } from "./Redux";
+export { default as Salesforce } from "./Salesforce";
 export { default as Sass } from "./Sass";
 export { default as Swift } from "./Swift";
 export { default as Tailwind } from "./Tailwind";
