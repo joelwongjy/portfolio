@@ -59,7 +59,7 @@ const ExperienceItem = (
             </div>
             <div className="flex">
               {stack.skills.map((skill, index) => (
-                <SkillIcon key={index} skill={skill} />
+                <SkillIcon key={index} skill={skill} showLabel />
               ))}
             </div>
           </div>
