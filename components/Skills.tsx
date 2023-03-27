@@ -12,13 +12,13 @@ export const Skills = (): ReactElement<typeof SectionWrapper> => {
   return (
     <SectionWrapper className="h-128 md:h-full">
       <SectionHeading title={title} />
-      <div className="gap-12 md:grid md:grid-cols-2 md:items-center">
+      <div className="gap-12 md:grid md:grid-cols-2">
         <SkillNavbar
           sections={sections}
           selectedSection={selectedSection}
           setSelectedSection={setSelectedSection}
         ></SkillNavbar>
-        <SkillGrid skills={sections[selectedSection].skills} />
+        <SkillGrid section={sections[selectedSection]} />
       </div>
     </SectionWrapper>
   );

@@ -54,7 +54,7 @@ const ExperienceItem = (
         ))}
         {stacks.map((stack, index) => (
           <div key={index} className="mt-3 flex flex-col items-start">
-            <div className="mb-4 rounded-full bg-gray-50 px-4 py-2 dark:bg-gray-900">
+            <div className="mb-4 rounded-full bg-gray-100 px-4 py-2 font-semibold dark:bg-gray-900">
               {stack.title}
             </div>
             <div className="flex">

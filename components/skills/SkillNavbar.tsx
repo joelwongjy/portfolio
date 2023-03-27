@@ -56,9 +56,7 @@ export const SkillNavbar = ({
             <motion.div
               variants={textMotion}
               transition={{ duration: 0.25, type: "tween" }}
-              className={`flex items-center max-md:!transform-none ${
-                isSelected(index) ? "!translate-x-8" : ""
-              }`}
+              className="flex items-center max-md:!transform-none"
             >
               <section.icon className="mr-2 h-6 text-indigo-500 dark:text-indigo-300 md:h-8" />
               {section.title}

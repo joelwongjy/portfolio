@@ -54,7 +54,7 @@ export const Hero = (): ReactElement<"div"> => {
       viewport={{ once: true, amount: 0.8 }}
       className="pt-20 md:pt-6"
     >
-      <div className="flex flex-col md:flex-row md:justify-between">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between">
         <motion.div variants={itemUp} className="flex flex-col ">
           <h1 className="flex flex-col text-6xl font-extrabold md:text-7xl">
             <span>Joel</span>
