@@ -57,7 +57,7 @@ const ExperienceItem = (
             <div className="mb-4 rounded-full bg-gray-100 px-4 py-2 font-semibold dark:bg-gray-900">
               {stack.title}
             </div>
-            <div className="flex">
+            <div className="flex gap-2">
               {stack.skills.map((skill, index) => (
                 <SkillIcon key={index} skill={skill} showLabel />
               ))}

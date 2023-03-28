@@ -45,9 +45,8 @@ export const SkillNavbar = ({
           <motion.button
             key={index}
             className={`${
-              isSelected(index)
-                ? "max-md:bg-indigo-200 max-md:dark:bg-indigo-700"
-                : ""
+              isSelected(index) &&
+              "max-md:bg-indigo-200 max-md:dark:bg-indigo-700"
             } mb-8 flex h-12 cursor-pointer items-center rounded-lg bg-indigo-50 p-4 text-sm font-medium dark:bg-indigo-900  md:mb-0 md:h-24 md:rounded-none md:border-b-2 md:bg-transparent md:text-xl`}
             onClick={() => setSelectedSection(index)}
             variants={buttonMotion}
