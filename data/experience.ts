@@ -48,8 +48,8 @@ export const experience: {
       organisationLink: "https://shopee.sg/",
       description: "Largest e-commerce platform in Southeast Asia",
       points: [
-        "Frontend Engineer in the Orders Team",
-        "Build features for the Product Detail Page in React, Redux, Sass and Typescript",
+        "Frontend Engineer in the Orders Team building features for the Product Detail Page in the core Shopee web app",
+        "Migrated monolithic repository to micro frontend architecture",
       ],
       stacks: [
         {
