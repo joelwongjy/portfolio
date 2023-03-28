@@ -11,7 +11,10 @@ export const AboutMe = (): ReactElement<"div"> => {
       <SectionHeading title={title} />
       {body.map((item, index) => {
         return (
-          <p key={index} className="mb-4 md:text-2xl md:leading-relaxed">
+          <p
+            key={index}
+            className="mb-4 md:w-2/3 md:text-2xl md:leading-relaxed"
+          >
             {item}
           </p>
         );

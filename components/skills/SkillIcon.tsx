@@ -15,7 +15,7 @@ export const SkillIcon = ({
 
   return (
     <div className="group mx-2 flex h-10 w-10 justify-center">
-      <div className="h-8 w-8 transition-all ease-in-out group-hover:h-10 group-hover:w-10">
+      <div className="flex h-8 w-8 justify-center transition-all ease-in-out group-hover:h-10 group-hover:w-10">
         <Svgr />
       </div>
       {showLabel && (
