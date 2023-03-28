@@ -29,8 +29,9 @@ export const experience: {
       organisationLink: "https://www.propelsoftware.com/",
       description: "Product Lifecycle Management (PLM) Software",
       points: [
-        "Build first iteration of the new Product Information Management platform in Salesforce Lightning Web Components (LWC) and Apex",
-        "Migration of features from React and Redux to LWC in core Product Lifecycle Management app",
+        "Built first iteration of the new Product Information Management platform in Salesforce Lightning Web Components (LWC) and Apex",
+        "Built custom lazy-rendering components to allow 80% faster page load speeds in core Product Lifecycle Management app",
+        "Migrated features from React and Redux to LWC",
       ],
       stacks: [
         {

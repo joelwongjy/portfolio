@@ -4,7 +4,7 @@ export const aboutMe: {
 } = {
   title: "about me",
   body: [
-    "Year 3 Computer Science student at the National University of Singapore.",
-    "I have designed and built Web and iOS applications, with a knack for aesthetically-pleasing and user-friendly design. In my free time, I also enjoy making YouTube videos.",
+    "My first experience coding was a free iOS app that received over 10,000 downloads. It inspired me to continue building impactful applications for the community with user-friendly and aesthetically-pleasing designs.",
+    "I also love delving into frontend frameworks and their optimizations, learning to push the boundaries of web development.",
   ],
 };

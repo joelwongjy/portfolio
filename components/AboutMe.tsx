@@ -4,10 +4,18 @@ import { SectionHeading } from "./section/SectionHeading";
 import { aboutMe } from "@/data/aboutMe";
 
 export const AboutMe = (): ReactElement<"div"> => {
+  const { title, body } = aboutMe;
+
   return (
     <SectionWrapper>
-      <SectionHeading title={aboutMe.title} />
-      <span className="md:text-xl">{aboutMe.body[1]}</span>
+      <SectionHeading title={title} />
+      {body.map((item, index) => {
+        return (
+          <p key={index} className="mb-4 md:text-2xl md:leading-relaxed">
+            {item}
+          </p>
+        );
+      })}
     </SectionWrapper>
   );
 };

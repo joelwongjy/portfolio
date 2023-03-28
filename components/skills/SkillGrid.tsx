@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
+import { motion } from "framer-motion";
 import { Skills } from "@/constants/technologies";
-import { getSvgrFromSkill } from "@/utils/skillUtils";
 import { SkillCard } from "./SkillCard";
 
 interface SkillGridProps {
@@ -16,15 +16,13 @@ export const SkillGrid = ({
   const { title, skills } = section;
 
   return (
-    <div>
-      <h2 className="mb-6 hidden text-2xl font-bold md:block">
-        {section.title}
-      </h2>
+    <motion.div>
+      <h2 className="mb-6 hidden text-2xl font-bold md:block">{title}</h2>
       <div className="grid grid-cols-2 gap-4">
-        {section.skills.map((skill) => {
+        {skills.map((skill) => {
           return <SkillCard key={skill} skill={skill} />;
         })}
       </div>
-    </div>
+    </motion.div>
   );
 };

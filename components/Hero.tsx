@@ -6,6 +6,7 @@ import profilePic from "../public/hero.jpg";
 import { Button } from "./buttons/Button";
 
 export const Hero = (): ReactElement<"div"> => {
+  const { firstName, lastName, title, body, resumeLink } = hero;
   const itemUp: Variants = {
     hidden: { opacity: 0, y: 300 },
     show: {
@@ -57,18 +58,18 @@ export const Hero = (): ReactElement<"div"> => {
       <div className="flex flex-col md:flex-row md:items-end md:justify-between">
         <motion.div variants={itemUp} className="flex flex-col ">
           <h1 className="flex flex-col text-6xl font-extrabold md:text-7xl">
-            <span>Joel</span>
-            <span>Wong</span>
+            <span>{firstName}</span>
+            <span>{lastName}</span>
           </h1>
           <h2 className="pt-4 text-3xl font-extralight tracking-wide md:text-5xl">
-            Frontend Developer
+            {title}
           </h2>
         </motion.div>
         <motion.div variants={itemLeft} className="mt-10 w-80 md:mt-0">
           <p className="text-small mb-4 font-light leading-7 md:text-left md:text-lg">
-            {hero.body}
+            {body}
           </p>
-          <Button label="Download Resume" />
+          <Button href={resumeLink} label="Download Resume" />
         </motion.div>
       </div>
       <motion.div variants={itemHalfUp}>
