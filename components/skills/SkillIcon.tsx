@@ -23,7 +23,7 @@ export const SkillIcon = ({
         <Svgr />
       </div>
       {showLabel && (
-        <div className="absolute mt-16 hidden text-sm font-medium text-gray-500 transition-opacity duration-150 group-hover:block dark:text-gray-200">
+        <div className="absolute mt-[72px] hidden text-sm font-medium text-gray-500 transition-opacity duration-150 group-hover:block dark:text-gray-200">
           {skill as string}
         </div>
       )}
