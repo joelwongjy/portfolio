@@ -13,7 +13,7 @@ export const AboutMe = (): ReactElement<"div"> => {
         return (
           <p
             key={index}
-            className="mb-4 md:text-2xl md:leading-relaxed lg:w-2/3"
+            className="mb-4 md:text-xl md:leading-relaxed lg:w-2/3"
           >
             {item}
           </p>

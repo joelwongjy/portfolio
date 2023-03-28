@@ -17,7 +17,7 @@ export const SkillGrid = ({
 
   return (
     <motion.div>
-      <h2 className="mb-6 hidden text-2xl font-bold md:block">{title}</h2>
+      <h2 className="mb-6 hidden text-2xl font-bold lg:block">{title}</h2>
       <div className="grid grid-cols-2 gap-4">
         {skills.map((skill) => {
           return <SkillCard key={skill} skill={skill} />;

@@ -10,9 +10,9 @@ export const Skills = (): ReactElement<typeof SectionWrapper> => {
   const [selectedSection, setSelectedSection] = useState(0);
 
   return (
-    <SectionWrapper className="h-128 md:h-full">
+    <SectionWrapper className="h-128 lg:h-full">
       <SectionHeading title={title} />
-      <div className="gap-12 md:grid md:grid-cols-2">
+      <div className="gap-12 lg:grid lg:grid-cols-2">
         <SkillNavbar
           sections={sections}
           selectedSection={selectedSection}
