@@ -5,12 +5,18 @@ import {
   ComputerDesktopIcon,
   PaintBrushIcon,
 } from "@heroicons/react/24/solid";
+import { RefAttributes } from "react";
 
 export const skills: {
   title: string;
   sections: {
     title: string;
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    icon: React.ForwardRefExoticComponent<
+      Omit<React.SVGProps<SVGSVGElement>, "ref"> & {
+        title?: string | undefined;
+        titleId?: string | undefined;
+      } & React.RefAttributes<SVGSVGElement>
+    >;
     skills: Skills[];
   }[];
 } = {

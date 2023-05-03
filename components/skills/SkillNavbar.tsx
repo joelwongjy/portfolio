@@ -5,7 +5,12 @@ import { Skills } from "@/constants/technologies";
 interface SkillNavbarProps {
   sections: {
     title: string;
-    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+    icon: React.ForwardRefExoticComponent<
+      Omit<React.SVGProps<SVGSVGElement>, "ref"> & {
+        title?: string | undefined;
+        titleId?: string | undefined;
+      } & React.RefAttributes<SVGSVGElement>
+    >;
     skills: Skills[];
   }[];
   selectedSection: number;
@@ -35,7 +40,6 @@ export const SkillNavbar = ({
     return selectedSection === index;
   };
 
-  console.log(selectedSection);
   return (
     <div
       className={`flex gap-4 overflow-scroll lg:grid lg:grid-cols-${sections.length}`}
@@ -55,7 +59,7 @@ export const SkillNavbar = ({
             <motion.div
               variants={textMotion}
               transition={{ duration: 0.25, type: "tween" }}
-              className="flex items-center max-lg:!transform-none"
+              className="max-lg:!transform-none flex items-center"
             >
               <section.icon className="mr-2 h-6 text-indigo-500 dark:text-indigo-300 lg:h-8" />
               {section.title}
