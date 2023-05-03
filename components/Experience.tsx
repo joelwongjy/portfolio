@@ -4,6 +4,7 @@ import { SectionHeading } from "./section/SectionHeading";
 import { experience } from "@/data/experience";
 import { teachingExperience } from "@/data/teachingExperience";
 import ExperienceItem from "./experience/ExperienceItem";
+import TeachingExperienceItem from "./teachingExperience/TeachingExperienceItem";
 
 export const Experience = (): ReactElement<"div"> => {
   const { title, experiences } = experience;
@@ -16,7 +17,7 @@ export const Experience = (): ReactElement<"div"> => {
         .map((exp, index) => (
           <ExperienceItem experience={exp} key={index} />
         ))}
-      {/* <TeachingExperienceItem teachingExperience={teachingExperience} /> */}
+      <TeachingExperienceItem teachingExperience={teachingExperience} />
     </SectionWrapper>
   );
 };

@@ -15,7 +15,13 @@ module.exports = {
       height: {
         128: "32rem",
       },
+      boxShadow: {
+        'card': '0 4px 40px -8px rgba(20, 20, 20, 0.12)',
+      }
     },
   },
-  plugins: [require("prettier-plugin-tailwindcss")],
+  plugins: [
+    require("prettier-plugin-tailwindcss"),
+    require("@tailwindcss/line-clamp"),
+  ],
 };
