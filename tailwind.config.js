@@ -10,6 +10,7 @@ module.exports = {
   theme: {
     fontFamily: {
       sans: ['"Plus Jakarta Sans"', ...defaultTheme.fontFamily.sans],
+      mono: [...defaultTheme.fontFamily.mono],
     },
     extend: {
       height: {
@@ -17,6 +18,7 @@ module.exports = {
       },
       boxShadow: {
         card: "0 4px 40px -8px rgba(20, 20, 20, 0.12)",
+        description: "0 10px 30px -15px rgba(20, 20, 20, 0.2)",
       },
     },
   },

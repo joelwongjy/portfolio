@@ -20,7 +20,7 @@ export const skills: {
     skills: Skills[];
   }[];
 } = {
-  title: "skills",
+  title: "Skills",
   sections: [
     {
       title: "Frontend",

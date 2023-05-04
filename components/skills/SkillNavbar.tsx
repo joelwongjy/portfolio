@@ -61,7 +61,7 @@ export const SkillNavbar = ({
               transition={{ duration: 0.25, type: "tween" }}
               className="max-lg:!transform-none flex items-center"
             >
-              <section.icon className="mr-2 h-6 text-indigo-500 dark:text-indigo-300 lg:h-8" />
+              <section.icon className="mr-2 h-6 text-indigo-700 dark:text-indigo-300 lg:h-8" />
               {section.title}
             </motion.div>
           </motion.button>

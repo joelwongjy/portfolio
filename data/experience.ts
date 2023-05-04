@@ -19,7 +19,7 @@ export const experience: {
   title: string;
   experiences: Experience[];
 } = {
-  title: "experience",
+  title: "Experience",
   experiences: [
     {
       start: "Aug 2022",

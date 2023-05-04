@@ -55,7 +55,7 @@ const TeachingExperienceItem = (
 
             return (
               <div className="flex items-center gap-2 my-5" key={index}>
-                <h2 className="font-bold">&gt;</h2>
+                <h2 className="">&gt;</h2>
                 <div className="flex items-center">
                   <p className="font-medium mr-3">{year}:</p>
                   {module[year]?.map((m, index) => (
