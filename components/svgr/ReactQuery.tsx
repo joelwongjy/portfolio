@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const ReactQuery = (): ReactElement<void, "svg"> => {
+export const ReactQuery = (): ReactElement<void, "svg"> => {
   return (
     <svg viewBox="0 0 256 230" version="1.1" preserveAspectRatio="xMidYMid">
       <title>React Query</title>
@@ -24,5 +24,3 @@ const ReactQuery = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default ReactQuery;
