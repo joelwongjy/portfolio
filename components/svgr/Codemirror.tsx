@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-export const Codemirror = (): ReactElement<void, "svg"> => (
+export const CodeMirror = (): ReactElement<void, "svg"> => (
   <svg
     className="svgr"
     viewBox="0 0 640 640"
