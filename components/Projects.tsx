@@ -12,7 +12,7 @@ export const Projects = (): ReactElement<"div"> => {
     <div>
       <SectionWrapper>
         <SectionHeading title={favoriteProjects.title} />
-        <div className="mx-auto my-8 mb-20 grid max-w-2xl grid-cols-1 gap-x-6 gap-y-10 lg:mx-0 lg:max-w-none">
+        <div className="mx-auto my-8 mb-20 grid max-w-2xl grid-cols-1 gap-x-6 gap-y-10 lg:mx-0 lg:max-w-none lg:gap-y-24">
           {favoriteProjects.projects.map((project, index) => (
             <FavouriteProjectItem
               project={project}

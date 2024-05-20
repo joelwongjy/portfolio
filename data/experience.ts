@@ -22,8 +22,41 @@ export const experience: {
   title: "Experience",
   experiences: [
     {
-      start: "Aug 2022",
+      start: "Jul 2024",
       end: "Present",
+      title: "Frontend Engineer",
+      organisation: "tiktok",
+      organisationLink: "https://www.tiktok.com/about?lang=en",
+      description: "Social media platform for sharing short-form videos",
+      points: ["Global E-commerce - Customer Business Team"],
+      stacks: [
+        {
+          title: "Tech Stack",
+          skills: [Skills.REACT],
+        },
+      ],
+      isShown: false,
+    },
+    {
+      start: "Dec 2023",
+      end: "Mar 2024",
+      title: "Full Stack Developer",
+      organisation: "kisi",
+      organisationLink: "https://www.getkisi.com/",
+      description: "Cloud-based door-access software",
+      points: [
+        "Built new integrations with third-party APIs for the Marketplace Team",
+      ],
+      stacks: [
+        {
+          title: "Tech Stack",
+          skills: [Skills.REACT, Skills.REACT_QUERY, Skills.FIREBASE],
+        },
+      ],
+    },
+    {
+      start: "Aug 2022",
+      end: "Dec 2023",
       title: "Software Engineer Intern",
       organisation: "propel",
       organisationLink: "https://www.propelsoftware.com/",
@@ -61,7 +94,7 @@ export const experience: {
     {
       start: "May 2021",
       end: "Sep 2021",
-      title: "Software Engineer Intern",
+      title: "Frontend Engineer Intern",
       organisation: "bantu",
       organisationLink: "https://bantu.life/",
       description: "Volunteer Management System for Social Enterprises",
@@ -112,7 +145,6 @@ export const experience: {
             Skills.NODE_JS,
             Skills.POSTGRES,
             Skills.EXPRESS,
-            Skills.TYPESCRIPT,
             Skills.MATERIAL_UI,
           ],
         },

@@ -1,17 +1,19 @@
 import { ReactElement } from "react";
+import { Link } from "react-scroll";
 
 interface Props {
   label: string;
-  href: string;
+  to: string;
 }
 
-export const NavbarItem = ({ label, href }: Props): ReactElement<Props> => {
+export const NavbarItem = ({ label, to }: Props): ReactElement<Props> => {
   return (
-    <a
-      href={href}
-      className="cursor-pointer rounded-lg px-8 py-4 hover:bg-gray-100 dark:hover:bg-gray-700 font-semibold"
+    <Link
+      to={to}
+      smooth
+      className="cursor-pointer rounded-lg px-8 py-4 font-semibold hover:bg-gray-100 dark:hover:bg-gray-700"
     >
       {label}
-    </a>
+    </Link>
   );
 };

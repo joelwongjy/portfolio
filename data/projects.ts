@@ -3,8 +3,8 @@ import { Skills } from "@/constants/technologies";
 export interface Project {
   title: string;
   description: string;
-  primaryMessage: string;
-  primaryLink: string;
+  primaryMessage?: string;
+  primaryLink?: string;
   secondaryMessage?: string;
   secondaryLink?: string;
   skills: Skills[];
@@ -23,6 +23,29 @@ export const project: {
   favoriteProjects: {
     title: "Favourite Projects",
     projects: [
+      {
+        title: "PeerPrep",
+        description:
+          "Mock-coding interview platform that scrapes questions from Leetcode to start collaborative coding sessions. Built for CS3219 Software Engineering Principles and Patterns.",
+        skills: [
+          Skills.REACT,
+          Skills.REACT_QUERY,
+          Skills.CHAKRA_UI,
+          Skills.CODEMIRROR,
+          Skills.NODE_JS,
+          Skills.EXPRESS,
+          Skills.MONGODB,
+          Skills.SOCKET_IO,
+          Skills.PRISMA,
+          Skills.DOCKER,
+          Skills.AWS,
+        ],
+        secondaryMessage: "View Source Code",
+        secondaryLink:
+          "https://github.com/CS3219-AY2324S1/ay2324s1-course-assessment-g03",
+        image:
+          "https://res.cloudinary.com/dsk6p2wwo/image/upload/v1716202829/Screenshot_2024-05-20_at_6.59.13_PM_whosp1.png",
+      },
       {
         title: "Wadio",
         description:
@@ -63,7 +86,7 @@ export const project: {
       {
         title: "YouTube Channel",
         description:
-          "I make vlogs about my life in NUS and beyond to document my life and memories. Over 4700 subscribers.",
+          "I make vlogs about my life in NUS and beyond to document my life and memories. Over 5100 subscribers.",
         skills: [Skills.FINALCUTPRO],
         primaryMessage: "Subscribe to my channel",
         primaryLink: "https://youtube.com/joelwongjy",

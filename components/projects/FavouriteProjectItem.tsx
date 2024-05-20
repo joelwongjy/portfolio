@@ -2,6 +2,7 @@ import { ReactElement } from "react";
 import { Project } from "@/data/projects";
 import Image from "next/image";
 import ProjectLinks from "./ProjectLinks";
+import { SkillIcon } from "../skills/SkillIcon";
 
 interface FavouriteProjectProps {
   project: Project;
@@ -35,21 +36,19 @@ const FavouriteProjectItem = (
             alt=""
             width="2260"
             height="1264"
-            className="rounded-xl object-cover transition-all duration-300 sm:aspect-[2/1] lg:aspect-[3/2]"
+            className="aspect-[16/9] rounded-xl object-cover transition-all duration-300"
           />
         </a>
 
         <div className="z-10 col-span-6 col-end-13 row-span-full flex flex-col self-center max-lg:mt-8 lg:items-end">
-          <h2 className="mb-4 text-2xl font-bold leading-6">{title}</h2>
-          <p className="mt-3 rounded-xl text-[16px] text-sm leading-6 lg:bg-gray-50 lg:p-6 lg:text-right lg:shadow-description lg:dark:bg-gray-900">
+          <h2 className="mb-4 mr-8 text-2xl font-bold leading-6">{title}</h2>
+          <p className="mt-3 rounded-xl text-[16px] leading-7 lg:bg-gray-50 lg:p-6 lg:shadow-description lg:dark:bg-zinc-900">
             {description}
           </p>
 
-          <div className="mb-4 mt-6 flex flex-wrap gap-x-3 gap-y-1">
+          <div className="mb-12 mt-6 flex flex-wrap gap-x-3 gap-y-4 md:mb-8 md:ml-32">
             {skills.map((skill, index) => (
-              <span key={index} className="font-mono text-sm">
-                {skill}
-              </span>
+              <SkillIcon key={index} skill={skill} showLabel />
             ))}
           </div>
 

@@ -15,6 +15,7 @@ module.exports = {
     extend: {
       height: {
         128: "32rem",
+        144: "36rem",
       },
       boxShadow: {
         card: "0 4px 40px -8px rgba(20, 20, 20, 0.12)",

@@ -5,10 +5,16 @@ export const getSvgrFromSkill = (
   skill: Skills
 ): (() => React.ReactElement<void, "svg">) => {
   switch (skill) {
+    case Skills.AWS:
+      return skills.AWS;
     case Skills.BULMA:
       return skills.Bulma;
     case Skills.C:
       return skills.C;
+    case Skills.CHAKRA_UI:
+      return skills.ChakraUI;
+    case Skills.CODEMIRROR:
+      return skills.CodeMirror;
     case Skills.DOCKER:
       return skills.Docker;
     case Skills.EXPRESS:
@@ -35,6 +41,8 @@ export const getSvgrFromSkill = (
       return skills.Laravel;
     case Skills.MATERIAL_UI:
       return skills.MaterialUI;
+    case Skills.MONGODB:
+      return skills.MongoDB;
     case Skills.MYSQL:
       return skills.MySQL;
     case Skills.NEXT_JS:
@@ -43,16 +51,22 @@ export const getSvgrFromSkill = (
       return skills.Node;
     case Skills.POSTGRES:
       return skills.Postgres;
+    case Skills.PRISMA:
+      return skills.Prisma;
     case Skills.PYTHON:
       return skills.Python;
     case Skills.REACT:
       return skills.ReactIcon;
+    case Skills.REACT_QUERY:
+      return skills.ReactQuery;
     case Skills.REDUX:
       return skills.Redux;
     case Skills.SALESFORCE:
       return skills.Salesforce;
     case Skills.SASS:
       return skills.Sass;
+    case Skills.SOCKET_IO:
+      return skills.SocketIO;
     case Skills.SWIFT:
       return skills.Swift;
     case Skills.TAILWIND:

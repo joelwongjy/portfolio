@@ -8,7 +8,7 @@ export const hero: {
   firstName: "Joel",
   lastName: "Wong",
   title: "Frontend Developer",
-  body: "Year 3 Computer Science student at National University of Singapore",
+  body: "Computer Science Graduate from National University of Singapore",
   resumeLink:
     "https://drive.google.com/file/d/1Br9VwspQIDhsu8iRKalhVOo68yk4uuEn/view?usp=share_link",
 };
