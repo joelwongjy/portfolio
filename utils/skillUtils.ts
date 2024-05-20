@@ -14,7 +14,7 @@ export const getSvgrFromSkill = (
     case Skills.CHAKRA_UI:
       return skills.ChakraUI;
     case Skills.CODEMIRROR:
-      return skills.CodeMirror;
+      return skills.Codemirror;
     case Skills.DOCKER:
       return skills.Docker;
     case Skills.EXPRESS:

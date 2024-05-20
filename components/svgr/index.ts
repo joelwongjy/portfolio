@@ -3,7 +3,7 @@ export { Bulma } from "./Bulma";
 export { C } from "./C";
 export { ChakraUI } from "./ChakraUI";
 export { Chevron } from "./Chevron";
-export { CodeMirror } from "./CodeMirror";
+export { Codemirror } from "./Codemirror";
 export { Docker } from "./Docker";
 export { Express } from "./Express";
 export { Figma } from "./Figma";
