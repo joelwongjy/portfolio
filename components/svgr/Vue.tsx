@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Vue = (): ReactElement<void, "svg"> => {
+export const Vue = (): ReactElement<void, "svg"> => {
   return (
     <svg
       viewBox="0 -17.5 256 256"
@@ -22,5 +22,3 @@ const Vue = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Vue;

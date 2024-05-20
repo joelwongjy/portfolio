@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const MaterialUI = (): ReactElement<void, "svg"> => {
+export const MaterialUI = (): ReactElement<void, "svg"> => {
   return (
     <svg
       className="svgr"
@@ -20,5 +20,3 @@ const MaterialUI = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default MaterialUI;

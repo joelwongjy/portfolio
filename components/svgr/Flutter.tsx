@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Flutter = (): ReactElement<void, "svg"> => {
+export const Flutter = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" viewBox="0 0 1999 2474.2">
       <path
@@ -17,5 +17,3 @@ const Flutter = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Flutter;

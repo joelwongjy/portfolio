@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Laravel = (): ReactElement<void, "svg"> => {
+export const Laravel = (): ReactElement<void, "svg"> => {
   return (
     <svg
       viewBox="0 -.11376601 49.74245785 51.31690859"
@@ -13,5 +13,3 @@ const Laravel = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Laravel;

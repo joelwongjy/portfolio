@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Postgres = (): ReactElement<void, "svg"> => {
+export const Postgres = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" viewBox="0 0 24 24">
       <path
@@ -10,5 +10,3 @@ const Postgres = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Postgres;

@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Bulma = (): ReactElement<void, "svg"> => {
+export const Bulma = (): ReactElement<void, "svg"> => {
   return (
     <svg
       className="svgr"
@@ -15,5 +15,3 @@ const Bulma = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Bulma;

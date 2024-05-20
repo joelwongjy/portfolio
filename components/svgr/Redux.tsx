@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Redux = (): ReactElement<void, "svg"> => {
+export const Redux = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" preserveAspectRatio="xMidYMid" viewBox="0 0 256 244">
       <path
@@ -10,5 +10,3 @@ const Redux = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Redux;

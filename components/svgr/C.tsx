@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const C = (): ReactElement<void, "svg"> => {
+export const C = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" viewBox="-146 226 50 50">
       <path
@@ -10,5 +10,3 @@ const C = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default C;

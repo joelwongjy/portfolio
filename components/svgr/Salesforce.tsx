@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Salesforce = (): ReactElement<void, "svg"> => {
+export const Salesforce = (): ReactElement<void, "svg"> => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="salesforce">
       <path
@@ -10,5 +10,3 @@ const Salesforce = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Salesforce;

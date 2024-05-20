@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Swift = (): ReactElement<void, "svg"> => {
+export const Swift = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" viewBox="0 0 16 16">
       <path
@@ -10,5 +10,3 @@ const Swift = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Swift;

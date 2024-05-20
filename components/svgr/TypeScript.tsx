@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const TypeScript = (): ReactElement<void, "svg"> => {
+export const TypeScript = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" preserveAspectRatio="xMidYMid" viewBox="0 0 256 256">
       <path d="M0 128v128h256V0H0z" fill="#007acc" />
@@ -12,5 +12,3 @@ const TypeScript = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default TypeScript;

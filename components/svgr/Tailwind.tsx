@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Tailwind = (): ReactElement<void, "svg"> => {
+export const Tailwind = (): ReactElement<void, "svg"> => {
   return (
     <svg
       className="svgr"
@@ -15,5 +15,3 @@ const Tailwind = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Tailwind;

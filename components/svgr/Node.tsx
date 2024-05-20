@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Node = (): ReactElement<void, "svg"> => {
+export const Node = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" preserveAspectRatio="xMidYMid" viewBox="0 0 256 289">
       <path
@@ -10,5 +10,3 @@ const Node = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Node;

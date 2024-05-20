@@ -42,7 +42,7 @@ export const SkillNavbar = ({
 
   return (
     <div
-      className={`flex gap-4 overflow-scroll lg:grid lg:grid-cols-${sections.length}`}
+      className={`flex gap-2 overflow-auto lg:grid lg:grid-cols-${sections.length}`}
     >
       {sections.map((section, index) => {
         return (
@@ -51,7 +51,7 @@ export const SkillNavbar = ({
             className={`${
               isSelected(index) &&
               "max-lg:bg-indigo-200 max-lg:dark:bg-indigo-700"
-            } mb-8 flex h-12 cursor-pointer items-center rounded-lg bg-indigo-50 p-4 text-sm font-medium dark:bg-indigo-900 lg:mb-0 lg:h-24 lg:rounded-none lg:border-b-2 lg:bg-transparent lg:text-xl`}
+            } mb-8 flex h-12 cursor-pointer items-center rounded-lg bg-indigo-50 p-4 text-sm font-medium dark:bg-indigo-900 lg:mb-0 lg:h-20 lg:rounded-none lg:border-b-2 lg:bg-transparent lg:text-xl`}
             onClick={() => setSelectedSection(index)}
             variants={buttonMotion}
             whileHover="hover"
@@ -59,7 +59,7 @@ export const SkillNavbar = ({
             <motion.div
               variants={textMotion}
               transition={{ duration: 0.25, type: "tween" }}
-              className="max-lg:!transform-none flex items-center"
+              className="flex items-center max-lg:!transform-none"
             >
               <section.icon className="mr-2 h-6 text-indigo-700 dark:text-indigo-300 lg:h-8" />
               {section.title}

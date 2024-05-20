@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Sass = (): ReactElement<void, "svg"> => {
+export const Sass = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" viewBox="0 0 547.8 410.6">
       <path
@@ -10,5 +10,3 @@ const Sass = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Sass;

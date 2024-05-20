@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Docker = (): ReactElement<void, "svg"> => {
+export const Docker = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" viewBox="0 0 1236.85 906.5">
       <path
@@ -14,5 +14,3 @@ const Docker = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Docker;

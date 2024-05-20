@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const NextJS = (): ReactElement<void, "svg"> => {
+export const NextJS = (): ReactElement<void, "svg"> => {
   return (
     <svg
       className="svgr"
@@ -16,5 +16,3 @@ const NextJS = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default NextJS;

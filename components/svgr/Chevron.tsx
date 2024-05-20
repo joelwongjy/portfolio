@@ -5,7 +5,7 @@ interface ChevronProps {
   width: number;
 }
 
-const Chevron = ({
+export const Chevron = ({
   height,
   width,
 }: ChevronProps): ReactElement<ChevronProps, "svg"> => {
@@ -19,5 +19,3 @@ const Chevron = ({
     </svg>
   );
 };
-
-export default Chevron;

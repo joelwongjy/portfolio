@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const JavaScript = (): ReactElement<void, "svg"> => {
+export const JavaScript = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" viewBox="0 0 630 630">
       <path d="M0 0h630v630H0z" fill="#f7df1e" />
@@ -12,5 +12,3 @@ const JavaScript = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default JavaScript;

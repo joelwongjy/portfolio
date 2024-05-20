@@ -1,5 +1,4 @@
 import { ReactElement } from "react";
-import { motion } from "framer-motion";
 import { Skills } from "@/constants/technologies";
 import { SkillCard } from "./SkillCard";
 
@@ -16,13 +15,13 @@ export const SkillGrid = ({
   const { title, skills } = section;
 
   return (
-    <motion.div>
+    <div>
       <h2 className="mb-6 hidden text-2xl font-bold lg:block">{title}</h2>
       <div className="grid grid-cols-2 gap-4">
         {skills.map((skill) => {
           return <SkillCard key={skill} skill={skill} />;
         })}
       </div>
-    </motion.div>
+    </div>
   );
 };

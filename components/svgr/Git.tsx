@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Git = (): ReactElement<void, "svg"> => {
+export const Git = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" viewBox="0 0 97 97">
       <path
@@ -10,5 +10,3 @@ const Git = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Git;

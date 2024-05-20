@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Firebase = (): ReactElement<void, "svg"> => {
+export const Firebase = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" preserveAspectRatio="xMidYMid" viewBox="0 0 256 351">
       <path
@@ -22,5 +22,3 @@ const Firebase = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Firebase;

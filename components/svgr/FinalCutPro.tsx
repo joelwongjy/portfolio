@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const FinalCutPro = (): ReactElement<void, "svg"> => {
+export const FinalCutPro = (): ReactElement<void, "svg"> => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
       <path
@@ -228,5 +228,3 @@ const FinalCutPro = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default FinalCutPro;

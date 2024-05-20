@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Express = (): ReactElement<void, "svg"> => {
+export const Express = (): ReactElement<void, "svg"> => {
   return (
     <svg
       className="svgr"
@@ -19,5 +19,3 @@ const Express = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Express;

@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const GitLab = (): ReactElement<void, "svg"> => {
+export const GitLab = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" viewBox="0 0 210 194">
       <g fill="none" fillRule="evenodd">
@@ -36,5 +36,3 @@ const GitLab = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default GitLab;

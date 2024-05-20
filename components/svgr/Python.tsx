@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Python = (): ReactElement<void, "svg"> => {
+export const Python = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" preserveAspectRatio="xMidYMid" viewBox="0 0 256 255">
       <path
@@ -14,5 +14,3 @@ const Python = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Python;

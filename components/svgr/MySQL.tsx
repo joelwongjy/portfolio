@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const MySQL = (): ReactElement<void, "svg"> => {
+export const MySQL = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" preserveAspectRatio="xMidYMid" viewBox="0 0 256 252">
       <path
@@ -14,5 +14,3 @@ const MySQL = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default MySQL;

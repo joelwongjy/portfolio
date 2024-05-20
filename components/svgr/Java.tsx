@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const Java = (): ReactElement<void, "svg"> => {
+export const Java = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" preserveAspectRatio="xMidYMid" viewBox="0 0 256 346">
       <path
@@ -26,5 +26,3 @@ const Java = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default Java;

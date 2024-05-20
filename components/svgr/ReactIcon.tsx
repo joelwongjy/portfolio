@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-const ReactIcon = (): ReactElement<void, "svg"> => {
+export const ReactIcon = (): ReactElement<void, "svg"> => {
   return (
     <svg className="svgr" preserveAspectRatio="xMidYMid" viewBox="0 0 256 230">
       <path
@@ -24,5 +24,3 @@ const ReactIcon = (): ReactElement<void, "svg"> => {
     </svg>
   );
 };
-
-export default ReactIcon;
