@@ -28,7 +28,7 @@ const ExperienceItem = (
 
   const organisationContent = hasLogo ? (
     <Image
-      className="h-12 max-w-sm object-contain object-left md:h-16"
+      className="max-w-96 h-12 object-contain object-left md:h-16"
       alt={organisation}
       src={organisationToLogo[organisation]}
     />
