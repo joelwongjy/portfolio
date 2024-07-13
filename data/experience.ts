@@ -28,7 +28,7 @@ export const experience: {
       organisation: "tiktok",
       organisationLink: "https://www.tiktok.com/about?lang=en",
       description: "Social media platform for sharing short-form videos",
-      points: ["Global E-commerce - Customer Business Team"],
+      points: ["Working on TikTok Shop"],
       stacks: [
         {
           title: "Tech Stack",
