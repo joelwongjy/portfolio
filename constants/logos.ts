@@ -6,6 +6,7 @@ import Propel from "@/public/propel.svg";
 import NUS from "@/public/nus.png";
 import Kisi from "@/public/kisi.svg";
 import TikTok from "@/public/tiktok.svg";
+import TikTokWhite from "@/public/tiktok-white.svg";
 
 export const organisationToLogo: { [key: string]: string | StaticImageData } = {
   bantu: BantuLogo,
@@ -15,4 +16,5 @@ export const organisationToLogo: { [key: string]: string | StaticImageData } = {
   kisi: Kisi,
   nus: NUS,
   tiktok: TikTok,
+  tiktokWhite: TikTokWhite,
 };

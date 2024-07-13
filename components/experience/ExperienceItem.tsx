@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import Image from "next/image";
 
 import { SkillIcon } from "../skills/SkillIcon";
@@ -24,13 +24,38 @@ const ExperienceItem = (
     stacks,
   } = experience;
 
+  const [mode, setMode] = useState("light");
+
   const hasLogo = organisationToLogo[organisation] != null;
+  const hasWhiteLogo = organisationToLogo[`${organisation}White`] != null;
+
+  useEffect(() => {
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", (e) => setMode(e.matches ? "dark" : "light"));
+
+    setMode(
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+    );
+
+    return () => {
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .removeEventListener("change", () => {});
+    };
+  }, []);
 
   const organisationContent = hasLogo ? (
     <Image
       className="max-w-96 h-12 object-contain object-left md:h-16"
       alt={organisation}
-      src={organisationToLogo[organisation]}
+      src={
+        mode === "dark" && hasWhiteLogo
+          ? organisationToLogo[`${organisation}White`]
+          : organisationToLogo[organisation]
+      }
     />
   ) : (
     organisation
