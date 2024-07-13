@@ -7,8 +7,8 @@ export const hero: {
 } = {
   firstName: "Joel",
   lastName: "Wong",
-  title: "Frontend Developer",
-  body: "Computer Science Graduate from National University of Singapore",
+  title: "Not your average CS kid",
+  body: "Frontend Engineer at TikTok",
   resumeLink:
     "https://drive.google.com/file/d/1Br9VwspQIDhsu8iRKalhVOo68yk4uuEn/view?usp=share_link",
 };
