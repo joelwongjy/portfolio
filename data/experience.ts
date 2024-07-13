@@ -28,7 +28,7 @@ export const experience: {
       organisation: "tiktok",
       organisationLink: "https://www.tiktok.com/about?lang=en",
       description: "Social media platform for sharing short-form videos",
-      points: ["Global E-commerce - Customer Business Team"],
+      points: ["Working on TikTok Shop"],
       stacks: [
         {
           title: "Tech Stack",
@@ -45,7 +45,7 @@ export const experience: {
       organisationLink: "https://www.getkisi.com/",
       description: "Cloud-based door-access software",
       points: [
-        "Built new integrations with third-party APIs for the Marketplace Team",
+        "Built new integrations linking third-party APIs to Kisi locks",
       ],
       stacks: [
         {
@@ -62,9 +62,9 @@ export const experience: {
       organisationLink: "https://www.propelsoftware.com/",
       description: "Product Lifecycle Management (PLM) Software",
       points: [
-        "Built first iteration of the new Product Information Management platform in Salesforce Lightning Web Components (LWC) and Apex",
-        "Built custom lazy-rendering components to allow 80% faster page load speeds in core Product Lifecycle Management app",
-        "Migrated features from React and Redux to LWC",
+        "Built the new Product Information Management (PIM) platform in Salesforce Lightning Web Components (LWC) and Apex",
+        "Built lazy-rendering components to allow faster page load speeds in PLM app",
+        "Migrated from React and Redux to LWC",
       ],
       stacks: [
         {
@@ -101,7 +101,6 @@ export const experience: {
       points: [
         "Initiated an overhaul of the Volunteer Management Platform bantu.life",
         "Singlehandedly redesigned user interface and coded new website within one month",
-        "Performed fixes and improvements for the main product, bantu Workspace",
       ],
       stacks: [
         {
@@ -119,9 +118,8 @@ export const experience: {
         "https://gdsc.community.dev/national-university-of-singapore/",
       description: "A #TechForGood club supported by Google Developers",
       points: [
-        "Led a team of 74 members to build tech solutions for the community",
-        "Started 3 new software development projects for Non-Profit Organizations in Singapore",
-        "Spearheaded technology workshops and a Hackathon to build generative skills in tech in students",
+        "Led a team of 74 members to start 3 new software development projects for Non-Profit Organizations in Singapore",
+        "Spearheaded technology workshops and a hackathon to build generative skills in tech in students",
       ],
       stacks: [],
     },
@@ -143,8 +141,9 @@ export const experience: {
           skills: [
             Skills.REACT,
             Skills.NODE_JS,
-            Skills.POSTGRES,
             Skills.EXPRESS,
+            Skills.POSTGRES,
+            Skills.DOCKER,
             Skills.MATERIAL_UI,
           ],
         },
