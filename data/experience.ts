@@ -35,7 +35,6 @@ export const experience: {
           skills: [Skills.REACT],
         },
       ],
-      isShown: false,
     },
     {
       start: "Dec 2023",
@@ -44,9 +43,7 @@ export const experience: {
       organisation: "kisi",
       organisationLink: "https://www.getkisi.com/",
       description: "Cloud-based door-access software",
-      points: [
-        "Built new integrations linking third-party APIs to Kisi locks",
-      ],
+      points: ["Built new integrations linking third-party APIs to Kisi locks"],
       stacks: [
         {
           title: "Tech Stack",
