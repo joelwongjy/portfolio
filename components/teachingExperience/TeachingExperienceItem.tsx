@@ -27,61 +27,57 @@ const TeachingExperienceItem = (
   } = teachingExperience;
 
   return (
-    <div className="grid grid-cols-1 gap-8 rounded-3xl py-10 md:grid-cols-3 md:gap-16">
-      <div className="col-span-1">
-        <a target="_blank" href={organisationLink}>
-          <Image
-            className="h-12 object-contain object-left md:h-16"
-            alt={organisation}
-            src={organisationToLogo[organisation]}
-          />
-        </a>
-        <h2 className="mt-4 font-semibold max-md:text-2xl">{title}</h2>
-        <h3 className="mt-1">{`${start} - ${end}`}</h3>
-      </div>
-      <div className="col-span-2 flex flex-col items-start">
-        <h2 className="mb-6 font-semibold max-md:text-lg">{description}</h2>
-        {points.map((point, index) => (
-          <p className="mb-3" key={index}>
-            {point}
-          </p>
-        ))}
-        <div>
-          {modules.map((module, index) => {
-            const year = Object.keys(module)[0];
-            if (year == null) {
-              return null;
-            }
-
-            return (
-              <div className="flex items-center gap-2 my-5" key={index}>
-                <h2 className="">&gt;</h2>
-                <div className="flex items-center">
-                  <p className="font-medium mr-3">{year}:</p>
-                  {module[year]?.map((m, index) => (
-                    <div key={index} className="flex flex-column">
-                      {index !== 0 && <span className="mx-2">|</span>}
-                      <ModuleCode moduleCode={m} />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+    <div className="flex flex-col items-start">
+      <a target="_blank" href={organisationLink}>
+        <Image
+          className="h-12 object-contain object-left"
+          alt={organisation}
+          src={organisationToLogo[organisation]}
+        />
+      </a>
+      <h2 className="mt-1 text-base font-medium italic text-gray-500 dark:text-gray-300">
+        {description}
+      </h2>
+      <p className="mb-2 mt-6 font-semibold">
+        {title}, {`${start} - ${end}`}
+      </p>
+      {points.map((point, index) => (
+        <div key={index} className="mb-2 flex flex-row">
+          <span className="mx-4">•</span>
+          <span>{point}</span>
         </div>
-        {stacks.map((stack, index) => (
-          <div key={index} className="mt-3 flex flex-col items-start">
-            <div className="mb-4 rounded-full bg-gray-100 px-4 py-2 font-semibold dark:bg-gray-900">
-              {stack.title}
+      ))}
+      <div>
+        {modules.map((module, index) => {
+          const year = Object.keys(module)[0];
+          if (year == null) {
+            return null;
+          }
+          return (
+            <div className="my-2 flex items-center gap-2" key={index}>
+              <p className="">&gt;</p>
+              <div className="flex items-center">
+                <p className="mr-3 font-medium">{year}:</p>
+                {module[year]?.map((m, index) => (
+                  <div key={index} className="flex-column flex">
+                    {index !== 0 && <span className="mx-2">|</span>}
+                    <ModuleCode moduleCode={m} />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex gap-2">
-              {stack.skills.map((skill, index) => (
-                <SkillIcon key={index} skill={skill} showLabel />
-              ))}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+      {stacks.map((stack, index) => (
+        <div key={index} className="mt-4 flex flex-col items-start">
+          <div className="flex gap-2">
+            {stack.skills.map((skill, index) => (
+              <SkillIcon key={index} skill={skill} showLabel />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };

@@ -15,7 +15,10 @@ export const Experience = (): ReactElement<"div"> => {
       {experiences
         .filter((exp) => exp.isShown !== false)
         .map((exp, index) => (
-          <ExperienceItem experience={exp} key={index} />
+          <div key={index}>
+            <ExperienceItem experience={exp} />
+            <hr className="my-8 border-neutral-100 dark:border-neutral-800"></hr>
+          </div>
         ))}
       <TeachingExperienceItem teachingExperience={teachingExperience} />
     </SectionWrapper>

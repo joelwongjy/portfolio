@@ -1,19 +1,34 @@
-import { ReactElement } from "react";
+import { motion, useSpring, VariantLabels, Variants } from "framer-motion";
+import { ReactElement, use, useEffect } from "react";
 
 interface ButtonProps {
   href?: string;
   label: string;
+  onClick?: () => void;
+  className?: string;
+  animate?: VariantLabels;
+  variants?: Variants;
 }
 
 export const Button = ({
   href,
   label,
+  onClick,
+  className,
+  animate,
+  variants,
 }: ButtonProps): ReactElement<ButtonProps, "a"> => {
   return (
-    <a href={href} target="_blank">
-      <button className="w-full rounded-md border-x border-b-4 border-t border-slate-300 bg-black px-4 py-3 text-left font-semibold text-white transition-all duration-200 hover:border-indigo-500 hover:bg-white hover:text-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white">
+    <motion.button
+      className={`${className} cursor-pointer rounded-full bg-gray-200/70 px-6 py-3 text-center font-semibold text-black backdrop-blur-sm transition-colors duration-200 hover:bg-gray-300/70 dark:bg-neutral-700/70 dark:text-white dark:hover:bg-neutral-800/70`}
+      animate={animate}
+      variants={variants}
+      onClick={onClick}
+      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+    >
+      <a href={href} target="_blank">
         {label}
-      </button>
-    </a>
+      </a>
+    </motion.button>
   );
 };

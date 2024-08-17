@@ -14,9 +14,9 @@ export const SkillIcon = ({
   const Svgr = getSvgrFromSkill(skill);
 
   return (
-    <div className="group flex h-10 w-10 items-center justify-center">
+    <div className="group flex h-6 w-8 items-center justify-center">
       <div
-        className={`flex h-8 w-8 justify-center transition-all ease-in-out ${
+        className={`flex h-7 w-7 justify-center transition-all ease-in-out ${
           showLabel && "group-hover:h-10 group-hover:w-10"
         }`}
       >

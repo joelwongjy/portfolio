@@ -10,14 +10,6 @@ export const SectionWrapper = ({
   children,
 }: SectionWrapperProps): ReactElement<SectionWrapperProps, "section"> => {
   return (
-    <section
-      className={
-        className
-          ? `mt-12 md:mt-24 flex flex-col ${className}`
-          : "mt-12 md:mt-24 flex flex-col"
-      }
-    >
-      {children}
-    </section>
+    <section className={`${className} my-12 flex flex-col`}>{children}</section>
   );
 };

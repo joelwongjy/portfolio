@@ -21,7 +21,7 @@ export const project: {
   otherProjects: ProjectSection;
 } = {
   favoriteProjects: {
-    title: "Favourite Projects",
+    title: "Projects",
     projects: [
       {
         title: "PeerPrep",

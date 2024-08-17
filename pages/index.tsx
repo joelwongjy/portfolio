@@ -1,7 +1,6 @@
 import Head from "next/head";
 import { Navbar } from "@/components/navbar/Navbar";
 import { Hero } from "@/components/Hero";
-import { AboutMe } from "@/components/AboutMe";
 import { Skills } from "@/components/Skills";
 import { Experience } from "@/components/Experience";
 import { Projects } from "@/components/Projects";
@@ -33,7 +32,6 @@ export default function Home() {
       <main>
         <Navbar />
         <Hero />
-        <AboutMe />
         <div id="skills">
           <Skills />
         </div>

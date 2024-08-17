@@ -10,15 +10,17 @@ export const Skills = (): ReactElement<typeof SectionWrapper> => {
   const [selectedSection, setSelectedSection] = useState(0);
 
   return (
-    <SectionWrapper className="h-144 lg:h-128">
+    <SectionWrapper className="">
       <SectionHeading title={title} />
-      <div className="gap-12 lg:grid lg:grid-cols-2 lg:items-start">
-        <SkillNavbar
-          sections={sections}
-          selectedSection={selectedSection}
-          setSelectedSection={setSelectedSection}
-        ></SkillNavbar>
+      <div className="relative">
         <SkillGrid section={sections[selectedSection]} />
+        <div className="sticky bottom-8 flex justify-center">
+          <SkillNavbar
+            sections={sections}
+            selectedSection={selectedSection}
+            setSelectedSection={setSelectedSection}
+          ></SkillNavbar>
+        </div>
       </div>
     </SectionWrapper>
   );

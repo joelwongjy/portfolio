@@ -28,12 +28,12 @@ const ProjectItem = (
       target="_blank"
       className="group/project flex cursor-pointer flex-col overflow-hidden rounded-xl border p-4 transition-all hover:shadow-card dark:border-zinc-900 dark:bg-zinc-900 dark:hover:bg-zinc-800"
     >
-      <div className="w-full overflow-hidden rounded-xl">
+      <div className="m-auto overflow-hidden rounded-xl">
         <Image
           src={image}
           alt=""
-          width="1000"
-          height="1000"
+          width="380"
+          height="400"
           className="rounded-xl object-cover transition-all duration-300 group-hover/project:scale-110 sm:aspect-[2/1] lg:aspect-[3/2]"
         />
       </div>
@@ -51,7 +51,7 @@ const ProjectItem = (
             </span>
           ))}
         </div>
-           
+
         <ProjectLinks
           primaryLink={primaryLink}
           primaryMessage={primaryMessage}

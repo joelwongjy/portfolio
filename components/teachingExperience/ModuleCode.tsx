@@ -17,7 +17,7 @@ const ModuleCode = (
   return (
     <div className="group flex flex-row items-center justify-center">
       <p>{moduleCode}</p>
-      <p className="absolute mt-11 opacity-0 text-sm font-medium text-gray-500 transition-opacity duration-150 group-hover:opacity-100 dark:text-gray-200">
+      <p className="font-sm absolute mt-8 text-xs text-gray-500 opacity-0 transition-opacity duration-150 group-hover:opacity-100 dark:text-gray-200">
         {moduleName}
       </p>
     </div>
