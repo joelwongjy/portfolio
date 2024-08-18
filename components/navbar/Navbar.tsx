@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import { Link } from "react-scroll";
 
 interface Props {
@@ -27,6 +27,10 @@ export const Navbar = (): ReactElement<"nav"> => {
   // ];
   const [open, setOpen] = useState(false);
   const [isLargeVariant, setIsLargeVariant] = useState(false);
+
+  useEffect(() => {
+    setIsLargeVariant(window.matchMedia("(min-width: 768px)").matches);
+  }, []);
 
   if (typeof window === "undefined") return <></>;
 
@@ -57,68 +61,80 @@ export const Navbar = (): ReactElement<"nav"> => {
 
   const largerVariants = {
     open: {
-      width: 632,
-      height: 304,
-      borderRadius: 60,
+      width: 612,
+      height: 240,
+      borderRadius: 44,
       boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.2)",
     },
     closed: {
-      width: 200,
+      width: 245,
       height: 56,
-      borderRadius: 60,
+      borderRadius: 44,
       boxShadow: "0 0 0 0 rgba(0, 0, 0, 0)",
     },
   };
 
   const variants = {
     open: {
-      width: 316,
-      height: 152,
-      borderRadius: 60,
+      width: 408,
+      height: 160,
+      borderRadius: 44,
       boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.2)",
     },
     closed: {
-      width: 150,
-      height: 42,
-      borderRadius: 60,
+      width: 163,
+      height: 37,
+      borderRadius: 44,
       boxShadow: "0 0 0 0 rgba(0, 0, 0, 0)",
     },
   };
 
   const spring = {
     type: "spring",
-    stiffness: 200,
-    damping: 20,
+    stiffness: 300,
+    damping: 25,
   };
 
-  const isMedium = window.matchMedia("(min-width: 768px)").matches;
-
   return (
-    <nav className="sticky top-4 z-10 flex h-0 justify-center">
+    <nav className="sticky top-4 z-10 flex h-0 cursor-pointer justify-center">
       <motion.div
         variants={isLargeVariant ? largerVariants : variants}
         animate={open ? "open" : "closed"}
         transition={spring}
         onClick={() => setOpen(!open)}
-        className="relative flex h-12 w-48 items-center justify-center bg-black p-3 backdrop-blur-sm"
+        className="relative flex h-12 w-48 items-center bg-black px-3 backdrop-blur-sm md:px-4"
       >
         {open && (
           <motion.h2
             initial={{
               opacity: 0,
               scale: 0,
-              y: 100,
             }}
             animate={{
               opacity: 1,
               scale: 1,
-              y: 0,
             }}
-            transition={spring}
-            className="text-white"
+            transition={{ ...spring, delay: 0.1 }}
+            className="flex h-full w-full items-center justify-center text-white"
           >
             Dynamic Island under construction 🚧
           </motion.h2>
+        )}
+        {!open && (
+          <motion.p
+            initial={{
+              opacity: 1,
+              scale: 0,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+            }}
+            transition={spring}
+            className="flex justify-start md:text-lg"
+          >
+            🚧
+          </motion.p>
         )}
       </motion.div>
     </nav>
