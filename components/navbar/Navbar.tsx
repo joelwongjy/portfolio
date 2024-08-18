@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import React, { ReactElement } from "react";
+import React, { ReactElement, useState } from "react";
 import { Link } from "react-scroll";
 
 interface Props {
@@ -25,8 +25,37 @@ export const Navbar = (): ReactElement<"nav"> => {
   //   { label: "Experience", to: "experience" },
   //   { label: "Projects", to: "projects" },
   // ];
-  const [open, setOpen] = React.useState(false);
-  const variants = {
+  const [open, setOpen] = useState(false);
+  const [isLargeVariant, setIsLargeVariant] = useState(false);
+
+  if (typeof window === "undefined") return <></>;
+
+  const throttle = (callback: Function, delay: number) => {
+    var wait = false;
+    return function () {
+      if (!wait) {
+        callback();
+        wait = true;
+        setTimeout(function () {
+          wait = false;
+        }, delay);
+      }
+    };
+  };
+
+  window.addEventListener(
+    "resize",
+    throttle(() => {
+      if (window.matchMedia("(min-width: 768px)").matches) {
+        setOpen(false);
+        setIsLargeVariant(true);
+      } else {
+        setIsLargeVariant(false);
+      }
+    }, 200)
+  );
+
+  const largerVariants = {
     open: {
       width: 632,
       height: 304,
@@ -40,16 +69,34 @@ export const Navbar = (): ReactElement<"nav"> => {
       boxShadow: "0 0 0 0 rgba(0, 0, 0, 0)",
     },
   };
+
+  const variants = {
+    open: {
+      width: 316,
+      height: 152,
+      borderRadius: 60,
+      boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.2)",
+    },
+    closed: {
+      width: 150,
+      height: 42,
+      borderRadius: 60,
+      boxShadow: "0 0 0 0 rgba(0, 0, 0, 0)",
+    },
+  };
+
   const spring = {
     type: "spring",
     stiffness: 200,
     damping: 20,
   };
 
+  const isMedium = window.matchMedia("(min-width: 768px)").matches;
+
   return (
     <nav className="sticky top-4 z-10 flex h-0 justify-center">
       <motion.div
-        variants={variants}
+        variants={isLargeVariant ? largerVariants : variants}
         animate={open ? "open" : "closed"}
         transition={spring}
         onClick={() => setOpen(!open)}

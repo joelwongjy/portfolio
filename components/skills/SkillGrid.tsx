@@ -30,7 +30,7 @@ export const SkillGrid = ({
   const { title, skills } = section;
 
   return (
-    <div className="mb-32 h-72 md:h-44">
+    <div className="mb-32 h-96 md:h-44">
       <h2 className="mb-6 block text-xl font-semibold md:hidden">{title}</h2>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         {skills.map((skill) => {

@@ -10,7 +10,7 @@ export const Hero = (): ReactElement<"div"> => {
   const { body: aboutMeBody } = aboutMe;
 
   return (
-    <div className="pt-40">
+    <div className="pt-28 md:pt-40">
       <div className="items-top m-auto mb-8 flex flex-row items-center justify-between">
         <h1>
           {firstName} {lastName}

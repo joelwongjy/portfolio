@@ -10,6 +10,6 @@ export const SectionWrapper = ({
   children,
 }: SectionWrapperProps): ReactElement<SectionWrapperProps, "section"> => {
   return (
-    <section className={`${className} my-12 flex flex-col`}>{children}</section>
+    <section className={`${className} my-20 flex flex-col`}>{children}</section>
   );
 };
