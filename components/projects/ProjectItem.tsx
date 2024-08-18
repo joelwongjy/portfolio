@@ -26,14 +26,14 @@ const ProjectItem = (
     <a
       href={primaryLink}
       target="_blank"
-      className="group/project flex cursor-pointer flex-col overflow-hidden rounded-xl border p-4 transition-all hover:shadow-card dark:border-zinc-900 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+      className="group/project flex cursor-pointer flex-col overflow-hidden rounded-xl border p-4 transition-transform hover:shadow-card dark:border-zinc-900 dark:bg-zinc-900 dark:hover:bg-zinc-800"
     >
       <div className="m-auto overflow-hidden rounded-xl">
         <Image
           src={image}
           alt=""
           width="380"
-          height="400"
+          height="200"
           className="rounded-xl object-cover transition-all duration-300 group-hover/project:scale-110 sm:aspect-[2/1] lg:aspect-[3/2]"
         />
       </div>

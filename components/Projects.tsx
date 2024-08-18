@@ -11,7 +11,7 @@ export const Projects = (): ReactElement<typeof SectionWrapper> => {
   return (
     <SectionWrapper>
       <SectionHeading title={favoriteProjects.title} />
-      <div className="grid grid-cols-1 gap-x-6 gap-y-6 lg:grid-cols-2 ">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {favoriteProjects.projects.map((project, index) => (
           <ProjectItem project={project} key={index}></ProjectItem>
         ))}

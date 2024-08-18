@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply m-auto box-border max-w-2xl border-white px-4 text-gray-900 dark:bg-[#00050f] dark:text-white;
+    @apply m-auto box-border max-w-2xl border-white px-4 text-gray-900 dark:bg-[#111010] dark:text-white;
   }
 
   h2,
