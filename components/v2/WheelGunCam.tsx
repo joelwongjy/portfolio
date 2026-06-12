@@ -53,6 +53,7 @@ const Gun = () => (
 );
 
 interface WheelGunCamProps {
+  box: number;
   compound: Compound;
   active: boolean;
   wingStop?: boolean;
@@ -60,7 +61,12 @@ interface WheelGunCamProps {
 
 // The pit stop from the gunner's crouch: gun in, nut off, worn wheel pulled
 // toward camera, brakes glowing, fresh compound on, gun away, car dropped.
-export const WheelGunCam = ({ compound, active, wingStop }: WheelGunCamProps) => {
+export const WheelGunCam = ({
+  box,
+  compound,
+  active,
+  wingStop,
+}: WheelGunCamProps) => {
   const [play, setPlay] = useState(0);
   const wasActive = useRef(false);
 
@@ -199,7 +205,7 @@ export const WheelGunCam = ({ compound, active, wingStop }: WheelGunCamProps) =>
 
       {/* HUD */}
       <div className="pointer-events-none absolute left-3 top-2.5 font-mono text-[10px] uppercase tracking-widest text-white/50">
-        Wheel gun cam ·{" "}
+        Box P{box} ·{" "}
         <span style={{ color: compound.color }}>{compound.name}</span>
         {wingStop && <span className="text-white/55"> + wing</span>}
       </div>
