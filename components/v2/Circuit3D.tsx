@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { organisationToLogo } from "@/constants/logos";
 import { experience } from "@/data/experience";
 
 import { CORNER_META, OrganisationLogo } from "./Circuit";
@@ -20,7 +21,13 @@ const CircuitScene = dynamic(() => import("./three/CircuitScene"), {
 });
 
 const items = experience.experiences.filter((e) => e.isShown !== false);
-const banners = items.map((i) => i.organisation);
+const banners = items.map((i) => {
+  const logo = organisationToLogo[i.organisation];
+  return {
+    name: i.organisation,
+    logo: typeof logo === "string" ? logo : logo?.src,
+  };
+});
 
 // One lap of Monaco as a scroll-driven flyover. Career entries hang over
 // the track as advertising bridges — tap one (or the pill) for details.

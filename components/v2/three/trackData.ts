@@ -28,39 +28,47 @@ const PLAN: P[] = [
   { x: 64, z: 33, y: 7.6 }, // Mirabeau (right)
   { x: 57, z: 31.5, y: 6.6 },
   { x: 51, z: 29.5, y: 5.8 }, // toward the hairpin
-  { x: 45.5, z: 26, y: 5.4 }, // Fairmont hairpin (tight left)
-  { x: 43.5, z: 22.5, y: 5.2 },
-  { x: 47, z: 20, y: 4.8 },
-  { x: 52, z: 19.5, y: 4.2 }, // out of the hairpin, south of the approach
-  { x: 57, z: 18.5, y: 3.4 },
-  { x: 61, z: 16, y: 2.6 }, // Portier (right-right)
-  { x: 64, z: 14, y: 2.2 },
-  { x: 72, z: 10, y: 1.9 }, // tunnel entry
-  { x: 81, z: 5, y: 1.6 }, // — under the hotel —
-  { x: 87, z: -3, y: 1.2 },
-  { x: 89, z: -12, y: 0.7 }, // tunnel exit
-  { x: 88, z: -20, y: 0.3 },
-  { x: 84.5, z: -26, y: 0 }, // Nouvelle Chicane (left)
-  { x: 80, z: -27.5, y: 0 },
-  { x: 74, z: -30, y: 0 }, // Tabac (left)
-  { x: 68, z: -34, y: 0 },
-  { x: 61, z: -35, y: 0 }, // Piscine: left-right
-  { x: 55, z: -38.5, y: 0 },
-  { x: 49, z: -43, y: 0 }, // right-left out of the pool
-  { x: 43, z: -42, y: 0 },
-  { x: 38, z: -38, y: 0 }, // La Rascasse (tight right)
-  { x: 34, z: -33, y: 0 },
-  { x: 28, z: -30, y: 0.2 }, // Antony Noghès (right)
-  { x: 18, z: -27, y: 0.2 },
-  { x: 8, z: -22, y: 0.1 },
-  { x: 2, z: -16, y: 0 },
+  { x: 46, z: 26.5, y: 5.4 }, // Fairmont hairpin: tight left U
+  { x: 43.2, z: 23.5, y: 5.2 },
+  { x: 44.5, z: 20.8, y: 5 },
+  { x: 48.5, z: 19.8, y: 4.6 },
+  { x: 53, z: 19.2, y: 4.2 }, // down to Portier
+  { x: 58, z: 18, y: 3.2 },
+  { x: 61.5, z: 15.5, y: 2.4 }, // Portier (right-right)
+  { x: 64.5, z: 13, y: 2.1 },
+  { x: 70, z: 10.5, y: 1.9 }, // ——— tunnel entry ———
+  { x: 77, z: 7.5, y: 1.7 },
+  { x: 83, z: 3, y: 1.45 },
+  { x: 87.5, z: -3, y: 1.15 },
+  { x: 89.5, z: -10, y: 0.8 }, // ——— tunnel exit ———
+  { x: 89.5, z: -17, y: 0.4 },
+  { x: 88.5, z: -21, y: 0.2 }, // Nouvelle Chicane: hard left-right
+  { x: 84.5, z: -22.5, y: 0 },
+  { x: 83.5, z: -26.5, y: 0 },
+  { x: 79, z: -29, y: 0 }, // Tabac (left kink)
+  { x: 73, z: -30.5, y: 0 },
+  { x: 67, z: -32, y: 0 }, // Piscine 1: left flick…
+  { x: 63.5, z: -36, y: 0 }, // …right
+  { x: 58, z: -37.5, y: 0 },
+  { x: 52, z: -39, y: 0 }, // Piscine 2: right…
+  { x: 48.5, z: -43.5, y: 0 }, // …left around the pool
+  { x: 43, z: -43, y: 0 },
+  { x: 38.5, z: -39.5, y: 0 }, // La Rascasse (tight right hook)
+  { x: 36, z: -34.5, y: 0 },
+  { x: 30, z: -30.5, y: 0.2 }, // Antony Noghès (right)
+  { x: 20, z: -27.5, y: 0.2 },
+  { x: 9, z: -22.5, y: 0.1 },
+  { x: 2, z: -15, y: 0 },
 ];
 
 // the seven career corners, in lap order
-const ANCHOR_PLAN_IDX = [3, 10, 13, 17, 21, 28, 33];
+const ANCHOR_PLAN_IDX = [3, 10, 13, 17, 22, 31, 38];
 
 // tunnel runs between these plan points
-const TUNNEL_RANGE: [number, number] = [23, 26];
+const TUNNEL_RANGE: [number, number] = [24, 28];
+
+// the Piscine pool sits inside its chicanes
+export const POOL = { x: 55.5, z: -42.5, w: 11, d: 5.5, rot: -0.25 };
 
 export interface TrackData {
   curve: THREE.CatmullRomCurve3;
@@ -70,6 +78,9 @@ export interface TrackData {
   samples: THREE.Vector3[];
   tangents: THREE.Vector3[];
   tunnelFractions: [number, number];
+  raceCurve: THREE.CatmullRomCurve3;
+  raceSamples: THREE.Vector3[];
+  raceTangents: THREE.Vector3[];
 }
 
 const nearestFraction = (samples: THREE.Vector3[], target: THREE.Vector3) => {
@@ -97,6 +108,35 @@ export const buildTrack = (): TrackData => {
     tangents.push(curve.getTangentAt(i / N));
   }
 
+  // The racing line: a heavy box-blur of the centreline naturally clips
+  // apexes and swings wide on entry and exit — out-in-out — then gets
+  // clamped to stay on the road.
+  const up = new THREE.Vector3(0, 1, 0);
+  const side = new THREE.Vector3();
+  const blurW = 55;
+  const racePts: THREE.Vector3[] = [];
+  for (let i = 0; i < N; i += 8) {
+    const acc = new THREE.Vector3();
+    for (let w = -blurW; w <= blurW; w++) {
+      acc.add(samples[(((i + w) % N) + N) % N]);
+    }
+    acc.multiplyScalar(1 / (2 * blurW + 1));
+    side.crossVectors(up, tangents[i]).setY(0).normalize();
+    const lat = THREE.MathUtils.clamp(
+      acc.sub(samples[i]).dot(side),
+      -2.4,
+      2.4
+    );
+    racePts.push(samples[i].clone().addScaledVector(side, lat));
+  }
+  const raceCurve = new THREE.CatmullRomCurve3(racePts, true, "centripetal", 0.5);
+  const raceSamples: THREE.Vector3[] = [];
+  const raceTangents: THREE.Vector3[] = [];
+  for (let i = 0; i <= N; i++) {
+    raceSamples.push(raceCurve.getPointAt(i / N));
+    raceTangents.push(raceCurve.getTangentAt(i / N));
+  }
+
   return {
     curve,
     length: curve.getLength(),
@@ -108,6 +148,9 @@ export const buildTrack = (): TrackData => {
       nearestFraction(samples, v[TUNNEL_RANGE[0]]),
       nearestFraction(samples, v[TUNNEL_RANGE[1]]),
     ],
+    raceCurve,
+    raceSamples,
+    raceTangents,
   };
 };
 
@@ -120,9 +163,11 @@ export const ribbonGeometry = (
   t0 = 0,
   t1 = 1,
   lateral = 0,
-  wallHeight = 0
+  wallHeight = 0,
+  useRaceLine = false
 ): THREE.BufferGeometry => {
-  const { samples, tangents } = track;
+  const samples = useRaceLine ? track.raceSamples : track.samples;
+  const tangents = useRaceLine ? track.raceTangents : track.tangents;
   const n = samples.length;
   const i0 = Math.floor(t0 * (n - 1));
   const i1 = Math.ceil(t1 * (n - 1));

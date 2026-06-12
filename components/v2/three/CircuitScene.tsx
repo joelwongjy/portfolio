@@ -11,22 +11,29 @@ import {
   buildTrack,
   cityBlocks,
   kerbSlabs,
+  POOL,
   ribbonGeometry,
   skirtGeometry,
   TrackData,
   yachts,
 } from "./trackData";
 
+export interface BannerInfo {
+  name: string;
+  logo?: string;
+}
+
 interface SceneProps {
   progressRef: MutableRefObject<number>;
   livery: string;
   glow: string;
-  banners: string[];
+  banners: BannerInfo[];
   onSelect: (i: number) => void;
 }
 
 // Monte Carlo facade palette
-const TONES = ["#E9DFCC", "#DECBAA", "#D9BA97", "#EDE8DC", "#CBAB8E"];
+const TONES = ["#EFE4CE", "#E3CFAB", "#E0BE98", "#F2EDE0", "#D2B091"];
+const CROWD = ["#E8C15A", "#5E9BD8", "#D86A6A", "#7CC487", "#B286D2", "#E89A55"];
 
 // ——— a proper little F1 car ———
 const F1Car = ({ livery }: { livery: string }) => {
@@ -34,12 +41,10 @@ const F1Car = ({ livery }: { livery: string }) => {
   const dark = <meshStandardMaterial color="#17171C" roughness={0.5} />;
   return (
     <group>
-      {/* floor */}
       <mesh position={[0, 0.14, 0.1]}>
         <boxGeometry args={[1.9, 0.08, 4.6]} />
         {dark}
       </mesh>
-      {/* monocoque, tapering to the nose */}
       <mesh position={[0, 0.42, -0.4]}>
         <boxGeometry args={[1.05, 0.5, 2.6]} />
         {body}
@@ -48,12 +53,10 @@ const F1Car = ({ livery }: { livery: string }) => {
         <boxGeometry args={[1, 0.42, 1.8]} />
         {body}
       </mesh>
-      {/* nose cone */}
       <mesh position={[0, 0.34, 2.9]} rotation={[Math.PI / 2, 0, 0]}>
         <coneGeometry args={[0.22, 1.1, 10]} />
         {body}
       </mesh>
-      {/* front wing + endplates */}
       <mesh position={[0, 0.16, 3.05]}>
         <boxGeometry args={[2.6, 0.07, 0.85]} />
         {dark}
@@ -68,19 +71,17 @@ const F1Car = ({ livery }: { livery: string }) => {
           {dark}
         </mesh>
       ))}
-      {/* sidepods */}
       {[-0.78, 0.78].map((x) => (
-        <mesh key={x} position={[x, 0.42, -0.5]} scale={[1, 1, 1]}>
+        <mesh key={x} position={[x, 0.42, -0.5]}>
           <boxGeometry args={[0.55, 0.46, 2]} />
           {body}
         </mesh>
       ))}
-      {/* cockpit + halo */}
       <mesh position={[0, 0.62, 0.55]}>
         <boxGeometry args={[0.66, 0.26, 1]} />
         {dark}
       </mesh>
-      <mesh position={[0, 0.72, 0.55]} rotation={[0, 0, 0]}>
+      <mesh position={[0, 0.72, 0.55]}>
         <torusGeometry args={[0.34, 0.045, 6, 12, Math.PI]} />
         {dark}
       </mesh>
@@ -88,12 +89,10 @@ const F1Car = ({ livery }: { livery: string }) => {
         <cylinderGeometry args={[0.04, 0.04, 0.5, 6]} />
         {dark}
       </mesh>
-      {/* helmet */}
       <mesh position={[0, 0.68, 0.42]}>
         <sphereGeometry args={[0.16, 10, 8]} />
         <meshStandardMaterial color="#F2F2F4" roughness={0.3} />
       </mesh>
-      {/* airbox + engine cover + fin */}
       <mesh position={[0, 0.78, -0.15]}>
         <boxGeometry args={[0.4, 0.34, 0.7]} />
         {body}
@@ -106,7 +105,6 @@ const F1Car = ({ livery }: { livery: string }) => {
         <boxGeometry args={[0.05, 0.34, 1.1]} />
         {body}
       </mesh>
-      {/* rear wing: main, flap, endplates, beam */}
       <mesh position={[0, 0.96, -2.18]}>
         <boxGeometry args={[2.1, 0.06, 0.5]} />
         {dark}
@@ -125,7 +123,6 @@ const F1Car = ({ livery }: { livery: string }) => {
         <boxGeometry args={[1.4, 0.07, 0.2]} />
         {dark}
       </mesh>
-      {/* wheels: tyre + rim face */}
       {[
         { x: -1.18, z: 1.62, r: 0.4 },
         { x: 1.18, z: 1.62, r: 0.4 },
@@ -147,7 +144,49 @@ const F1Car = ({ livery }: { livery: string }) => {
   );
 };
 
-// overhead advertising bridge carrying a career entry
+// banner with the company logo and a tap hint
+const bannerTexture = (info: BannerInfo, livery: string) => {
+  const c = document.createElement("canvas");
+  c.width = 512;
+  c.height = 84;
+  const ctx = c.getContext("2d")!;
+  const tex = new THREE.CanvasTexture(c);
+  tex.anisotropy = 4;
+
+  const chrome = () => {
+    ctx.fillStyle = "#FCFAF4";
+    ctx.fillRect(0, 0, 512, 84);
+    ctx.fillStyle = livery;
+    ctx.fillRect(0, 0, 14, 84);
+    ctx.fillRect(0, 74, 512, 10);
+    // tap hint
+    ctx.fillStyle = "#9A958A";
+    ctx.font = "700 17px system-ui, sans-serif";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "right";
+    ctx.fillText("TAP FOR DETAILS ▸", 496, 40);
+    ctx.textAlign = "left";
+  };
+  chrome();
+  ctx.fillStyle = "#16181E";
+  ctx.font = "800 42px system-ui, sans-serif";
+  ctx.textBaseline = "middle";
+  ctx.fillText(info.name.toUpperCase(), 34, 38);
+
+  if (info.logo) {
+    const img = new Image();
+    img.onload = () => {
+      chrome();
+      const h = 52;
+      const w = (img.width / img.height) * h;
+      ctx.drawImage(img, 34, 16, Math.min(w, 300), h);
+      tex.needsUpdate = true;
+    };
+    img.src = info.logo;
+  }
+  return tex;
+};
+
 const AdBridge = ({
   position,
   rotationY,
@@ -161,13 +200,14 @@ const AdBridge = ({
 }) => (
   <group position={position} rotation={[0, rotationY, 0]}>
     {[-5.6, 5.6].map((x) => (
-      <mesh key={x} position={[x, 2.5, 0]}>
+      <mesh key={x} position={[x, 2.5, 0]} castShadow>
         <boxGeometry args={[0.4, 5, 0.4]} />
         <meshStandardMaterial color="#3A3F4C" roughness={0.6} />
       </mesh>
     ))}
     <mesh
       position={[0, 5.4, 0]}
+      castShadow
       onClick={(e) => {
         e.stopPropagation();
         onClick();
@@ -193,7 +233,7 @@ const Rig = ({
   lineRef: MutableRefObject<THREE.BufferGeometry | null>;
 }) => {
   const { camera } = useThree();
-  const sm = useRef({ t: 0, roll: 0 });
+  const sm = useRef({ t: 0, roll: 0, speed: 0 });
   const look = useRef(new THREE.Vector3());
   const tmp = useMemo(
     () => ({
@@ -206,21 +246,23 @@ const Rig = ({
     []
   );
 
-  useFrame((_, dt) => {
+  useFrame((state, dt) => {
     const target = THREE.MathUtils.clamp(progressRef.current, 0, 1) * 0.985;
     const k = 1 - Math.exp(-5.5 * Math.min(dt, 0.05));
+    const prevT = sm.current.t;
     sm.current.t += (target - sm.current.t) * k;
     const t = THREE.MathUtils.clamp(sm.current.t, 0.0001, 0.9999);
+    const speed = Math.abs(sm.current.t - prevT) / Math.max(dt, 0.001);
+    sm.current.speed += (speed - sm.current.speed) * Math.min(1, dt * 3);
 
-    track.curve.getPointAt(t, tmp.pos);
-    track.curve.getTangentAt(t, tmp.tan);
+    track.raceCurve.getPointAt(t, tmp.pos);
+    track.raceCurve.getTangentAt(t, tmp.tan);
 
     if (carRef.current) {
       carRef.current.position.copy(tmp.pos);
       tmp.target.copy(tmp.pos).add(tmp.tan);
       carRef.current.lookAt(tmp.target);
-      // lean into the corner
-      track.curve.getTangentAt(Math.min(t + 0.004, 1), tmp.tan2);
+      track.raceCurve.getTangentAt(Math.min(t + 0.004, 1), tmp.tan2);
       const steer = Math.atan2(
         tmp.tan.x * tmp.tan2.z - tmp.tan.z * tmp.tan2.x,
         tmp.tan.x * tmp.tan2.x + tmp.tan.z * tmp.tan2.z
@@ -229,12 +271,12 @@ const Rig = ({
       sm.current.roll += (targetRoll - sm.current.roll) * k;
       carRef.current.rotateZ(sm.current.roll);
     }
+
     if (lineRef.current) {
-      const segs = Math.floor(t * (track.samples.length - 2));
+      const segs = Math.floor(t * (track.raceSamples.length - 2));
       lineRef.current.setDrawRange(0, segs * 6);
     }
 
-    // drop low through the tunnel, fly high everywhere else
     const [t0, t1] = track.tunnelFractions;
     const inTunnel = t > t0 - 0.012 && t < t1 + 0.004;
     const back = inTunnel ? -9 : -17;
@@ -245,27 +287,20 @@ const Rig = ({
     tmp.target.copy(tmp.pos).addScaledVector(tmp.tan, 9);
     look.current.lerp(tmp.target, k);
     camera.lookAt(look.current);
+
+    // speed feel: widen the view and tremble slightly at pace
+    const pace = THREE.MathUtils.clamp(sm.current.speed * 22, 0, 1);
+    const cam = camera as THREE.PerspectiveCamera;
+    const fovTarget = 52 + pace * 9;
+    if (Math.abs(cam.fov - fovTarget) > 0.05) {
+      cam.fov += (fovTarget - cam.fov) * Math.min(1, dt * 5);
+      cam.updateProjectionMatrix();
+    }
+    if (pace > 0.15) {
+      camera.position.y += Math.sin(state.clock.elapsedTime * 42) * 0.035 * pace;
+    }
   });
   return null;
-};
-
-const bannerTexture = (text: string, livery: string) => {
-  const c = document.createElement("canvas");
-  c.width = 512;
-  c.height = 84;
-  const ctx = c.getContext("2d")!;
-  ctx.fillStyle = "#FBF8F1";
-  ctx.fillRect(0, 0, 512, 84);
-  ctx.fillStyle = livery;
-  ctx.fillRect(0, 0, 18, 84);
-  ctx.fillRect(0, 70, 512, 14);
-  ctx.fillStyle = "#16181E";
-  ctx.font = "800 44px system-ui, sans-serif";
-  ctx.textBaseline = "middle";
-  ctx.fillText(text.toUpperCase(), 40, 36);
-  const tex = new THREE.CanvasTexture(c);
-  tex.anisotropy = 4;
-  return tex;
 };
 
 const Kerbs = ({ track }: { track: TrackData }) => {
@@ -295,13 +330,13 @@ const Kerbs = ({ track }: { track: TrackData }) => {
 
   return (
     <>
-      <instancedMesh ref={redRef} args={[undefined, undefined, red.length]}>
+      <instancedMesh ref={redRef} args={[undefined, undefined, red.length]} receiveShadow>
         <boxGeometry args={[1.15, 0.08, 1.7]} />
-        <meshStandardMaterial color="#C8322E" roughness={0.7} />
+        <meshStandardMaterial color="#D33A35" roughness={0.7} />
       </instancedMesh>
-      <instancedMesh ref={whiteRef} args={[undefined, undefined, white.length]}>
+      <instancedMesh ref={whiteRef} args={[undefined, undefined, white.length]} receiveShadow>
         <boxGeometry args={[1.15, 0.08, 1.7]} />
-        <meshStandardMaterial color="#EDEDED" roughness={0.7} />
+        <meshStandardMaterial color="#F4F4F2" roughness={0.7} />
       </instancedMesh>
     </>
   );
@@ -327,25 +362,85 @@ const City = ({ track }: { track: TrackData }) => {
     if (m.instanceColor) m.instanceColor.needsUpdate = true;
   }, [blocks]);
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, blocks.length]}>
+    <instancedMesh
+      ref={ref}
+      args={[undefined, undefined, blocks.length]}
+      castShadow
+      receiveShadow
+    >
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial roughness={0.85} />
     </instancedMesh>
   );
 };
 
+// spectators packing the stands
+const Crowd = ({
+  stands,
+}: {
+  stands: { x: number; z: number; len: number; face: number }[];
+}) => {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const seats = useMemo(() => {
+    const out: { x: number; y: number; z: number; tone: number }[] = [];
+    let n = 0;
+    stands.forEach((s) => {
+      for (let row = 0; row < 3; row++) {
+        for (let zz = -s.len / 2 + 1; zz < s.len / 2 - 0.5; zz += 1.15) {
+          n++;
+          const r = Math.sin(n * 12.9898) * 43758.5453;
+          if (r - Math.floor(r) < 0.18) continue;
+          out.push({
+            x: s.x + s.face * (0.9 - row * 0.8),
+            y: 1.3 + row * 0.75,
+            z: s.z + zz,
+            tone: n % CROWD.length,
+          });
+        }
+      }
+    });
+    return out;
+  }, [stands]);
+
+  useLayoutEffect(() => {
+    const m = ref.current;
+    if (!m) return;
+    const o = new THREE.Object3D();
+    const col = new THREE.Color();
+    seats.forEach((s, i) => {
+      o.position.set(s.x, s.y, s.z);
+      o.scale.setScalar(1);
+      o.updateMatrix();
+      m.setMatrixAt(i, o.matrix);
+      m.setColorAt(i, col.set(CROWD[s.tone]));
+    });
+    m.instanceMatrix.needsUpdate = true;
+    if (m.instanceColor) m.instanceColor.needsUpdate = true;
+  }, [seats]);
+
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, seats.length]}>
+      <sphereGeometry args={[0.26, 6, 5]} />
+      <meshStandardMaterial roughness={0.9} />
+    </instancedMesh>
+  );
+};
+
+const STANDS = [
+  { x: -7, z: 0, len: 26, face: 1 },
+  { x: 8, z: -2, len: 18, face: -1 },
+  { x: 60, z: -46.5, len: 20, face: -1 },
+];
+
 const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
   const track = useMemo(buildTrack, []);
   const asphalt = useMemo(() => ribbonGeometry(track, 7.2, 0.02), [track]);
-  const line = useMemo(() => ribbonGeometry(track, 0.7, 0.07), [track]);
-  const armcoL = useMemo(
-    () => ribbonGeometry(track, 0, 0, 0, 1, 4.2, 0.55),
+  const line = useMemo(
+    () => ribbonGeometry(track, 0.7, 0.07, 0, 1, 0, 0, true),
     [track]
   );
-  const armcoR = useMemo(
-    () => ribbonGeometry(track, 0, 0, 0, 1, -4.2, 0.55),
-    [track]
-  );
+  const armcoL = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, 4.2, 0.55), [track]);
+  const armcoR = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, -4.2, 0.55), [track]);
   const skirtL = useMemo(() => skirtGeometry(track, 3.65), [track]);
   const skirtR = useMemo(() => skirtGeometry(track, -3.65), [track]);
   const [tun0, tun1] = track.tunnelFractions;
@@ -371,28 +466,45 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
 
   const tunnelMid = track.curve.getPointAt((tun0 + tun1) / 2);
 
+  useLayoutEffect(() => {
+    carRef.current?.traverse((o) => {
+      o.castShadow = true;
+    });
+  }, []);
+
   return (
     <>
-      <color attach="background" args={["#A8CDE8"]} />
-      <fog attach="fog" args={["#BBD5EA", 120, 320]} />
-      <hemisphereLight args={["#CFE4F7", "#8E8A77", 1.15]} />
-      <directionalLight position={[60, 90, 30]} intensity={2} color="#FFF3DC" />
+      <color attach="background" args={["#9FD0F2"]} />
+      <fog attach="fog" args={["#BCDcf2", 130, 340]} />
+      <hemisphereLight args={["#D8ECFC", "#998F77", 1.0]} />
+      <directionalLight
+        position={[70, 110, 40]}
+        intensity={2.4}
+        color="#FFF6E0"
+        castShadow
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-120}
+        shadow-camera-right={120}
+        shadow-camera-top={120}
+        shadow-camera-bottom={-120}
+        shadow-camera-far={320}
+        shadow-bias={-0.0004}
+      />
 
       {/* the rock and the sea */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[30, -0.1, 10]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[30, -0.1, 10]} receiveShadow>
         <planeGeometry args={[500, 500]} />
-        <meshStandardMaterial color="#C9C2B0" roughness={1} />
+        <meshStandardMaterial color="#CFC8B4" roughness={1} />
       </mesh>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[62, 0.02, -6]}>
         <planeGeometry args={[46, 36]} />
-        <meshStandardMaterial color="#2D7CB8" roughness={0.25} metalness={0.1} />
+        <meshStandardMaterial color="#2D9BC9" roughness={0.2} metalness={0.1} />
       </mesh>
-      {/* yachts */}
       {boats.map((b, i) => (
         <group key={i} position={[b.x, 0.25, b.z]} rotation={[0, b.rot, 0]}>
-          <mesh>
+          <mesh castShadow>
             <boxGeometry args={[b.l * 0.36, 0.4, b.l]} />
-            <meshStandardMaterial color="#F4F6F8" roughness={0.4} />
+            <meshStandardMaterial color="#F8FAFC" roughness={0.4} />
           </mesh>
           <mesh position={[0, 0.34, -b.l * 0.1]}>
             <boxGeometry args={[b.l * 0.22, 0.26, b.l * 0.42]} />
@@ -400,7 +512,6 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
           </mesh>
         </group>
       ))}
-      {/* hills behind the principality */}
       {[
         [-30, 26, 90, 60],
         [10, 30, 120, 76],
@@ -408,31 +519,41 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
       ].map(([x, h, z, w], i) => (
         <mesh key={i} position={[x, 0, z]}>
           <coneGeometry args={[w as number, (h as number) * 2, 7]} />
-          <meshStandardMaterial color="#8B9876" roughness={1} flatShading />
+          <meshStandardMaterial color="#86A06B" roughness={1} flatShading />
         </mesh>
       ))}
 
       <City track={track} />
 
-      {/* embankment under the road */}
+      {/* the Piscine pool */}
+      <group position={[POOL.x, 0, POOL.z]} rotation={[0, POOL.rot, 0]}>
+        <mesh position={[0, 0.04, 0]}>
+          <boxGeometry args={[POOL.w + 2.4, 0.12, POOL.d + 2.4]} />
+          <meshStandardMaterial color="#E8E4D8" roughness={0.9} />
+        </mesh>
+        <mesh position={[0, 0.12, 0]}>
+          <boxGeometry args={[POOL.w, 0.08, POOL.d]} />
+          <meshStandardMaterial color="#3EC1D6" roughness={0.2} />
+        </mesh>
+      </group>
+
+      {/* embankments, road, kerbs, armco */}
       <mesh geometry={skirtL}>
-        <meshStandardMaterial color="#AFA793" roughness={1} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#B5AC97" roughness={1} side={THREE.DoubleSide} />
       </mesh>
       <mesh geometry={skirtR}>
-        <meshStandardMaterial color="#AFA793" roughness={1} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#B5AC97" roughness={1} side={THREE.DoubleSide} />
       </mesh>
-      <mesh geometry={asphalt}>
-        <meshStandardMaterial color="#5A5E66" roughness={0.95} />
+      <mesh geometry={asphalt} receiveShadow>
+        <meshStandardMaterial color="#5C6068" roughness={0.95} />
       </mesh>
       <Kerbs track={track} />
-      {/* armco */}
       <mesh geometry={armcoL}>
-        <meshStandardMaterial color="#C6CBD4" roughness={0.4} metalness={0.4} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#CDD2DA" roughness={0.4} metalness={0.4} side={THREE.DoubleSide} />
       </mesh>
       <mesh geometry={armcoR}>
-        <meshStandardMaterial color="#C6CBD4" roughness={0.4} metalness={0.4} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#CDD2DA" roughness={0.4} metalness={0.4} side={THREE.DoubleSide} />
       </mesh>
-      {/* racing line */}
       <mesh
         geometry={line}
         ref={(m) => {
@@ -440,25 +561,32 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
           if (m) (m.geometry as THREE.BufferGeometry).setDrawRange(0, 0);
         }}
       >
-        <meshStandardMaterial
-          color={livery}
-          emissive={livery}
-          emissiveIntensity={0.55}
-        />
+        <meshStandardMaterial color={livery} emissive={livery} emissiveIntensity={0.55} />
       </mesh>
 
       {/* the tunnel under the Fairmont */}
-      <mesh geometry={tunnelRoof} position={[0, 0, 0]}>
-        <meshStandardMaterial color="#B8AE9C" roughness={0.9} side={THREE.DoubleSide} />
+      <mesh geometry={tunnelRoof}>
+        <meshStandardMaterial color="#C2B8A4" roughness={0.9} side={THREE.DoubleSide} />
       </mesh>
       <mesh geometry={tunnelL}>
-        <meshStandardMaterial color="#8F8675" roughness={0.9} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#958C7A" roughness={0.9} side={THREE.DoubleSide} />
       </mesh>
       <mesh geometry={tunnelR}>
-        <meshStandardMaterial color="#8F8675" roughness={0.9} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#958C7A" roughness={0.9} side={THREE.DoubleSide} />
       </mesh>
-      {/* the Fairmont sits over the tunnel */}
-      {[0.18, 0.5, 0.82].map((f, i) => {
+      {[0.2, 0.5, 0.8].map((f, i) => {
+        const p = track.curve.getPointAt(tun0 + (tun1 - tun0) * f);
+        return (
+          <pointLight
+            key={`tl-${i}`}
+            position={[p.x, p.y + 3.4, p.z]}
+            intensity={70}
+            distance={22}
+            color="#FFB36B"
+          />
+        );
+      })}
+      {[0.16, 0.46, 0.78].map((f, i) => {
         const t = tun0 + (tun1 - tun0) * f;
         const p = track.curve.getPointAt(t);
         const tan = track.curve.getTangentAt(t);
@@ -467,25 +595,17 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
             key={`hotel-${i}`}
             position={[p.x, p.y + 6.4, p.z]}
             rotation={[0, Math.atan2(tan.x, tan.z), 0]}
+            castShadow
           >
-            <boxGeometry args={[17, 5.2, 15]} />
-            <meshStandardMaterial color="#E3D7BE" roughness={0.85} />
+            <boxGeometry args={[17, 5.2, 16]} />
+            <meshStandardMaterial color="#EADFC6" roughness={0.85} />
           </mesh>
         );
       })}
-      {/* sodium glow inside */}
-      <pointLight
-        position={[tunnelMid.x, tunnelMid.y + 3, tunnelMid.z]}
-        intensity={120}
-        distance={34}
-        color="#FFB36B"
-      />
 
       {/* career ad bridges */}
       {track.cornerPositions.map((c, i) => {
-        const fi = Math.round(
-          track.cornerFractions[i] * (track.samples.length - 1)
-        );
+        const fi = Math.round(track.cornerFractions[i] * (track.samples.length - 1));
         const tan = track.tangents[fi];
         return (
           <AdBridge
@@ -498,7 +618,21 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
         );
       })}
 
-      {/* casino gardens + Beau Rivage greenery */}
+      {/* marshal posts at every career corner */}
+      {track.cornerPositions.map((c, i) => (
+        <group key={`marshal-${i}`} position={[c.x + 5.4, c.y, c.z + 2]}>
+          <mesh position={[0, 0.55, 0]} castShadow>
+            <boxGeometry args={[0.9, 1.1, 0.9]} />
+            <meshStandardMaterial color="#E8762C" roughness={0.8} />
+          </mesh>
+          <mesh position={[0, 1.15, 0]}>
+            <boxGeometry args={[0.95, 0.1, 0.95]} />
+            <meshStandardMaterial color="#F4F4F2" roughness={0.8} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* greenery */}
       {[
         [58, 50],
         [63, 47],
@@ -506,50 +640,67 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
         [18, 36],
         [26, 46],
         [12, 30],
-        [70, -34],
-        [64, -39],
-        [44, -47],
+        [70, -36],
+        [44, -48],
       ].map(([x, z], i) => (
         <group key={`tree-${i}`} position={[x, 0, z]}>
-          <mesh position={[0, 1.1, 0]}>
+          <mesh position={[0, 1.1, 0]} castShadow>
             <cylinderGeometry args={[0.12, 0.16, 2.2, 5]} />
             <meshStandardMaterial color="#6B5A44" roughness={1} />
           </mesh>
-          <mesh position={[0, 2.6, 0]}>
+          <mesh position={[0, 2.6, 0]} castShadow>
             <icosahedronGeometry args={[1.4 + (i % 3) * 0.4, 0]} />
-            <meshStandardMaterial color="#4E7A45" roughness={1} flatShading />
+            <meshStandardMaterial color="#4E8A47" roughness={1} flatShading />
           </mesh>
         </group>
       ))}
 
-      {/* grandstands along the pit straight */}
-      {[
-        { x: -7, z: 0, len: 26 },
-        { x: 8, z: -2, len: 18 },
-      ].map((g, i) => (
+      {/* grandstands, crowd, flags */}
+      {STANDS.map((g, i) => (
         <group key={`stand-${i}`} position={[g.x, 0, g.z]}>
-          <mesh position={[0, 1.4, 0]}>
+          <mesh position={[0, 1.4, 0]} castShadow>
             <boxGeometry args={[4, 2.8, g.len]} />
-            <meshStandardMaterial color={i === 0 ? "#D8D2C2" : "#E5E0D5"} roughness={0.85} />
+            <meshStandardMaterial color="#DCD6C6" roughness={0.85} />
           </mesh>
-          <mesh position={[i === 0 ? 0.6 : -0.6, 3.1, 0]} rotation={[0, 0, i === 0 ? -0.18 : 0.18]}>
+          <mesh
+            position={[g.face * -0.6, 3.2, 0]}
+            rotation={[0, 0, g.face * 0.18]}
+            castShadow
+          >
             <boxGeometry args={[4.6, 0.18, g.len + 1]} />
-            <meshStandardMaterial color="#F4F2EC" roughness={0.7} />
+            <meshStandardMaterial color="#F7F5EF" roughness={0.7} />
           </mesh>
+          {[-1, 0, 1].map((f) => (
+            <group key={f} position={[g.face * -1.6, 0, f * (g.len / 2 - 2)]}>
+              <mesh position={[0, 2.6, 0]}>
+                <cylinderGeometry args={[0.05, 0.05, 5.2, 5]} />
+                <meshStandardMaterial color="#8A8FA0" roughness={0.5} />
+              </mesh>
+              <mesh position={[0.45, 4.9, 0]}>
+                <boxGeometry args={[0.9, 0.55, 0.04]} />
+                <meshStandardMaterial
+                  color={f === 0 ? livery : CROWD[(i + f + 3) % CROWD.length]}
+                  roughness={0.7}
+                  side={THREE.DoubleSide}
+                />
+              </mesh>
+            </group>
+          ))}
         </group>
       ))}
+      <Crowd stands={STANDS} />
 
       {/* start gantry */}
       <group
         position={[track.samples[0].x, track.samples[0].y, track.samples[0].z]}
         rotation={[0, Math.atan2(track.tangents[0].x, track.tangents[0].z), 0]}
       >
-        <mesh position={[0, 4.6, 0]}>
+        <mesh position={[0, 4.6, 0]} castShadow>
           <boxGeometry args={[11, 0.6, 0.6]} />
           <meshStandardMaterial color="#3A3F4C" roughness={0.6} />
         </mesh>
         {[-4.4, 4.4].map((x) => (
-          <mesh key={x} position={[x, 2.3, 0]}>
+          <mesh key={x} position={[x, 2.3, 0]} castShadow>
             <boxGeometry args={[0.45, 4.6, 0.45]} />
             <meshStandardMaterial color="#3A3F4C" roughness={0.6} />
           </mesh>
@@ -557,11 +708,7 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
         {[-2.4, -1.2, 0, 1.2, 2.4].map((x) => (
           <mesh key={`l-${x}`} position={[x, 4.2, 0.34]}>
             <sphereGeometry args={[0.18, 8, 8]} />
-            <meshStandardMaterial
-              color="#FF1801"
-              emissive="#FF1801"
-              emissiveIntensity={1.2}
-            />
+            <meshStandardMaterial color="#FF1801" emissive="#FF1801" emissiveIntensity={1.2} />
           </mesh>
         ))}
       </group>
@@ -570,12 +717,7 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
         <F1Car livery={livery} />
       </group>
 
-      <Rig
-        progressRef={progressRef}
-        track={track}
-        carRef={carRef}
-        lineRef={lineGeoRef}
-      />
+      <Rig progressRef={progressRef} track={track} carRef={carRef} lineRef={lineGeoRef} />
     </>
   );
 };
@@ -583,8 +725,14 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
 const CircuitScene = (props: SceneProps) => (
   <Canvas
     dpr={[1, 1.6]}
-    camera={{ fov: 52, near: 0.5, far: 360, position: [0, 12, -40] }}
-    gl={{ antialias: true, powerPreference: "high-performance" }}
+    shadows
+    camera={{ fov: 52, near: 0.5, far: 380, position: [0, 12, -40] }}
+    gl={{
+      antialias: true,
+      powerPreference: "high-performance",
+      toneMapping: THREE.ACESFilmicToneMapping,
+      toneMappingExposure: 1.12,
+    }}
   >
     <Scene {...props} />
   </Canvas>
