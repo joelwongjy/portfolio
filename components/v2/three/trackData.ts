@@ -1,64 +1,66 @@
 import * as THREE from "three";
 
-// The lap in world units. X is lateral, Z runs forward (the scroll
-// direction), Y is elevation — the final stretch dips underground into the
-// Yas-style pit tunnel. Corner complexes reuse the same real-circuit shapes
-// as the 2D map: Loews, Eau Rouge, Rettifilio, 130R, Becketts, the Sling.
-const GAP = 92;
-const L = -16; // left anchor lateral
-const R = 16; // right anchor lateral
-
+// Circuit de Monaco, traced from the real plan. X runs east, Z north,
+// Y is elevation — the climb from Ste Dévote through Beau Rivage up to
+// Casino Square, back down through Mirabeau and the Fairmont hairpin to
+// sea level, through the tunnel and around the harbour. One world unit
+// is roughly 4 metres.
 interface P {
   x: number;
   z: number;
   y?: number;
 }
 
-// canonical motif waypoints, written left-anchor → right-anchor in a
-// 0..1 normalised gap, lateral in 2D-map coords (24..96 → remapped)
-const mapX = (x2d: number, dir: number, xa: number) =>
-  xa + dir * ((x2d - 24) / 72) * (R - L);
+const PLAN: P[] = [
+  { x: 0, z: -8 }, // start/finish
+  { x: 1, z: 8 },
+  { x: 3, z: 22 }, // Ste Dévote entry
+  { x: 7, z: 29 }, // T1 apex (right)
+  { x: 14, z: 34, y: 1 },
+  { x: 24, z: 42, y: 3.2 }, // Beau Rivage climb
+  { x: 34, z: 50, y: 5.6 },
+  { x: 44, z: 55, y: 7.6 },
+  { x: 54, z: 60, y: 9.2 }, // Massenet left sweep
+  { x: 62, z: 60, y: 10.2 },
+  { x: 68, z: 55, y: 10.6 }, // Casino Square (right)
+  { x: 70, z: 47, y: 10.2 },
+  { x: 66, z: 40, y: 8.8 }, // downhill
+  { x: 64, z: 33, y: 7.6 }, // Mirabeau (right)
+  { x: 57, z: 30, y: 6.6 },
+  { x: 51, z: 27, y: 5.8 }, // toward the hairpin
+  { x: 46, z: 24, y: 5.4 }, // Fairmont hairpin (tight left)
+  { x: 44, z: 28, y: 5.2 },
+  { x: 47, z: 32, y: 5 },
+  { x: 53, z: 30.5, y: 4.4 }, // out of the hairpin
+  { x: 58, z: 25, y: 3.4 },
+  { x: 60, z: 19, y: 2.6 }, // Portier (right-right)
+  { x: 64, z: 14, y: 2.2 },
+  { x: 72, z: 10, y: 1.9 }, // tunnel entry
+  { x: 81, z: 5, y: 1.6 }, // — under the hotel —
+  { x: 87, z: -3, y: 1.2 },
+  { x: 89, z: -12, y: 0.7 }, // tunnel exit
+  { x: 88, z: -20, y: 0.3 },
+  { x: 84.5, z: -26, y: 0 }, // Nouvelle Chicane (left)
+  { x: 80, z: -27.5, y: 0 },
+  { x: 74, z: -30, y: 0 }, // Tabac (left)
+  { x: 68, z: -34, y: 0 },
+  { x: 61, z: -35, y: 0 }, // Piscine: left-right
+  { x: 55, z: -38.5, y: 0 },
+  { x: 49, z: -43, y: 0 }, // right-left out of the pool
+  { x: 43, z: -42, y: 0 },
+  { x: 38, z: -38, y: 0 }, // La Rascasse (tight right)
+  { x: 34, z: -33, y: 0 },
+  { x: 28, z: -30, y: 0.2 }, // Antony Noghès (right)
+  { x: 18, z: -27, y: 0.2 },
+  { x: 8, z: -22, y: 0.1 },
+  { x: 2, z: -16, y: 0 },
+];
 
-type Gap = { x2d: number; t: number }[];
+// the seven career corners, in lap order
+const ANCHOR_PLAN_IDX = [3, 10, 13, 16, 21, 28, 33];
 
-const loews: Gap = [
-  { x2d: 48, t: 0.14 },
-  { x2d: 48, t: 0.52 },
-  { x2d: 74, t: 0.52 },
-  { x2d: 74, t: 0.24 },
-  { x2d: 96, t: 0.24 },
-];
-const eauRouge: Gap = [
-  { x2d: 14, t: 0.1 },
-  { x2d: 52, t: 0.24 },
-  { x2d: 96, t: 0.44 },
-];
-const rettifilio: Gap = [
-  { x2d: 58, t: 0.5 },
-  { x2d: 42, t: 0.62 },
-  { x2d: 96, t: 0.78 },
-];
-const r130: Gap = [
-  { x2d: 6, t: 0.38 },
-  { x2d: 36, t: 0.66 },
-  { x2d: 78, t: 0.78 },
-  { x2d: 74, t: 0.88 },
-  { x2d: 96, t: 0.95 },
-];
-const becketts: Gap = [
-  { x2d: 44, t: 0.12 },
-  { x2d: 12, t: 0.32 },
-  { x2d: 54, t: 0.52 },
-  { x2d: 96, t: 0.68 },
-];
-const sling: Gap = [
-  { x2d: 50, t: 0.42 },
-  { x2d: 32, t: 0.56 },
-  { x2d: 60, t: 0.68 },
-  { x2d: 96, t: 0.82 },
-];
-
-const GAPS = [loews, eauRouge, rettifilio, r130, becketts, sling];
+// tunnel runs between these plan points
+const TUNNEL_RANGE: [number, number] = [23, 26];
 
 export interface TrackData {
   curve: THREE.CatmullRomCurve3;
@@ -67,43 +69,27 @@ export interface TrackData {
   cornerPositions: THREE.Vector3[];
   samples: THREE.Vector3[];
   tangents: THREE.Vector3[];
+  tunnelFractions: [number, number];
 }
 
-export const buildTrack = (): TrackData => {
-  const pts: P[] = [];
-  const anchorIdx: number[] = [];
-
-  // grid + run to T1
-  pts.push({ x: L, z: -40 });
-  pts.push({ x: L, z: -12 });
-  let z = 0;
-  pts.push({ x: L, z });
-  anchorIdx.push(pts.length - 1);
-
-  for (let g = 0; g < GAPS.length; g++) {
-    const xa = g % 2 === 0 ? L : R;
-    const dir = g % 2 === 0 ? 1 : -1;
-    const z0 = z;
-    for (const wp of GAPS[g]) {
-      pts.push({ x: mapX(wp.x2d, dir, xa), z: z0 + wp.t * GAP });
+const nearestFraction = (samples: THREE.Vector3[], target: THREE.Vector3) => {
+  let best = 0;
+  let bestD = Infinity;
+  samples.forEach((s, i) => {
+    const d = s.distanceToSquared(target);
+    if (d < bestD) {
+      bestD = d;
+      best = i;
     }
-    z = z0 + GAP;
-    pts.push({ x: g % 2 === 0 ? R : L, z });
-    anchorIdx.push(pts.length - 1);
-  }
+  });
+  return best / (samples.length - 1);
+};
 
-  // run-off into the underground pit tunnel
-  const lastX = GAPS.length % 2 === 0 ? L : R;
-  pts.push({ x: lastX, z: z + 26 });
-  pts.push({ x: lastX, z: z + 44, y: -0.4 });
-  pts.push({ x: lastX, z: z + 58, y: -2.4 });
-  pts.push({ x: lastX, z: z + 74, y: -4.2 });
-  pts.push({ x: lastX, z: z + 92, y: -4.6 });
+export const buildTrack = (): TrackData => {
+  const v = PLAN.map((p) => new THREE.Vector3(p.x, p.y ?? 0, p.z));
+  const curve = new THREE.CatmullRomCurve3(v, true, "centripetal", 0.5);
 
-  const v = pts.map((p) => new THREE.Vector3(p.x, p.y ?? 0, p.z));
-  const curve = new THREE.CatmullRomCurve3(v, false, "centripetal", 0.5);
-
-  const N = 1400;
+  const N = 1600;
   const samples: THREE.Vector3[] = [];
   const tangents: THREE.Vector3[] = [];
   for (let i = 0; i <= N; i++) {
@@ -111,54 +97,63 @@ export const buildTrack = (): TrackData => {
     tangents.push(curve.getTangentAt(i / N));
   }
 
-  const cornerFractions = anchorIdx.map((idx) => {
-    const target = v[idx];
-    let best = 0;
-    let bestD = Infinity;
-    samples.forEach((s, i) => {
-      const d = s.distanceToSquared(target);
-      if (d < bestD) {
-        bestD = d;
-        best = i;
-      }
-    });
-    return best / N;
-  });
-
   return {
     curve,
     length: curve.getLength(),
-    cornerFractions,
-    cornerPositions: anchorIdx.map((i) => v[i].clone()),
+    cornerFractions: ANCHOR_PLAN_IDX.map((i) => nearestFraction(samples, v[i])),
+    cornerPositions: ANCHOR_PLAN_IDX.map((i) => v[i].clone()),
     samples,
     tangents,
+    tunnelFractions: [
+      nearestFraction(samples, v[TUNNEL_RANGE[0]]),
+      nearestFraction(samples, v[TUNNEL_RANGE[1]]),
+    ],
   };
 };
 
-// A flat ribbon that follows the curve — used for grass, asphalt and the
-// racing line.
+// A ribbon that follows the curve between two fractions; lift !== 0 builds a
+// vertical wall instead of a flat strip.
 export const ribbonGeometry = (
   track: TrackData,
   width: number,
-  yOffset: number
+  yOffset: number,
+  t0 = 0,
+  t1 = 1,
+  lateral = 0,
+  wallHeight = 0
 ): THREE.BufferGeometry => {
   const { samples, tangents } = track;
   const n = samples.length;
-  const pos = new Float32Array(n * 2 * 3);
+  const i0 = Math.floor(t0 * (n - 1));
+  const i1 = Math.ceil(t1 * (n - 1));
+  const count = i1 - i0 + 1;
+  const pos = new Float32Array(count * 2 * 3);
   const up = new THREE.Vector3(0, 1, 0);
   const side = new THREE.Vector3();
-  for (let i = 0; i < n; i++) {
-    side.crossVectors(up, tangents[i]).setY(0).normalize();
-    const p = samples[i];
-    pos[i * 6] = p.x + side.x * width * 0.5;
-    pos[i * 6 + 1] = p.y + yOffset;
-    pos[i * 6 + 2] = p.z + side.z * width * 0.5;
-    pos[i * 6 + 3] = p.x - side.x * width * 0.5;
-    pos[i * 6 + 4] = p.y + yOffset;
-    pos[i * 6 + 5] = p.z - side.z * width * 0.5;
+  for (let i = 0; i < count; i++) {
+    const s = i0 + i;
+    side.crossVectors(up, tangents[s]).setY(0).normalize();
+    const p = samples[s];
+    const cx = p.x + side.x * lateral;
+    const cz = p.z + side.z * lateral;
+    if (wallHeight > 0) {
+      pos[i * 6] = cx;
+      pos[i * 6 + 1] = p.y + yOffset;
+      pos[i * 6 + 2] = cz;
+      pos[i * 6 + 3] = cx;
+      pos[i * 6 + 4] = p.y + yOffset + wallHeight;
+      pos[i * 6 + 5] = cz;
+    } else {
+      pos[i * 6] = cx + side.x * width * 0.5;
+      pos[i * 6 + 1] = p.y + yOffset;
+      pos[i * 6 + 2] = cz + side.z * width * 0.5;
+      pos[i * 6 + 3] = cx - side.x * width * 0.5;
+      pos[i * 6 + 4] = p.y + yOffset;
+      pos[i * 6 + 5] = cz - side.z * width * 0.5;
+    }
   }
   const idx: number[] = [];
-  for (let i = 0; i < n - 1; i++) {
+  for (let i = 0; i < count - 1; i++) {
     const a = i * 2;
     idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
   }
@@ -175,7 +170,6 @@ export interface KerbSlab {
   red: boolean;
 }
 
-// Alternating red/white slabs along both edges wherever the road curves.
 export const kerbSlabs = (track: TrackData): KerbSlab[] => {
   const { samples, tangents } = track;
   const slabs: KerbSlab[] = [];
@@ -186,7 +180,7 @@ export const kerbSlabs = (track: TrackData): KerbSlab[] => {
   for (let i = 4; i < samples.length - 4; i += 2) {
     const angle = tangents[i - 4].angleTo(tangents[i + 4]);
     acc += samples[i].distanceTo(samples[i - 2]);
-    if (angle < 0.09 || acc < 1.6) continue;
+    if (angle < 0.1 || acc < 1.4) continue;
     acc = 0;
     count++;
     side.crossVectors(up, tangents[i]).setY(0).normalize();
@@ -194,9 +188,9 @@ export const kerbSlabs = (track: TrackData): KerbSlab[] => {
     for (const s of [1, -1]) {
       slabs.push({
         position: new THREE.Vector3(
-          samples[i].x + side.x * s * 3.9,
-          samples[i].y + 0.045,
-          samples[i].z + side.z * s * 3.9
+          samples[i].x + side.x * s * 3.05,
+          samples[i].y + 0.03,
+          samples[i].z + side.z * s * 3.05
         ),
         rotationY: rotY,
         red: count % 2 === 0,
@@ -212,29 +206,31 @@ export interface CityBlock {
   w: number;
   d: number;
   h: number;
+  tone: number;
 }
 
-// Deterministic pseudo-random city filling the space around the lap.
+const rand = (i: number, salt: number) => {
+  const s = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453;
+  return s - Math.floor(s);
+};
+
+// Monte Carlo apartment blocks: dense on the hill side (north-west of the
+// circuit), nothing in the harbour.
 export const cityBlocks = (track: TrackData): CityBlock[] => {
   const blocks: CityBlock[] = [];
-  const rand = (i: number, salt: number) => {
-    const s = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453;
-    return s - Math.floor(s);
-  };
-  const zMin = -40;
-  const zMax = track.samples[track.samples.length - 1].z;
   let i = 0;
-  for (let z = zMin; z < zMax - 60; z += 11) {
-    for (const lane of [-1, 1]) {
+  for (let gx = -28; gx < 100; gx += 9) {
+    for (let gz = -50; gz < 80; gz += 9) {
       i++;
-      if (rand(i, 1) < 0.15) continue;
-      const x = lane * (26 + rand(i, 2) * 30);
-      const bz = z + rand(i, 3) * 10;
-      // keep clear of the road
+      if (rand(i, 1) < 0.3) continue;
+      const x = gx + rand(i, 2) * 6;
+      const z = gz + rand(i, 3) * 6;
+      // the harbour basin stays clear
+      if (x > 36 && x < 86 && z > -26 && z < 12) continue;
       let clear = true;
-      for (let s = 0; s < track.samples.length; s += 12) {
+      for (let s = 0; s < track.samples.length; s += 10) {
         const p = track.samples[s];
-        if ((p.x - x) ** 2 + (p.z - bz) ** 2 < 16 * 16) {
+        if ((p.x - x) ** 2 + (p.z - z) ** 2 < 13 * 13) {
           clear = false;
           break;
         }
@@ -242,37 +238,28 @@ export const cityBlocks = (track: TrackData): CityBlock[] => {
       if (!clear) continue;
       blocks.push({
         x,
-        z: bz,
-        w: 5 + rand(i, 4) * 6,
-        d: 5 + rand(i, 5) * 6,
-        h: 3 + rand(i, 6) * rand(i, 7) * 26,
+        z,
+        w: 4.5 + rand(i, 4) * 5,
+        d: 4.5 + rand(i, 5) * 5,
+        h: 3 + rand(i, 6) * 10,
+        tone: Math.floor(rand(i, 7) * 5),
       });
     }
   }
   return blocks;
 };
 
-// shared emissive window texture, generated once on the client
-export const windowTexture = (): THREE.CanvasTexture => {
-  const c = document.createElement("canvas");
-  c.width = 64;
-  c.height = 64;
-  const ctx = c.getContext("2d")!;
-  ctx.fillStyle = "#0a0b14";
-  ctx.fillRect(0, 0, 64, 64);
-  for (let yy = 4; yy < 64; yy += 9) {
-    for (let xx = 4; xx < 64; xx += 8) {
-      const r = Math.sin(xx * 12.9898 + yy * 78.233) * 43758.5453;
-      const v = r - Math.floor(r);
-      if (v > 0.45) {
-        ctx.fillStyle = v > 0.8 ? "#ffd98a" : "#8a7a4d";
-        ctx.globalAlpha = v > 0.8 ? 0.95 : 0.6;
-        ctx.fillRect(xx, yy, 4, 5);
-      }
-    }
-  }
-  ctx.globalAlpha = 1;
-  const tex = new THREE.CanvasTexture(c);
-  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-  return tex;
-};
+export interface Yacht {
+  x: number;
+  z: number;
+  l: number;
+  rot: number;
+}
+
+export const yachts = (): Yacht[] =>
+  Array.from({ length: 12 }).map((_, i) => ({
+    x: 46 + rand(i + 1, 11) * 32,
+    z: -20 + rand(i + 1, 12) * 26,
+    l: 2.5 + rand(i + 1, 13) * 4,
+    rot: rand(i + 1, 14) * Math.PI,
+  }));

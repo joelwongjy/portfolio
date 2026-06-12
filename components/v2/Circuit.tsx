@@ -168,16 +168,16 @@ const sling = motifFrom((g) => [
 
 const MOTIFS: Motif[] = [loews, eauRouge, rettifilio, r130, becketts, sling];
 
-// Card i sits at corner CORNER_META[i]; the motif leading into card i + 1 is
-// the corner complex it is named after.
+// Card i sits at corner CORNER_META[i] — the real Monaco corners, in lap
+// order.
 export const CORNER_META = [
-  { corner: "Turn 1", circuit: "Marina Bay" },
-  { corner: "Loews Hairpin", circuit: "Monaco" },
-  { corner: "Eau Rouge", circuit: "Spa" },
-  { corner: "Rettifilio", circuit: "Monza" },
-  { corner: "130R", circuit: "Suzuka" },
-  { corner: "Becketts", circuit: "Silverstone" },
-  { corner: "The Sling", circuit: "Marina Bay" },
+  { corner: "Ste Dévote", circuit: "Monte Carlo" },
+  { corner: "Casino Square", circuit: "Monte Carlo" },
+  { corner: "Mirabeau", circuit: "Monte Carlo" },
+  { corner: "Fairmont Hairpin", circuit: "Monte Carlo" },
+  { corner: "Portier", circuit: "Monte Carlo" },
+  { corner: "Nouvelle Chicane", circuit: "Monte Carlo" },
+  { corner: "Piscine", circuit: "Monte Carlo" },
 ];
 
 const buildTrack = (corners: Corner[], height: number) => {
