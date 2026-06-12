@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useEffect } from "react";
 
-import { Circuit } from "@/components/v2/Circuit";
+import { Circuit3D } from "@/components/v2/Circuit3D";
 import { HeroV2 } from "@/components/v2/HeroV2";
 import { IslandNav } from "@/components/v2/IslandNav";
 import { LiveryProvider } from "@/components/v2/LiveryContext";
@@ -36,7 +36,7 @@ export default function RaceWeekend() {
             <IslandNav />
             <main>
               <HeroV2 />
-              <Circuit />
+              <Circuit3D />
               <PitLane />
               <Podium />
             </main>

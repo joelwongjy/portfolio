@@ -194,7 +194,7 @@ const buildTrack = (corners: Corner[], height: number) => {
   return { d, kerbs };
 };
 
-const OrganisationLogo = ({ organisation }: { organisation: string }) => {
+export const OrganisationLogo = ({ organisation }: { organisation: string }) => {
   const whiteLogo = organisationToLogo[`${organisation}White`];
   const logo = organisationToLogo[organisation];
   if (whiteLogo) {
