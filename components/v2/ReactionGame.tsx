@@ -1,5 +1,12 @@
 import { motion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  MouseEvent as ReactMouseEvent,
+  PointerEvent as ReactPointerEvent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { useLivery } from "./LiveryContext";
 
@@ -53,7 +60,18 @@ export const ReactionGame = () => {
     );
   }, []);
 
-  const tap = useCallback(() => {
+  const measure = useCallback(() => {
+    const dt = Math.round(performance.now() - goTime.current);
+    setMs(dt);
+    setPhase("result");
+    setBest((prev) => {
+      const next = prev === null || dt < prev ? dt : prev;
+      localStorage.setItem(PB_KEY, String(next));
+      return next;
+    });
+  }, []);
+
+  const fire = useCallback(() => {
     if (phase === "idle" || phase === "result" || phase === "jump") {
       start();
       return;
@@ -64,34 +82,54 @@ export const ReactionGame = () => {
       setPhase("jump");
       return;
     }
-    if (phase === "go") {
-      const dt = Math.round(performance.now() - goTime.current);
-      setMs(dt);
-      setPhase("result");
-      setBest((prev) => {
-        const next = prev === null || dt < prev ? dt : prev;
-        localStorage.setItem(PB_KEY, String(next));
-        return next;
-      });
-    }
-  }, [phase, start]);
+    if (phase === "go") measure();
+  }, [phase, start, measure]);
+
+  // Touch handling: pointerdown gives accurate timing but also fires when a
+  // scroll gesture begins, so it only reacts mid-game ("go"). Everything
+  // else waits for a settled click/tap — and clicks that travelled (drags,
+  // scroll flicks) are ignored.
+  const handled = useRef(0);
+  const downAt = useRef({ x: 0, y: 0 });
+  const onPointerDown = useCallback(
+    (e: ReactPointerEvent) => {
+      downAt.current = { x: e.clientX, y: e.clientY };
+      if (phase !== "go") return;
+      handled.current = performance.now();
+      measure();
+    },
+    [phase, measure]
+  );
+  const onClick = useCallback(
+    (e: ReactMouseEvent) => {
+      if (performance.now() - handled.current < 500) return;
+      const moved = Math.hypot(
+        e.clientX - downAt.current.x,
+        e.clientY - downAt.current.y
+      );
+      if (moved > 12) return;
+      fire();
+    },
+    [fire]
+  );
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.code !== "Space" || e.repeat) return;
       e.preventDefault();
-      tap();
+      fire();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [tap]);
+  }, [fire]);
 
   return (
     <div
       role="button"
       tabIndex={0}
       aria-label="Reaction test — tap when the lights go out"
-      onPointerDown={tap}
+      onPointerDown={onPointerDown}
+      onClick={onClick}
       className="relative mx-auto flex w-full max-w-md cursor-pointer select-none flex-col items-center outline-none"
     >
       <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">

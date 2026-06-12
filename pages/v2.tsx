@@ -5,7 +5,9 @@ import { Circuit } from "@/components/v2/Circuit";
 import { HeroV2 } from "@/components/v2/HeroV2";
 import { IslandNav } from "@/components/v2/IslandNav";
 import { LiveryProvider } from "@/components/v2/LiveryContext";
+import { PitLane } from "@/components/v2/PitLane";
 import { Podium } from "@/components/v2/Podium";
+import { RaceProvider } from "@/components/v2/RaceContext";
 
 export default function RaceWeekend() {
   useEffect(() => {
@@ -29,17 +31,20 @@ export default function RaceWeekend() {
         <meta name="theme-color" content="#050505" />
       </Head>
       <LiveryProvider>
-        <div className="min-h-screen bg-[#050505] text-white">
-          <IslandNav />
-          <main>
-            <HeroV2 />
-            <Circuit />
-            <Podium />
-          </main>
-          <footer className="pb-10 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-white/25">
-            <p>Joel Wong · Race Weekend prototype</p>
-          </footer>
-        </div>
+        <RaceProvider>
+          <div className="min-h-screen overflow-x-clip bg-[#050505] text-white">
+            <IslandNav />
+            <main>
+              <HeroV2 />
+              <Circuit />
+              <PitLane />
+              <Podium />
+            </main>
+            <footer className="pb-10 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-white/25">
+              <p>Joel Wong · Race Weekend prototype</p>
+            </footer>
+          </div>
+        </RaceProvider>
       </LiveryProvider>
     </>
   );

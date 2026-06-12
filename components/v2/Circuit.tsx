@@ -3,11 +3,11 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { organisationToLogo } from "@/constants/logos";
-import { Skills } from "@/constants/technologies";
 import { experience } from "@/data/experience";
-import { getSvgrFromSkill } from "@/utils/skillUtils";
 
 import { RaceCar } from "./RaceCar";
+import { RaceState, useRace } from "./RaceContext";
+import { TechChip } from "./TechChip";
 
 const RAIL_WIDTH = 120;
 const LEFT_X = 24;
@@ -148,7 +148,7 @@ const MOTIFS: Motif[] = [loews, eauRouge, rettifilio, r130, becketts, sling];
 
 // Card i sits at corner CORNER_META[i]; the motif leading into card i + 1 is
 // the corner complex it is named after.
-const CORNER_META = [
+export const CORNER_META = [
   { corner: "Turn 1", circuit: "Marina Bay" },
   { corner: "Loews Hairpin", circuit: "Monaco" },
   { corner: "Eau Rouge", circuit: "Spa" },
@@ -167,18 +167,6 @@ const buildTrack = (corners: Corner[], height: number) => {
   }
   d += ` L ${corners[corners.length - 1].x} ${height}`;
   return d;
-};
-
-const TechChip = ({ skill }: { skill: Skills }) => {
-  const Svgr = getSvgrFromSkill(skill);
-  return (
-    <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 py-1 pl-1.5 pr-2.5 text-[11px] text-white/70">
-      <span className="flex h-4 w-4 items-center justify-center [&_svg]:h-full [&_svg]:w-full">
-        <Svgr />
-      </span>
-      {skill}
-    </span>
-  );
 };
 
 const OrganisationLogo = ({ organisation }: { organisation: string }) => {
@@ -218,6 +206,8 @@ export const Circuit = () => {
   const listRef = useRef<HTMLOListElement>(null);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const pathRef = useRef<SVGPathElement>(null);
+  const { setRace } = useRace();
+  const lastRace = useRef<RaceState>({ active: false, corner: 0, progress: 0 });
 
   const [track, setTrack] = useState<Track>();
   const [trackLength, setTrackLength] = useState(0);
@@ -317,7 +307,23 @@ export const Circuit = () => {
         (Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * 180) / Math.PI
       );
       dashOffset.set(trackLength - at);
-      setPassed(track.corners.filter((c) => c.y <= targetY).length);
+      const passedCount = track.corners.filter((c) => c.y <= targetY).length;
+      setPassed(passedCount);
+      // feed the Dynamic Island's live activity
+      const next: RaceState = {
+        active: centerY > 0 && centerY < track.height,
+        corner: Math.max(passedCount, 1),
+        progress: Math.round((at / trackLength) * 100) / 100,
+      };
+      const prev = lastRace.current;
+      if (
+        next.active !== prev.active ||
+        next.corner !== prev.corner ||
+        next.progress !== prev.progress
+      ) {
+        lastRace.current = next;
+        setRace(next);
+      }
     };
 
     update();
@@ -327,7 +333,16 @@ export const Circuit = () => {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, [track, trackLength, anchorLengths, carX, carY, carAngle, dashOffset]);
+  }, [
+    track,
+    trackLength,
+    anchorLengths,
+    carX,
+    carY,
+    carAngle,
+    dashOffset,
+    setRace,
+  ]);
 
   return (
     <section id="circuit" className="mx-auto max-w-2xl px-4 pb-12 pt-24 sm:px-6">
@@ -448,8 +463,8 @@ export const Circuit = () => {
                 ref={(el) => {
                   itemRefs.current[i] = el;
                 }}
-                initial={{ opacity: 0, x: 24 }}
-                whileInView={{ opacity: 1, x: 0 }}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, ease: [0.21, 0.6, 0.35, 1] }}
               >
