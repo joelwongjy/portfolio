@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { hero } from "@/data/hero";
 
 import { useLivery } from "./LiveryContext";
+import { ReactionGame } from "./ReactionGame";
 
 const rise = {
   hidden: { opacity: 0, y: 24 },
@@ -13,7 +14,7 @@ const rise = {
   }),
 };
 
-export const HeroV2 = ({ started }: { started: boolean }) => {
+export const HeroV2 = () => {
   const { team } = useLivery();
 
   return (
@@ -47,7 +48,7 @@ export const HeroV2 = ({ started }: { started: boolean }) => {
         variants={rise}
         custom={0}
         initial="hidden"
-        animate={started ? "visible" : "hidden"}
+        animate="visible"
         className="absolute inset-x-0 top-20 flex items-center justify-between px-5 font-mono text-[10px] uppercase tracking-[0.25em] text-white/40 sm:top-24 sm:px-10"
       >
         <span>Rnd 26 · Marina Bay</span>
@@ -66,7 +67,7 @@ export const HeroV2 = ({ started }: { started: boolean }) => {
         variants={rise}
         custom={0.05}
         initial="hidden"
-        animate={started ? "visible" : "hidden"}
+        animate="visible"
         className="relative mb-5 text-xs font-semibold uppercase tracking-[0.35em]"
         style={{ color: "var(--livery)" }}
       >
@@ -76,7 +77,7 @@ export const HeroV2 = ({ started }: { started: boolean }) => {
         variants={rise}
         custom={0.15}
         initial="hidden"
-        animate={started ? "visible" : "hidden"}
+        animate="visible"
         className="relative text-6xl font-extrabold leading-none tracking-tighter text-white sm:text-8xl"
       >
         {hero.firstName}
@@ -87,26 +88,26 @@ export const HeroV2 = ({ started }: { started: boolean }) => {
         variants={rise}
         custom={0.3}
         initial="hidden"
-        animate={started ? "visible" : "hidden"}
+        animate="visible"
         className="relative mt-6 max-w-md text-lg text-white/60"
       >
         {hero.body}. {hero.title}.
       </motion.p>
-      <motion.p
+      <motion.div
         variants={rise}
-        custom={0.4}
+        custom={0.45}
         initial="hidden"
-        animate={started ? "visible" : "hidden"}
-        className="relative mt-8 font-mono text-[11px] uppercase tracking-[0.25em] text-white/40"
+        animate="visible"
+        className="relative mt-8 flex w-full justify-center"
       >
-        6 seasons · 7 teams · Singapore based
-      </motion.p>
+        <ReactionGame />
+      </motion.div>
 
       <motion.div
         variants={rise}
         custom={0.55}
         initial="hidden"
-        animate={started ? "visible" : "hidden"}
+        animate="visible"
         className="absolute bottom-10 flex flex-col items-center gap-2 text-white/40"
       >
         <span className="text-[11px] font-medium uppercase tracking-[0.3em]">

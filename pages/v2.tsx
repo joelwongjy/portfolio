@@ -1,17 +1,13 @@
 import Head from "next/head";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { Circuit } from "@/components/v2/Circuit";
 import { HeroV2 } from "@/components/v2/HeroV2";
 import { IslandNav } from "@/components/v2/IslandNav";
-import { LightsOut } from "@/components/v2/LightsOut";
 import { LiveryProvider } from "@/components/v2/LiveryContext";
 import { Podium } from "@/components/v2/Podium";
 
 export default function RaceWeekend() {
-  const [started, setStarted] = useState(false);
-  const handleLightsOut = useCallback(() => setStarted(true), []);
-
   useEffect(() => {
     document.body.classList.add("v2");
     document.documentElement.classList.add("scroll-smooth");
@@ -34,10 +30,9 @@ export default function RaceWeekend() {
       </Head>
       <LiveryProvider>
         <div className="min-h-screen bg-[#050505] text-white">
-          {!started && <LightsOut onDone={handleLightsOut} />}
           <IslandNav />
           <main>
-            <HeroV2 started={started} />
+            <HeroV2 />
             <Circuit />
             <Podium />
           </main>
