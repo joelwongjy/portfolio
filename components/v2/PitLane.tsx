@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { project } from "@/data/projects";
 
 import { roundedPath, Waypoint } from "./Circuit";
-import { PitBox } from "./PitBox";
 import { RaceCar } from "./RaceCar";
+import { Box3D, CrewDot } from "./Scenery";
 import { TechChip } from "./TechChip";
 import {
   FollowInfo,
@@ -14,8 +14,10 @@ import {
 } from "./useTrackFollower";
 
 const RAIL_WIDTH = 120;
-const LANE_X = 60; // the fast lane down the middle of the rail
-const SPUR_X = 116; // garage entrance — right up against the cam panel
+const LANE_X = 84; // the straight pit lane in front of the building
+const DOOR_X = 56; // apron where the car stops at its garage door
+const BUILDING = { x: 4, w: 42, d: 6 };
+const MARKER_OFFSET = 36;
 
 // Pirelli-style compounds fitted at each stop. Stop 2 also replaces the
 // front wing the car arrives with damaged.
@@ -32,16 +34,15 @@ const projects = [
   ...project.otherProjects.projects,
 ];
 
-// Down the lane, swing right to the garage door (the wheel-gun cam panel),
-// hold alongside it, back out — for every stop.
+// Straight down the lane, swing left to the garage door, hold, pull back out.
 const buildLane = (anchors: { x: number; y: number }[], height: number) => {
   const pts: Waypoint[] = [{ x: LANE_X, y: 0 }];
   anchors.forEach((a) => {
     pts.push(
-      { x: LANE_X, y: a.y - 58, r: 16 },
-      { x: SPUR_X, y: a.y - 24, r: 12 },
-      { x: SPUR_X, y: a.y + 24, r: 12 },
-      { x: LANE_X, y: a.y + 58, r: 16 }
+      { x: LANE_X, y: a.y - 56, r: 16 },
+      { x: DOOR_X, y: a.y - 22, r: 10 },
+      { x: DOOR_X, y: a.y + 22, r: 10 },
+      { x: LANE_X, y: a.y + 56, r: 16 }
     );
   });
   pts.push({ x: LANE_X, y: height });
@@ -60,7 +61,7 @@ export const PitLane = () => {
     (info: FollowInfo) => {
       if (!track) return;
       const near = track.corners.findIndex(
-        (c) => Math.abs(c.y - info.targetY) < 55
+        (c) => Math.abs(c.y - info.targetY) < 50
       );
       setAtStall(near);
     },
@@ -80,18 +81,12 @@ export const PitLane = () => {
       ? COMPOUNDS[Math.min(passed, COMPOUNDS.length) - 1].color
       : "#52525B";
 
-  // The car parks level with the centre of each card's cam panel.
   const measure = useCallback(() => {
     const list = listRef.current;
     if (!list) return;
     const anchors = itemRefs.current
       .filter((el): el is HTMLLIElement => el !== null)
-      .map((el) => {
-        const cam = el.querySelector<HTMLElement>("[data-cam]");
-        const camTop = cam ? cam.offsetTop : 0;
-        const camHeight = cam ? cam.offsetHeight : 120;
-        return { x: SPUR_X, y: el.offsetTop + camTop + camHeight / 2 };
-      });
+      .map((el) => ({ x: DOOR_X, y: el.offsetTop + MARKER_OFFSET }));
     if (anchors.length === 0) return;
     const height = list.offsetHeight;
     setTrack({ d: buildLane(anchors, height), height, corners: anchors });
@@ -117,8 +112,8 @@ export const PitLane = () => {
           Box, box.
         </h2>
         <p className="mt-4 text-white/50">
-          {projects.length} stops after the flag — the projects. Fresh tyres
-          at every box. Speed limit 60.
+          Out of the tunnel and into the garage — {projects.length} stops, one
+          per project. Speed limit 60.
         </p>
       </header>
 
@@ -132,17 +127,47 @@ export const PitLane = () => {
             fill="none"
             aria-hidden
           >
-            <text
-              x={LANE_X}
+            {/* the pit building, Apple-Maps 3D style */}
+            <Box3D
+              x={BUILDING.x}
               y={12}
+              w={BUILDING.w}
+              h={track.height - 36}
+              d={BUILDING.d}
+            />
+            {/* rooftop furniture */}
+            <circle
+              cx={BUILDING.x + BUILDING.w / 2}
+              cy={42}
+              r={11}
+              fill="none"
+              stroke="rgba(255,255,255,0.18)"
+              strokeWidth={1.5}
+            />
+            <text
+              x={BUILDING.x + BUILDING.w / 2}
+              y={45.5}
               textAnchor="middle"
-              fontSize={7}
-              className="font-mono"
-              fill="rgba(255,255,255,0.35)"
+              fontSize={9}
+              fontWeight={800}
+              fill="var(--livery)"
             >
-              PIT ENTRY
+              JW
             </text>
-            {/* lane: same asphalt as the circuit, no kerbs in here */}
+            {track.corners.map((c, i) => (
+              <rect
+                key={`ac-${i}`}
+                x={BUILDING.x + 6}
+                y={c.y - 64}
+                width={7}
+                height={7}
+                fill="#1A1A20"
+                stroke="rgba(255,255,255,0.1)"
+                strokeWidth={0.8}
+              />
+            ))}
+
+            {/* lane: same asphalt as the circuit */}
             <path
               d={track.d}
               stroke="rgba(255,255,255,0.28)"
@@ -158,6 +183,16 @@ export const PitLane = () => {
               strokeLinecap="round"
               strokeLinejoin="round"
             />
+            {/* speed-limit centre line on the straight */}
+            <line
+              x1={LANE_X}
+              y1={56}
+              x2={LANE_X}
+              y2={track.height - 16}
+              stroke="rgba(255,255,255,0.12)"
+              strokeWidth={1.5}
+              strokeDasharray="8 8"
+            />
             {trackLength > 0 && (
               <motion.path
                 d={track.d}
@@ -172,16 +207,68 @@ export const PitLane = () => {
                 }}
               />
             )}
-            <text
-              x={LANE_X}
-              y={track.height - 8}
-              textAnchor="middle"
-              fontSize={7}
-              className="font-mono"
-              fill="rgba(255,255,255,0.35)"
-            >
-              PIT EXIT
-            </text>
+
+            {/* garage doors cut into the building face */}
+            {track.corners.map((c, i) => (
+              <g key={`door-${i}`}>
+                {atStall === i && (
+                  <motion.rect
+                    x={BUILDING.x + BUILDING.w - 9}
+                    y={c.y - 12}
+                    width={10}
+                    height={24}
+                    rx={2}
+                    fill="var(--livery)"
+                    animate={{ opacity: [0.15, 0.5, 0.15] }}
+                    transition={{ duration: 1.1, repeat: Infinity }}
+                  />
+                )}
+                <rect
+                  x={BUILDING.x + BUILDING.w - 7}
+                  y={c.y - 11}
+                  width={7}
+                  height={22}
+                  fill="#08080A"
+                  stroke="rgba(255,255,255,0.18)"
+                  strokeWidth={1}
+                />
+                <text
+                  x={BUILDING.x + BUILDING.w - 12}
+                  y={c.y + 2.5}
+                  textAnchor="end"
+                  fontSize={7}
+                  className="font-mono"
+                  fill={
+                    passed > i ? "var(--livery)" : "rgba(255,255,255,0.35)"
+                  }
+                >
+                  P{i + 1}
+                </text>
+                {/* the crew at the door when the car boxes */}
+                {atStall === i &&
+                  [
+                    { x: DOOR_X - 9, y: c.y - 16 },
+                    { x: DOOR_X + 9, y: c.y - 16 },
+                    { x: DOOR_X - 9, y: c.y + 16 },
+                    { x: DOOR_X + 9, y: c.y + 16 },
+                  ].map((p, j) => (
+                    <motion.g
+                      key={j}
+                      transform={`translate(${p.x} ${p.y})`}
+                      animate={{ y: [0, -1.6, 0] }}
+                      transition={{
+                        duration: 0.4,
+                        repeat: Infinity,
+                        delay: j * 0.1,
+                      }}
+                    >
+                      <CrewDot />
+                    </motion.g>
+                  ))}
+              </g>
+            ))}
+
+            {/* car */}
             {trackLength > 0 && (
               <motion.g style={{ transform: carTransform }}>
                 <RaceCar
@@ -191,10 +278,49 @@ export const PitLane = () => {
                 />
               </motion.g>
             )}
+
+            {/* tunnel mouth — the car emerges from underground */}
+            <defs>
+              <linearGradient id="tunnelOut" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="35%" stopColor="#050505" stopOpacity="1" />
+                <stop offset="100%" stopColor="#050505" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <rect x={LANE_X - 15} y={0} width={30} height={54} fill="url(#tunnelOut)" />
+            <rect
+              x={LANE_X - 18}
+              y={50}
+              width={36}
+              height={6}
+              rx={3}
+              fill="#26262D"
+              stroke="rgba(255,255,255,0.12)"
+              strokeWidth={0.8}
+            />
+            <text
+              x={LANE_X}
+              y={66}
+              textAnchor="middle"
+              fontSize={6.5}
+              className="font-mono"
+              fill="rgba(255,255,255,0.35)"
+            >
+              TUNNEL EXIT
+            </text>
+            <text
+              x={LANE_X}
+              y={track.height - 6}
+              textAnchor="middle"
+              fontSize={7}
+              className="font-mono"
+              fill="rgba(255,255,255,0.35)"
+            >
+              PIT EXIT
+            </text>
           </svg>
         )}
 
-        <ol ref={listRef} className="relative space-y-16 pl-[132px] pt-16">
+        <ol ref={listRef} className="relative space-y-16 pl-[132px] pt-20">
           {projects.map((item, i) => {
             const compound = COMPOUNDS[i % COMPOUNDS.length];
             return (
@@ -209,16 +335,7 @@ export const PitLane = () => {
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, ease: [0.21, 0.6, 0.35, 1] }}
               >
-                <div data-cam>
-                  <PitBox
-                    box={i + 1}
-                    compound={compound}
-                    fitted={passed > i}
-                    active={atStall === i}
-                  />
-                </div>
-
-                <p className="mt-4 font-mono text-[11px] uppercase tracking-widest text-white/40">
+                <p className="font-mono text-[11px] uppercase tracking-widest text-white/40">
                   Stop {i + 1} ·{" "}
                   <span style={{ color: "var(--livery)" }}>
                     {compound.time}s

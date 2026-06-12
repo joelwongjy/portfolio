@@ -7,6 +7,14 @@ import { experience } from "@/data/experience";
 
 import { RaceCar } from "./RaceCar";
 import { RaceState, useRace } from "./RaceContext";
+import {
+  Casino,
+  FerrisWheel,
+  Grandstand,
+  MarinaBaySands,
+  Trees,
+  TwinTowers,
+} from "./Scenery";
 import { TechChip } from "./TechChip";
 import {
   FollowInfo,
@@ -323,6 +331,31 @@ export const Circuit = () => {
                 />
               ))
             )}
+            {/* grass verges along the whole lap */}
+            <path
+              d={track.d}
+              stroke="#152F1B"
+              strokeWidth={26}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity={0.6}
+            />
+            {/* trackside landmarks, one per corner, opposite the apex */}
+            {track.corners.map((corner, i) => {
+              const zx = corner.x === LEFT_X ? 62 : 12;
+              const landmarks = [
+                <MarinaBaySands key="mbs" x={zx + 4} y={corner.y - 12} />,
+                <Casino key="casino" x={zx + 6} y={corner.y - 12} />,
+                <Trees key="spa" x={zx + 8} y={corner.y - 8} />,
+                <Grandstand key="monza" x={zx + 2} y={corner.y - 6} />,
+                <FerrisWheel key="suzuka" x={zx + 24} y={corner.y - 2} />,
+                <Trees key="silverstone" x={zx + 8} y={corner.y - 8} />,
+                <TwinTowers key="sg" x={zx + 6} y={corner.y - 10} />,
+              ];
+              return (
+                <g key={`scenery-${i}`}>{landmarks[i % landmarks.length]}</g>
+              );
+            })}
             {/* red and white kerbs peeking out at every corner */}
             {track.kerbs && (
               <>
@@ -401,7 +434,7 @@ export const Circuit = () => {
             ))}
             <text
               x={track.corners[track.corners.length - 1].x}
-              y={track.height - 6}
+              y={track.height - 84}
               textAnchor="middle"
               fontSize={14}
             >
@@ -413,6 +446,59 @@ export const Circuit = () => {
                 <RaceCar />
               </motion.g>
             )}
+            {/* underground pit tunnel — the car drives in beneath it */}
+            <defs>
+              <linearGradient id="tunnelIn" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#050505" stopOpacity="0" />
+                <stop offset="65%" stopColor="#050505" stopOpacity="1" />
+              </linearGradient>
+            </defs>
+            {(() => {
+              const exitX = track.corners[track.corners.length - 1].x;
+              return (
+                <g>
+                  <rect
+                    x={exitX - 15}
+                    y={track.height - 58}
+                    width={30}
+                    height={58}
+                    fill="url(#tunnelIn)"
+                  />
+                  <rect
+                    x={exitX - 18}
+                    y={track.height - 62}
+                    width={36}
+                    height={6}
+                    rx={3}
+                    fill="#26262D"
+                    stroke="rgba(255,255,255,0.12)"
+                    strokeWidth={0.8}
+                  />
+                  <path
+                    d={`M ${exitX - 4} ${track.height - 46} l 4 5 l 4 -5`}
+                    stroke="rgba(255,255,255,0.35)"
+                    strokeWidth={1.5}
+                    fill="none"
+                  />
+                  <path
+                    d={`M ${exitX - 4} ${track.height - 34} l 4 5 l 4 -5`}
+                    stroke="rgba(255,255,255,0.22)"
+                    strokeWidth={1.5}
+                    fill="none"
+                  />
+                  <text
+                    x={exitX}
+                    y={track.height - 68}
+                    textAnchor="middle"
+                    fontSize={6.5}
+                    className="font-mono"
+                    fill="rgba(255,255,255,0.35)"
+                  >
+                    PIT TUNNEL
+                  </text>
+                </g>
+              );
+            })()}
           </svg>
         )}
 
