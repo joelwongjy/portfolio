@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { project } from "@/data/projects";
 
 import { roundedPath, Waypoint } from "./Circuit";
+import { PitBox } from "./PitBox";
 import { RaceCar } from "./RaceCar";
 import { TechChip } from "./TechChip";
 import {
@@ -11,7 +12,6 @@ import {
   TrackGeometry,
   useTrackFollower,
 } from "./useTrackFollower";
-import { WheelGunCam } from "./WheelGunCam";
 
 const RAIL_WIDTH = 120;
 const LANE_X = 60; // the fast lane down the middle of the rail
@@ -203,7 +203,7 @@ export const PitLane = () => {
                 transition={{ duration: 0.5, ease: [0.21, 0.6, 0.35, 1] }}
               >
                 <div data-cam>
-                  <WheelGunCam
+                  <PitBox
                     box={i + 1}
                     compound={compound}
                     active={atStall === i}
