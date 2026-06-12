@@ -12,6 +12,11 @@
     @apply max-w-none bg-[#050505] px-0;
   }
 
+  /* svgr icons carry white "empty space" fills meant for light pages */
+  body.v2 .empty-space {
+    fill: transparent;
+  }
+
   h2,
   p,
   span {

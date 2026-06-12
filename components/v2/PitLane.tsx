@@ -5,7 +5,7 @@ import { project } from "@/data/projects";
 
 import { roundedPath, Waypoint } from "./Circuit";
 import { RaceCar } from "./RaceCar";
-import { Box3D, CrewDot } from "./Scenery";
+import { Box3D, CrewDot, TunnelPortal, Windows } from "./Scenery";
 import { TechChip } from "./TechChip";
 import {
   FollowInfo,
@@ -135,36 +135,63 @@ export const PitLane = () => {
               h={track.height - 36}
               d={BUILDING.d}
             />
-            {/* rooftop furniture */}
+            {/* helipad up top */}
             <circle
               cx={BUILDING.x + BUILDING.w / 2}
-              cy={42}
-              r={11}
+              cy={40}
+              r={10}
               fill="none"
               stroke="rgba(255,255,255,0.18)"
               strokeWidth={1.5}
             />
             <text
               x={BUILDING.x + BUILDING.w / 2}
-              y={45.5}
+              y={43.5}
               textAnchor="middle"
               fontSize={9}
+              fontWeight={700}
+              fill="rgba(255,255,255,0.4)"
+            >
+              H
+            </text>
+            {/* the giant painted roof mark, Vegas pit-building style */}
+            <text
+              x={BUILDING.x + BUILDING.w / 2 + 9}
+              y={(track.corners[0].y + track.corners[track.corners.length - 1].y) / 2}
+              textAnchor="middle"
+              fontSize={30}
               fontWeight={800}
               fill="var(--livery)"
+              opacity={0.9}
+              transform={`rotate(90 ${BUILDING.x + BUILDING.w / 2 + 9} ${
+                (track.corners[0].y +
+                  track.corners[track.corners.length - 1].y) /
+                2
+              })`}
+              style={{ letterSpacing: 6 }}
             >
-              JW
+              JW RACING
             </text>
+            {/* glazed front along the lane + rooftop AC units */}
             {track.corners.map((c, i) => (
-              <rect
-                key={`ac-${i}`}
-                x={BUILDING.x + 6}
-                y={c.y - 64}
-                width={7}
-                height={7}
-                fill="#1A1A20"
-                stroke="rgba(255,255,255,0.1)"
-                strokeWidth={0.8}
-              />
+              <g key={`facade-${i}`}>
+                <Windows
+                  x={BUILDING.x + BUILDING.w - 6}
+                  y={c.y - 56}
+                  cols={1}
+                  rows={6}
+                  pitchY={5.4}
+                />
+                <rect
+                  x={BUILDING.x + 6}
+                  y={c.y - 64}
+                  width={7}
+                  height={7}
+                  fill="#252840"
+                  stroke="rgba(255,255,255,0.1)"
+                  strokeWidth={0.8}
+                />
+              </g>
             ))}
 
             {/* lane: same asphalt as the circuit */}
@@ -279,27 +306,11 @@ export const PitLane = () => {
               </motion.g>
             )}
 
-            {/* tunnel mouth — the car emerges from underground */}
-            <defs>
-              <linearGradient id="tunnelOut" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="35%" stopColor="#050505" stopOpacity="1" />
-                <stop offset="100%" stopColor="#050505" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <rect x={LANE_X - 15} y={0} width={30} height={54} fill="url(#tunnelOut)" />
-            <rect
-              x={LANE_X - 18}
-              y={50}
-              width={36}
-              height={6}
-              rx={3}
-              fill="#26262D"
-              stroke="rgba(255,255,255,0.12)"
-              strokeWidth={0.8}
-            />
+            {/* Yas Marina tunnel mouth — the car emerges from underground */}
+            <TunnelPortal x={LANE_X} mouthY={2} dir="out" id="tunnelOut" />
             <text
               x={LANE_X}
-              y={66}
+              y={70}
               textAnchor="middle"
               fontSize={6.5}
               className="font-mono"

@@ -12,7 +12,9 @@ import {
   FerrisWheel,
   Grandstand,
   MarinaBaySands,
+  StreetWalls,
   Trees,
+  TunnelPortal,
   TwinTowers,
 } from "./Scenery";
 import { TechChip } from "./TechChip";
@@ -353,7 +355,14 @@ export const Circuit = () => {
                 <TwinTowers key="sg" x={zx + 6} y={corner.y - 10} />,
               ];
               return (
-                <g key={`scenery-${i}`}>{landmarks[i % landmarks.length]}</g>
+                <g key={`scenery-${i}`}>
+                  {/* street circuit: concrete walls + catch fencing */}
+                  {(i % landmarks.length === 0 ||
+                    i % landmarks.length === 6) && (
+                    <StreetWalls x={corner.x} y={corner.y} />
+                  )}
+                  {landmarks[i % landmarks.length]}
+                </g>
               );
             })}
             {/* red and white kerbs peeking out at every corner */}
@@ -414,18 +423,18 @@ export const Circuit = () => {
                 <circle
                   cx={corner.x}
                   cy={corner.y}
-                  r={7}
+                  r={5.5}
                   fill="#050505"
                   stroke={
                     i < passed ? "var(--livery)" : "rgba(255,255,255,0.25)"
                   }
-                  strokeWidth={2}
+                  strokeWidth={1.8}
                 />
                 <text
-                  x={corner.x + (i % 2 === 0 ? 14 : -14)}
-                  y={corner.y + 3}
+                  x={corner.x + (i % 2 === 0 ? 16 : -16)}
+                  y={corner.y + 2.5}
                   textAnchor={i % 2 === 0 ? "start" : "end"}
-                  fontSize={9}
+                  fontSize={8}
                   fill={i < passed ? "var(--livery)" : "rgba(255,255,255,0.3)"}
                 >
                   T{i + 1}
@@ -446,59 +455,23 @@ export const Circuit = () => {
                 <RaceCar />
               </motion.g>
             )}
-            {/* underground pit tunnel — the car drives in beneath it */}
-            <defs>
-              <linearGradient id="tunnelIn" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#050505" stopOpacity="0" />
-                <stop offset="65%" stopColor="#050505" stopOpacity="1" />
-              </linearGradient>
-            </defs>
-            {(() => {
-              const exitX = track.corners[track.corners.length - 1].x;
-              return (
-                <g>
-                  <rect
-                    x={exitX - 15}
-                    y={track.height - 58}
-                    width={30}
-                    height={58}
-                    fill="url(#tunnelIn)"
-                  />
-                  <rect
-                    x={exitX - 18}
-                    y={track.height - 62}
-                    width={36}
-                    height={6}
-                    rx={3}
-                    fill="#26262D"
-                    stroke="rgba(255,255,255,0.12)"
-                    strokeWidth={0.8}
-                  />
-                  <path
-                    d={`M ${exitX - 4} ${track.height - 46} l 4 5 l 4 -5`}
-                    stroke="rgba(255,255,255,0.35)"
-                    strokeWidth={1.5}
-                    fill="none"
-                  />
-                  <path
-                    d={`M ${exitX - 4} ${track.height - 34} l 4 5 l 4 -5`}
-                    stroke="rgba(255,255,255,0.22)"
-                    strokeWidth={1.5}
-                    fill="none"
-                  />
-                  <text
-                    x={exitX}
-                    y={track.height - 68}
-                    textAnchor="middle"
-                    fontSize={6.5}
-                    className="font-mono"
-                    fill="rgba(255,255,255,0.35)"
-                  >
-                    PIT TUNNEL
-                  </text>
-                </g>
-              );
-            })()}
+            {/* Yas Marina underpass — the car drives in beneath it */}
+            <TunnelPortal
+              x={track.corners[track.corners.length - 1].x}
+              mouthY={track.height - 2}
+              dir="in"
+              id="tunnelIn"
+            />
+            <text
+              x={track.corners[track.corners.length - 1].x}
+              y={track.height - 68}
+              textAnchor="middle"
+              fontSize={6.5}
+              className="font-mono"
+              fill="rgba(255,255,255,0.35)"
+            >
+              PIT TUNNEL
+            </text>
           </svg>
         )}
 
@@ -518,16 +491,16 @@ export const Circuit = () => {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="font-mono text-[11px] uppercase tracking-widest text-white/40">
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-white/40">
                       T{i + 1} · {item.start} — {item.end}
                     </p>
                     <p
-                      className="mt-0.5 font-mono text-[10px] uppercase tracking-widest"
+                      className="mt-1 font-mono text-[10px] uppercase tracking-widest opacity-90"
                       style={{ color: "var(--livery)" }}
                     >
                       {meta.corner} · {meta.circuit}
                     </p>
-                    <h3 className="mt-2 text-xl font-bold text-white">
+                    <h3 className="mt-2.5 text-xl font-bold tracking-tight text-white">
                       {item.title}
                     </h3>
                   </div>

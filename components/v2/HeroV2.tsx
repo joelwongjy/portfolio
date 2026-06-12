@@ -49,7 +49,7 @@ export const HeroV2 = () => {
         custom={0}
         initial="hidden"
         animate="visible"
-        className="absolute inset-x-0 top-16 flex items-center justify-between px-5 font-mono text-[10px] uppercase tracking-[0.25em] text-white/40 sm:top-20 sm:px-10"
+        className="absolute inset-x-0 top-16 flex items-center justify-between px-5 font-mono text-[10px] uppercase tracking-[0.25em] text-white/30 sm:top-20 sm:px-10"
       >
         <span>Rnd 26 · Marina Bay</span>
         <span className="flex items-center gap-2">
