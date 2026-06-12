@@ -1,21 +1,56 @@
+interface RaceCarProps {
+  // skews and greys the front wing until the pit crew fits a fresh one
+  damagedWing?: boolean;
+  // tyre sidewall colour (Pirelli compound); undefined leaves plain rubber
+  compound?: string;
+  // up on the jacks: wheels spread away from the floor mid-stop
+  jacked?: boolean;
+}
+
+const WHEELS = [
+  { x: -15, y: -11, w: 8, side: -1 },
+  { x: -15, y: 5.5, w: 8, side: 1 },
+  { x: 6, y: -10.5, w: 7, side: -1 },
+  { x: 6, y: 5, w: 7, side: 1 },
+];
+
 // Top-down F1 car, drawn pointing +x and centred on the origin so it can be
 // rotated to the track tangent. Painted with the livery CSS variable.
-// `damagedWing` skews and greys the front wing until the pit crew fits a
-// fresh one.
-export const RaceCar = ({ damagedWing = false }: { damagedWing?: boolean }) => (
+export const RaceCar = ({
+  damagedWing = false,
+  compound,
+  jacked = false,
+}: RaceCarProps) => (
   <g style={{ filter: "drop-shadow(0 1.5px 2.5px rgba(0,0,0,0.6))" }}>
     {/* rear wing */}
     <rect x={-19} y={-8} width={3.6} height={16} rx={1.2} fill="#1C1C1F" />
     <rect x={-19} y={-8} width={1.4} height={16} rx={0.7} fill="var(--livery)" opacity={0.9} />
     {/* wheels */}
-    <rect x={-15} y={-11} width={8} height={5.5} rx={2} fill="#141416" />
-    <rect x={-15} y={5.5} width={8} height={5.5} rx={2} fill="#141416" />
-    <rect x={6} y={-10.5} width={7} height={5.5} rx={2} fill="#141416" />
-    <rect x={6} y={5} width={7} height={5.5} rx={2} fill="#141416" />
-    <rect x={-13.4} y={-9.4} width={4.8} height={2.3} rx={1.1} fill="#2E2E33" />
-    <rect x={-13.4} y={7.1} width={4.8} height={2.3} rx={1.1} fill="#2E2E33" />
-    <rect x={7.3} y={-8.9} width={4.4} height={2.3} rx={1.1} fill="#2E2E33" />
-    <rect x={7.3} y={6.6} width={4.4} height={2.3} rx={1.1} fill="#2E2E33" />
+    {WHEELS.map((wheel, i) => (
+      <g
+        key={i}
+        transform={jacked ? `translate(0 ${wheel.side * 1.8})` : undefined}
+      >
+        <rect
+          x={wheel.x}
+          y={wheel.y}
+          width={wheel.w}
+          height={5.5}
+          rx={2}
+          fill="#141416"
+          stroke={compound}
+          strokeWidth={compound ? 1.5 : 0}
+        />
+        <rect
+          x={wheel.x + 1.5}
+          y={wheel.y + 1.6}
+          width={wheel.w - 3}
+          height={2.3}
+          rx={1.1}
+          fill="#2E2E33"
+        />
+      </g>
+    ))}
     {/* floor */}
     <rect x={-16} y={-7} width={24} height={14} rx={4} fill="#101014" />
     {/* monocoque + sidepods */}

@@ -32,20 +32,29 @@ const projects = [
   ...project.otherProjects.projects,
 ];
 
-// In, stop at the box, out — for every stall.
+// In, stop at the box, out — for every stall. The long vertical run through
+// the box keeps the car "stationary" in it for more of the scroll.
 const buildLane = (anchors: { x: number; y: number }[], height: number) => {
   const pts: Waypoint[] = [{ x: LANE_X, y: 0 }];
   anchors.forEach((a) => {
     pts.push(
-      { x: LANE_X, y: a.y - 52, r: 16 },
-      { x: BOX_X, y: a.y - 18, r: 12 },
-      { x: BOX_X, y: a.y + 18, r: 12 },
-      { x: LANE_X, y: a.y + 52, r: 16 }
+      { x: LANE_X, y: a.y - 58, r: 16 },
+      { x: BOX_X, y: a.y - 26, r: 12 },
+      { x: BOX_X, y: a.y + 26, r: 12 },
+      { x: LANE_X, y: a.y + 58, r: 16 }
     );
   });
   pts.push({ x: LANE_X, y: height });
   return `M ${LANE_X} 0` + roundedPath(pts);
 };
+
+// Screen offsets of the four wheels of a car parked nose-down at a stall.
+const WHEEL_SPOTS = [
+  { dx: -8, dy: -10 },
+  { dx: 8, dy: -10 },
+  { dx: -8, dy: 10 },
+  { dx: 8, dy: 10 },
+];
 
 const Tyre = ({
   compound,
@@ -76,12 +85,13 @@ export const PitLane = () => {
 
   const [track, setTrack] = useState<TrackGeometry>();
   const [atStall, setAtStall] = useState(-1);
+  const [justFitted, setJustFitted] = useState<number | null>(null);
 
   const onUpdate = useCallback(
     (info: FollowInfo) => {
       if (!track) return;
       const near = track.corners.findIndex(
-        (c) => Math.abs(c.y - info.targetY) < 44
+        (c) => Math.abs(c.y - info.targetY) < 50
       );
       setAtStall(near);
     },
@@ -94,6 +104,24 @@ export const PitLane = () => {
     track,
     onUpdate
   );
+
+  // One-shot tyre/wing change choreography when the car clears a stop.
+  const prevPassed = useRef(0);
+  useEffect(() => {
+    if (passed > prevPassed.current) {
+      setJustFitted(passed - 1);
+      const timer = window.setTimeout(() => setJustFitted(null), 800);
+      prevPassed.current = passed;
+      return () => window.clearTimeout(timer);
+    }
+    prevPassed.current = passed;
+  }, [passed]);
+
+  // worn rubber on arrival, then whatever the last stop fitted
+  const carCompound =
+    passed > 0
+      ? COMPOUNDS[Math.min(passed, COMPOUNDS.length) - 1].color
+      : "#52525B";
 
   const measure = useCallback(() => {
     const list = listRef.current;
@@ -192,9 +220,95 @@ export const PitLane = () => {
             >
               PIT EXIT
             </text>
+            {/* pit crew working each wheel while the car is in the box */}
+            {atStall >= 0 &&
+              track.corners[atStall] &&
+              WHEEL_SPOTS.map((spot, j) => (
+                <motion.circle
+                  key={`crew-${j}`}
+                  cx={track.corners[atStall].x + spot.dx * 1.7}
+                  cy={track.corners[atStall].y + spot.dy}
+                  r={2}
+                  fill="var(--livery)"
+                  animate={{ opacity: [0.25, 1, 0.25] }}
+                  transition={{
+                    duration: 0.45,
+                    repeat: Infinity,
+                    delay: j * 0.1,
+                  }}
+                />
+              ))}
+
+            {/* old tyres off, new compound on */}
+            {justFitted !== null && track.corners[justFitted] && (
+              <g>
+                {WHEEL_SPOTS.map((spot, j) => {
+                  const wheelX = track.corners[justFitted].x + spot.dx;
+                  const wheelY = track.corners[justFitted].y + spot.dy;
+                  const out = spot.dx < 0 ? -28 : 28;
+                  return (
+                    <g key={`swap-${j}`}>
+                      <motion.g
+                        initial={{ x: wheelX, y: wheelY, opacity: 1, rotate: 0 }}
+                        animate={{
+                          x: wheelX + out,
+                          y: wheelY + 12,
+                          opacity: 0,
+                          rotate: 90,
+                        }}
+                        transition={{ duration: 0.55, ease: "easeOut" }}
+                      >
+                        <rect x={-2.75} y={-4} width={5.5} height={8} rx={2} fill="#3F3F46" />
+                      </motion.g>
+                      <motion.g
+                        initial={{ x: wheelX + out, y: wheelY - 14, opacity: 0 }}
+                        animate={{ x: wheelX, y: wheelY, opacity: [0, 1, 0] }}
+                        transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+                      >
+                        <rect
+                          x={-2.75}
+                          y={-4}
+                          width={5.5}
+                          height={8}
+                          rx={2}
+                          fill="#141416"
+                          stroke={COMPOUNDS[justFitted % COMPOUNDS.length].color}
+                          strokeWidth={1.5}
+                        />
+                      </motion.g>
+                    </g>
+                  );
+                })}
+                {/* broken front wing tumbles away at the wing stop */}
+                {justFitted === WING_STOP && (
+                  <motion.g
+                    initial={{
+                      x: track.corners[justFitted].x,
+                      y: track.corners[justFitted].y + 15,
+                      opacity: 1,
+                      rotate: -14,
+                    }}
+                    animate={{
+                      x: track.corners[justFitted].x - 24,
+                      y: track.corners[justFitted].y + 44,
+                      opacity: 0,
+                      rotate: -80,
+                    }}
+                    transition={{ duration: 0.65, ease: "easeOut" }}
+                  >
+                    <rect x={-6.5} y={-1.8} width={13} height={3.6} rx={1.4} fill="#55555C" />
+                  </motion.g>
+                )}
+              </g>
+            )}
+
             {trackLength > 0 && (
               <motion.g style={{ transform: carTransform }}>
-                <RaceCar damagedWing={passed <= WING_STOP} />
+                <RaceCar
+                  damagedWing={passed <= WING_STOP}
+                  compound={carCompound}
+                  jacked={atStall >= 0}
+                />
               </motion.g>
             )}
           </svg>
@@ -219,32 +333,11 @@ export const PitLane = () => {
                 {/* garage box around the stop point */}
                 <div
                   aria-hidden
-                  className={`absolute -left-[118px] top-0 h-12 w-16 rounded-lg border transition-colors ${
+                  className={`absolute -left-[118px] -top-2 h-16 w-16 rounded-lg border transition-colors ${
                     fitted ? "border-white/30" : "border-white/10"
                   }`}
                 >
-                  {/* pit crew at work */}
-                  {atStall === i &&
-                    [0, 1, 2, 3].map((j) => (
-                      <motion.span
-                        key={j}
-                        className="absolute h-1.5 w-1.5 rounded-full"
-                        style={{
-                          backgroundColor: "var(--livery)",
-                          left: j % 2 === 0 ? -3 : undefined,
-                          right: j % 2 === 1 ? -3 : undefined,
-                          top: j < 2 ? 8 : undefined,
-                          bottom: j >= 2 ? 8 : undefined,
-                        }}
-                        animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.5, 1] }}
-                        transition={{
-                          duration: 0.45,
-                          repeat: Infinity,
-                          delay: j * 0.1,
-                        }}
-                      />
-                    ))}
-                  <span className="absolute right-1 top-1/2 -translate-y-1/2">
+                  <span className="absolute right-0.5 top-1/2 -translate-y-1/2">
                     <Tyre compound={compound} fitted={fitted} />
                   </span>
                   <span className="absolute -bottom-5 left-0 right-0 text-center font-mono text-[9px] text-white/40">
