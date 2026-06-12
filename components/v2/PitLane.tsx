@@ -11,6 +11,7 @@ import {
   TrackGeometry,
   useTrackFollower,
 } from "./useTrackFollower";
+import { WheelGunCam } from "./WheelGunCam";
 
 const RAIL_WIDTH = 120;
 const LANE_X = 84; // the fast lane the car drives down
@@ -358,6 +359,13 @@ export const PitLane = () => {
                 <h3 className="mt-2 text-xl font-bold text-white">
                   {item.title}
                 </h3>
+                <div className="mt-3">
+                  <WheelGunCam
+                    compound={compound}
+                    active={atStall === i}
+                    wingStop={i === WING_STOP}
+                  />
+                </div>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   {item.description}
                 </p>
