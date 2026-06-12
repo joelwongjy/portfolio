@@ -29,7 +29,12 @@ interface Corner {
 // radii, rotated so the complex enters and exits vertically. The rounding
 // pass below turns the waypoint chain into tangent arcs — a racing line
 // never changes direction discontinuously.
-type Motif = (xa: number, ya: number, xb: number, yb: number) => string;
+type Motif = (
+  xa: number,
+  ya: number,
+  xb: number,
+  yb: number
+) => { d: string; kerbs: string };
 
 export interface Waypoint {
   x: number;
@@ -38,9 +43,13 @@ export interface Waypoint {
 }
 
 // Replace every interior waypoint with a circular arc of its radius,
-// trimming the adjoining straights to the tangent points.
-export const roundedPath = (pts: Waypoint[]) => {
+// trimming the adjoining straights to the tangent points. Arc segments are
+// also returned separately so the corners can be dressed with kerbs.
+export const roundedPath = (
+  pts: Waypoint[]
+): { d: string; kerbs: string } => {
   let d = "";
+  let kerbs = "";
   for (let i = 1; i < pts.length - 1; i++) {
     const p0 = pts[i - 1];
     const p1 = pts[i];
@@ -64,14 +73,18 @@ export const roundedPath = (pts: Waypoint[]) => {
     const radius = trim / Math.tan(angle / 2);
     const a = { x: p1.x - v1.x * trim, y: p1.y - v1.y * trim };
     const b = { x: p1.x + v2.x * trim, y: p1.y + v2.y * trim };
-    d += ` L ${a.x.toFixed(1)} ${a.y.toFixed(1)}`;
-    d += ` A ${radius.toFixed(1)} ${radius.toFixed(1)} 0 0 ${
+    const arc = `A ${radius.toFixed(1)} ${radius.toFixed(1)} 0 0 ${
       cross > 0 ? 1 : 0
     } ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+    d += ` L ${a.x.toFixed(1)} ${a.y.toFixed(1)} ${arc}`;
+    // only meaningful direction changes earn a kerb
+    if (angle > 0.25) {
+      kerbs += `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} ${arc} `;
+    }
   }
   const last = pts[pts.length - 1];
   d += ` L ${last.x} ${last.y}`;
-  return d;
+  return { d, kerbs };
 };
 
 // Canonical waypoints are written for a left anchor (x 24) flowing to a
@@ -159,13 +172,16 @@ export const CORNER_META = [
 
 const buildTrack = (corners: Corner[], height: number) => {
   let d = `M ${corners[0].x} 0 L ${corners[0].x} ${corners[0].y}`;
+  let kerbs = "";
   for (let i = 0; i < corners.length - 1; i++) {
     const a = corners[i];
     const b = corners[i + 1];
-    d += " " + MOTIFS[i % MOTIFS.length](a.x, a.y, b.x, b.y);
+    const seg = MOTIFS[i % MOTIFS.length](a.x, a.y, b.x, b.y);
+    d += " " + seg.d;
+    kerbs += seg.kerbs;
   }
   d += ` L ${corners[corners.length - 1].x} ${height}`;
-  return d;
+  return { d, kerbs };
 };
 
 const OrganisationLogo = ({ organisation }: { organisation: string }) => {
@@ -251,7 +267,8 @@ export const Circuit = () => {
       }));
     if (corners.length === 0) return;
     const height = list.offsetHeight;
-    setTrack({ d: buildTrack(corners, height), height, corners });
+    const built = buildTrack(corners, height);
+    setTrack({ d: built.d, kerbs: built.kerbs, height, corners });
   }, []);
 
   useEffect(() => {
@@ -306,12 +323,40 @@ export const Circuit = () => {
                 />
               ))
             )}
+            {/* red and white kerbs peeking out at every corner */}
+            {track.kerbs && (
+              <>
+                <path
+                  d={track.kerbs}
+                  stroke="#D62E2E"
+                  strokeWidth={15}
+                  strokeDasharray="7 7"
+                  fill="none"
+                />
+                <path
+                  d={track.kerbs}
+                  stroke="#EDEDED"
+                  strokeWidth={15}
+                  strokeDasharray="7 7"
+                  strokeDashoffset={7}
+                  fill="none"
+                />
+              </>
+            )}
+            {/* white track limits */}
+            <path
+              d={track.d}
+              stroke="rgba(255,255,255,0.28)"
+              strokeWidth={12.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
             {/* tarmac */}
             <path
               ref={pathRef}
               d={track.d}
-              stroke="rgba(255,255,255,0.12)"
-              strokeWidth={6}
+              stroke="#1E1E23"
+              strokeWidth={11}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -320,7 +365,7 @@ export const Circuit = () => {
               <motion.path
                 d={track.d}
                 stroke="var(--livery)"
-                strokeWidth={6}
+                strokeWidth={4}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray={trackLength}

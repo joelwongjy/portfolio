@@ -3,6 +3,7 @@ import { RefObject, useEffect, useState } from "react";
 
 export interface TrackGeometry {
   d: string;
+  kerbs?: string;
   height: number;
   corners: { x: number; y: number }[];
 }

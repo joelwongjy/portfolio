@@ -45,7 +45,7 @@ const buildLane = (anchors: { x: number; y: number }[], height: number) => {
     );
   });
   pts.push({ x: LANE_X, y: height });
-  return `M ${LANE_X} 0` + roundedPath(pts);
+  return `M ${LANE_X} 0` + roundedPath(pts).d;
 };
 
 export const PitLane = () => {
@@ -142,12 +142,19 @@ export const PitLane = () => {
             >
               PIT ENTRY
             </text>
-            {/* lane */}
+            {/* lane: same asphalt as the circuit, no kerbs in here */}
+            <path
+              d={track.d}
+              stroke="rgba(255,255,255,0.28)"
+              strokeWidth={12.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
             <path
               ref={pathRef}
               d={track.d}
-              stroke="rgba(255,255,255,0.12)"
-              strokeWidth={6}
+              stroke="#1E1E23"
+              strokeWidth={11}
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -155,7 +162,7 @@ export const PitLane = () => {
               <motion.path
                 d={track.d}
                 stroke="var(--livery)"
-                strokeWidth={6}
+                strokeWidth={4}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeDasharray={trackLength}
@@ -206,8 +213,8 @@ export const PitLane = () => {
                   <PitBox
                     box={i + 1}
                     compound={compound}
+                    fitted={passed > i}
                     active={atStall === i}
-                    wingStop={i === WING_STOP}
                   />
                 </div>
 
