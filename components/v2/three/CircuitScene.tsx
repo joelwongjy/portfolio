@@ -241,6 +241,8 @@ const Rig = ({
       tan: new THREE.Vector3(),
       tan2: new THREE.Vector3(),
       cam: new THREE.Vector3(),
+      camAnchor: new THREE.Vector3(),
+      camTan: new THREE.Vector3(),
       target: new THREE.Vector3(),
     }),
     []
@@ -257,6 +259,9 @@ const Rig = ({
 
     track.raceCurve.getPointAt(t, tmp.pos);
     track.raceCurve.getTangentAt(t, tmp.tan);
+    // the camera tracks the smoother centreline, slightly behind the car
+    track.curve.getPointAt(t, tmp.camAnchor);
+    track.curve.getTangentAt(t, tmp.camTan);
 
     if (carRef.current) {
       carRef.current.position.copy(tmp.pos);
@@ -279,13 +284,15 @@ const Rig = ({
 
     const [t0, t1] = track.tunnelFractions;
     const inTunnel = t > t0 - 0.012 && t < t1 + 0.004;
-    const back = inTunnel ? -9 : -17;
-    const lift = inTunnel ? 2.4 : 11;
-    tmp.cam.copy(tmp.pos).addScaledVector(tmp.tan, back);
-    tmp.cam.y = tmp.pos.y + lift;
-    camera.position.lerp(tmp.cam, k);
-    tmp.target.copy(tmp.pos).addScaledVector(tmp.tan, 9);
-    look.current.lerp(tmp.target, k);
+    const back = inTunnel ? -9 : -16;
+    const lift = inTunnel ? 2.4 : 12.5;
+    // heavier damping for the camera than the car keeps corners calm
+    const kCam = 1 - Math.exp(-3.2 * Math.min(dt, 0.05));
+    tmp.cam.copy(tmp.camAnchor).addScaledVector(tmp.camTan, back);
+    tmp.cam.y = tmp.camAnchor.y + lift;
+    camera.position.lerp(tmp.cam, kCam);
+    tmp.target.copy(tmp.pos).addScaledVector(tmp.tan, 8);
+    look.current.lerp(tmp.target, kCam);
     camera.lookAt(look.current);
 
     // speed feel: widen the view and tremble slightly at pace
@@ -434,15 +441,37 @@ const STANDS = [
 
 const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
   const track = useMemo(buildTrack, []);
-  const asphalt = useMemo(() => ribbonGeometry(track, 7.2, 0.02), [track]);
+  const asphalt = useMemo(() => ribbonGeometry(track, 8.6, 0.02), [track]);
   const line = useMemo(
     () => ribbonGeometry(track, 0.7, 0.07, 0, 1, 0, 0, true),
     [track]
   );
-  const armcoL = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, 4.2, 0.55), [track]);
-  const armcoR = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, -4.2, 0.55), [track]);
-  const skirtL = useMemo(() => skirtGeometry(track, 3.65), [track]);
-  const skirtR = useMemo(() => skirtGeometry(track, -3.65), [track]);
+  const armcoL = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, 4.9, 0.55), [track]);
+  const armcoR = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, -4.9, 0.55), [track]);
+  const skirtL = useMemo(() => skirtGeometry(track, 4.32), [track]);
+  const skirtR = useMemo(() => skirtGeometry(track, -4.32), [track]);
+  // greenery only where it cannot touch the asphalt
+  const trees = useMemo(() => {
+    const spots = [
+      [58, 50],
+      [63, 47],
+      [55, 54],
+      [18, 36],
+      [26, 46],
+      [12, 30],
+      [70, -36],
+      [44, -48],
+      [30, 38],
+      [76, -34],
+    ];
+    return spots.filter(([x, z]) => {
+      for (let s = 0; s < track.samples.length; s += 8) {
+        const p = track.samples[s];
+        if ((p.x - x) ** 2 + (p.z - z) ** 2 < 9 * 9) return false;
+      }
+      return true;
+    });
+  }, [track]);
   const [tun0, tun1] = track.tunnelFractions;
   const tunnelRoof = useMemo(
     () => ribbonGeometry(track, 10, 4.4, tun0, tun1),
@@ -633,16 +662,7 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
       ))}
 
       {/* greenery */}
-      {[
-        [58, 50],
-        [63, 47],
-        [55, 54],
-        [18, 36],
-        [26, 46],
-        [12, 30],
-        [70, -36],
-        [44, -48],
-      ].map(([x, z], i) => (
+      {trees.map(([x, z], i) => (
         <group key={`tree-${i}`} position={[x, 0, z]}>
           <mesh position={[0, 1.1, 0]} castShadow>
             <cylinderGeometry args={[0.12, 0.16, 2.2, 5]} />

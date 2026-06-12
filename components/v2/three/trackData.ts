@@ -124,12 +124,24 @@ export const buildTrack = (): TrackData => {
     side.crossVectors(up, tangents[i]).setY(0).normalize();
     const lat = THREE.MathUtils.clamp(
       acc.sub(samples[i]).dot(side),
-      -2.4,
-      2.4
+      -2.8,
+      2.8
     );
     racePts.push(samples[i].clone().addScaledVector(side, lat));
   }
-  const raceCurve = new THREE.CatmullRomCurve3(racePts, true, "centripetal", 0.5);
+  // a light second pass irons out kinks the clamp introduced
+  const smoothed = racePts.map((_, i) => {
+    const a = racePts[(i - 1 + racePts.length) % racePts.length];
+    const b = racePts[i];
+    const c = racePts[(i + 1) % racePts.length];
+    return new THREE.Vector3()
+      .add(a)
+      .add(b)
+      .add(b)
+      .add(c)
+      .multiplyScalar(0.25);
+  });
+  const raceCurve = new THREE.CatmullRomCurve3(smoothed, true, "centripetal", 0.5);
   const raceSamples: THREE.Vector3[] = [];
   const raceTangents: THREE.Vector3[] = [];
   for (let i = 0; i <= N; i++) {
@@ -269,9 +281,9 @@ export const kerbSlabs = (track: TrackData): KerbSlab[] => {
     for (const s of [1, -1]) {
       slabs.push({
         position: new THREE.Vector3(
-          samples[i].x + side.x * s * 3.05,
+          samples[i].x + side.x * s * 3.7,
           samples[i].y + 0.03,
-          samples[i].z + side.z * s * 3.05
+          samples[i].z + side.z * s * 3.7
         ),
         rotationY: rotY,
         red: count % 2 === 0,
@@ -319,20 +331,24 @@ export const cityBlocks = (track: TrackData): CityBlock[] => {
           nearestD = d;
           nearestY = p.y;
         }
-        if (d < 13 * 13) {
+        if (d < 17 * 17) {
           clear = false;
           break;
         }
       }
       if (!clear) continue;
       // terrace into the hillside: blocks near the climb sit on the slope
-      const proximity = Math.max(0, 1 - Math.sqrt(nearestD) / 45);
+      const near = Math.sqrt(nearestD);
+      const proximity = Math.max(0, 1 - near / 45);
+      // keep the skyline low next to the road so the chase camera never
+      // dives through a tower
+      const hMax = near < 26 ? 5.5 : 13;
       blocks.push({
         x,
         z,
         w: 4.5 + rand(i, 4) * 5,
         d: 4.5 + rand(i, 5) * 5,
-        h: 3 + rand(i, 6) * 10,
+        h: Math.min(3 + rand(i, 6) * 10, hMax),
         tone: Math.floor(rand(i, 7) * 5),
         base: Math.max(0, nearestY * proximity - 1),
       });

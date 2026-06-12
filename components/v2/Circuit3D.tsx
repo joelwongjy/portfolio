@@ -99,7 +99,10 @@ export const Circuit3D = () => {
       className="relative"
       style={{ height: `${(items.length + 1) * 100}vh` }}
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
+      <div
+        className="sticky top-0 h-screen w-full overflow-hidden"
+        style={{ height: "100dvh" }}
+      >
         <CircuitScene
           progressRef={progressRef}
           livery={team.color}
@@ -142,7 +145,8 @@ export const Circuit3D = () => {
               exit={{ opacity: 0, y: -14 }}
               transition={{ duration: 0.35 }}
               onClick={() => setOpen(active)}
-              className="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-full border border-white/15 bg-black/80 py-2.5 pl-5 pr-4 backdrop-blur-xl"
+              className="absolute left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-full border border-white/15 bg-black/80 py-2.5 pl-5 pr-4 backdrop-blur-xl"
+              style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 20px)" }}
             >
               <span
                 className="font-mono text-[10px] uppercase tracking-widest"
@@ -166,7 +170,8 @@ export const Circuit3D = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 22 }}
               transition={{ duration: 0.35, ease: [0.21, 0.6, 0.35, 1] }}
-              className="absolute inset-x-3 bottom-4 max-h-[52vh] overflow-y-auto rounded-2xl border border-white/10 bg-black/70 p-5 backdrop-blur-xl sm:inset-x-auto sm:bottom-8 sm:right-8 sm:w-[430px]"
+              className="absolute inset-x-3 max-h-[55dvh] overflow-y-auto rounded-2xl border border-white/10 bg-black/80 p-5 backdrop-blur-xl sm:inset-x-auto sm:right-8 sm:w-[430px]"
+              style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 14px)" }}
             >
               <button
                 onClick={() => setOpen(null)}
