@@ -1,4 +1,4 @@
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
+import { motion } from "framer-motion";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -8,6 +8,11 @@ import { experience } from "@/data/experience";
 import { RaceCar } from "./RaceCar";
 import { RaceState, useRace } from "./RaceContext";
 import { TechChip } from "./TechChip";
+import {
+  FollowInfo,
+  TrackGeometry,
+  useTrackFollower,
+} from "./useTrackFollower";
 
 const RAIL_WIDTH = 120;
 const LEFT_X = 24;
@@ -19,12 +24,6 @@ interface Corner {
   y: number;
 }
 
-interface Track {
-  d: string;
-  height: number;
-  corners: Corner[];
-}
-
 // Each gap between two jobs is a corner complex traced from a real circuit:
 // the waypoints encode the genuine turn sequence, directions and relative
 // radii, rotated so the complex enters and exits vertically. The rounding
@@ -32,7 +31,7 @@ interface Track {
 // never changes direction discontinuously.
 type Motif = (xa: number, ya: number, xb: number, yb: number) => string;
 
-interface Waypoint {
+export interface Waypoint {
   x: number;
   y: number;
   r?: number;
@@ -40,7 +39,7 @@ interface Waypoint {
 
 // Replace every interior waypoint with a circular arc of its radius,
 // trimming the adjoining straights to the tangent points.
-const roundedPath = (pts: Waypoint[]) => {
+export const roundedPath = (pts: Waypoint[]) => {
   let d = "";
   for (let i = 1; i < pts.length - 1; i++) {
     const p0 = pts[i - 1];
@@ -209,16 +208,35 @@ export const Circuit = () => {
   const { setRace } = useRace();
   const lastRace = useRef<RaceState>({ active: false, corner: 0, progress: 0 });
 
-  const [track, setTrack] = useState<Track>();
-  const [trackLength, setTrackLength] = useState(0);
-  const [anchorLengths, setAnchorLengths] = useState<number[]>([]);
-  const [passed, setPassed] = useState(0);
+  const [track, setTrack] = useState<TrackGeometry>();
 
-  const carX = useMotionValue(LEFT_X);
-  const carY = useMotionValue(0);
-  const carAngle = useMotionValue(90);
-  const carTransform = useMotionTemplate`translate(${carX}px, ${carY}px) rotate(${carAngle}deg) scale(0.92)`;
-  const dashOffset = useMotionValue(0);
+  // feed the Dynamic Island's live activity
+  const onUpdate = useCallback(
+    (info: FollowInfo) => {
+      const next: RaceState = {
+        active: info.centerY > 0 && info.centerY < info.trackHeight,
+        corner: Math.max(info.passed, 1),
+        progress: Math.round((info.at / info.trackLength) * 100) / 100,
+      };
+      const prev = lastRace.current;
+      if (
+        next.active !== prev.active ||
+        next.corner !== prev.corner ||
+        next.progress !== prev.progress
+      ) {
+        lastRace.current = next;
+        setRace(next);
+      }
+    },
+    [setRace]
+  );
+
+  const { trackLength, passed, carTransform, dashOffset } = useTrackFollower(
+    pathRef,
+    listRef,
+    track,
+    onUpdate
+  );
 
   const items = experience.experiences.filter((e) => e.isShown !== false);
 
@@ -242,107 +260,6 @@ export const Circuit = () => {
     if (listRef.current) observer.observe(listRef.current);
     return () => observer.disconnect();
   }, [measure]);
-
-  // Hairpins double back on themselves, so y is not monotonic along the
-  // track and arc length can't be found from y directly. Instead, sample the
-  // path once to find each anchor's arc length, then interpolate between
-  // anchors while scrolling — the car drives the full corner complex
-  // (including the loop) between one card and the next.
-  useEffect(() => {
-    const path = pathRef.current;
-    if (!path || !track) return;
-    const total = path.getTotalLength();
-    const best = track.corners.map(() => ({ d: Infinity, l: 0 }));
-    const steps = 1200;
-    for (let s = 0; s <= steps; s++) {
-      const l = (s / steps) * total;
-      const p = path.getPointAtLength(l);
-      track.corners.forEach((corner, i) => {
-        const d = (p.x - corner.x) ** 2 + (p.y - corner.y) ** 2;
-        if (d < best[i].d) best[i] = { d, l };
-      });
-    }
-    setTrackLength(total);
-    setAnchorLengths(best.map((b) => b.l));
-    dashOffset.set(total);
-  }, [track, dashOffset]);
-
-  // The car drives alongside whatever crosses the vertical middle of the
-  // viewport.
-  useEffect(() => {
-    const path = pathRef.current;
-    const list = listRef.current;
-    if (!path || !list || !track || !trackLength || !anchorLengths.length)
-      return;
-
-    const ys = track.corners.map((c) => c.y);
-    const last = ys.length - 1;
-
-    const lengthAt = (targetY: number) => {
-      if (targetY <= ys[0]) {
-        return (targetY / ys[0]) * anchorLengths[0];
-      }
-      if (targetY >= ys[last]) {
-        const span = track.height - ys[last];
-        const t = span > 0 ? (targetY - ys[last]) / span : 1;
-        return anchorLengths[last] + t * (trackLength - anchorLengths[last]);
-      }
-      let i = 0;
-      while (i < last && ys[i + 1] < targetY) i++;
-      const t = (targetY - ys[i]) / (ys[i + 1] - ys[i]);
-      return anchorLengths[i] + t * (anchorLengths[i + 1] - anchorLengths[i]);
-    };
-
-    const update = () => {
-      const rect = list.getBoundingClientRect();
-      const centerY = window.innerHeight / 2 - rect.top;
-      const targetY = Math.min(Math.max(centerY, 0), track.height);
-      const at = lengthAt(targetY);
-      const point = path.getPointAtLength(at);
-      const ahead = path.getPointAtLength(Math.min(at + 1, trackLength));
-      const behind = path.getPointAtLength(Math.max(at - 1, 0));
-      carX.set(point.x);
-      carY.set(point.y);
-      carAngle.set(
-        (Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * 180) / Math.PI
-      );
-      dashOffset.set(trackLength - at);
-      const passedCount = track.corners.filter((c) => c.y <= targetY).length;
-      setPassed(passedCount);
-      // feed the Dynamic Island's live activity
-      const next: RaceState = {
-        active: centerY > 0 && centerY < track.height,
-        corner: Math.max(passedCount, 1),
-        progress: Math.round((at / trackLength) * 100) / 100,
-      };
-      const prev = lastRace.current;
-      if (
-        next.active !== prev.active ||
-        next.corner !== prev.corner ||
-        next.progress !== prev.progress
-      ) {
-        lastRace.current = next;
-        setRace(next);
-      }
-    };
-
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [
-    track,
-    trackLength,
-    anchorLengths,
-    carX,
-    carY,
-    carAngle,
-    dashOffset,
-    setRace,
-  ]);
 
   return (
     <section id="circuit" className="mx-auto max-w-2xl px-4 pb-12 pt-24 sm:px-6">

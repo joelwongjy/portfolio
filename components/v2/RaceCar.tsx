@@ -1,6 +1,8 @@
 // Top-down F1 car, drawn pointing +x and centred on the origin so it can be
 // rotated to the track tangent. Painted with the livery CSS variable.
-export const RaceCar = () => (
+// `damagedWing` skews and greys the front wing until the pit crew fits a
+// fresh one.
+export const RaceCar = ({ damagedWing = false }: { damagedWing?: boolean }) => (
   <g style={{ filter: "drop-shadow(0 1.5px 2.5px rgba(0,0,0,0.6))" }}>
     {/* rear wing */}
     <rect x={-19} y={-8} width={3.6} height={16} rx={1.2} fill="#1C1C1F" />
@@ -28,8 +30,21 @@ export const RaceCar = () => (
     {/* spine highlight */}
     <rect x={-14} y={-0.9} width={30} height={1.8} rx={0.9} fill="#FFFFFF" opacity={0.22} />
     {/* front wing */}
-    <rect x={14.5} y={-9.5} width={4} height={19} rx={1.4} fill="#1C1C1F" />
-    <rect x={16.8} y={-9.5} width={1.7} height={19} rx={0.85} fill="var(--livery)" opacity={0.9} />
+    <g
+      transform={damagedWing ? "rotate(-14 16.5 0)" : undefined}
+      opacity={damagedWing ? 0.65 : 1}
+    >
+      <rect x={14.5} y={-9.5} width={4} height={19} rx={1.4} fill="#1C1C1F" />
+      <rect
+        x={16.8}
+        y={-9.5}
+        width={1.7}
+        height={19}
+        rx={0.85}
+        fill={damagedWing ? "#55555C" : "var(--livery)"}
+        opacity={0.9}
+      />
+    </g>
     {/* cockpit, halo, helmet */}
     <rect x={-2.5} y={-2.1} width={7} height={4.2} rx={2} fill="#0C0C0E" />
     <circle cx={3} cy={0} r={2.7} fill="none" stroke="#3D3D44" strokeWidth={1.1} />
