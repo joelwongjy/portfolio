@@ -21,11 +21,47 @@ export const HeroV2 = ({ started }: { started: boolean }) => {
       id="top"
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center"
     >
+      {/* technical grid backdrop */}
       <div
         aria-hidden
-        className="absolute left-1/2 top-1/3 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-25 blur-[120px] transition-colors duration-700 sm:h-[36rem] sm:w-[36rem]"
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+          maskImage:
+            "radial-gradient(ellipse 90% 65% at 50% 42%, black 25%, transparent 78%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 90% 65% at 50% 42%, black 25%, transparent 78%)",
+        }}
+      />
+      {/* livery glow */}
+      <div
+        aria-hidden
+        className="absolute left-1/2 top-1/3 h-[28rem] w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-[120px] transition-colors duration-700 sm:h-[36rem] sm:w-[36rem]"
         style={{ backgroundColor: "var(--livery)" }}
       />
+
+      {/* race control strip */}
+      <motion.div
+        variants={rise}
+        custom={0}
+        initial="hidden"
+        animate={started ? "visible" : "hidden"}
+        className="absolute inset-x-0 top-20 flex items-center justify-between px-5 font-mono text-[10px] uppercase tracking-[0.25em] text-white/40 sm:top-24 sm:px-10"
+      >
+        <span>Rnd 26 · Marina Bay</span>
+        <span className="flex items-center gap-2">
+          <motion.span
+            className="block h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: "var(--livery)" }}
+            animate={{ opacity: [1, 0.2, 1] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+          />
+          Live
+        </span>
+      </motion.div>
+
       <motion.p
         variants={rise}
         custom={0.05}
@@ -56,9 +92,19 @@ export const HeroV2 = ({ started }: { started: boolean }) => {
       >
         {hero.body}. {hero.title}.
       </motion.p>
+      <motion.p
+        variants={rise}
+        custom={0.4}
+        initial="hidden"
+        animate={started ? "visible" : "hidden"}
+        className="relative mt-8 font-mono text-[11px] uppercase tracking-[0.25em] text-white/40"
+      >
+        6 seasons · 7 teams · Singapore based
+      </motion.p>
+
       <motion.div
         variants={rise}
-        custom={0.5}
+        custom={0.55}
         initial="hidden"
         animate={started ? "visible" : "hidden"}
         className="absolute bottom-10 flex flex-col items-center gap-2 text-white/40"

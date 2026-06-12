@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 import { Circuit } from "@/components/v2/Circuit";
@@ -7,6 +6,7 @@ import { HeroV2 } from "@/components/v2/HeroV2";
 import { IslandNav } from "@/components/v2/IslandNav";
 import { LightsOut } from "@/components/v2/LightsOut";
 import { LiveryProvider } from "@/components/v2/LiveryContext";
+import { Podium } from "@/components/v2/Podium";
 
 export default function RaceWeekend() {
   const [started, setStarted] = useState(false);
@@ -39,14 +39,10 @@ export default function RaceWeekend() {
           <main>
             <HeroV2 started={started} />
             <Circuit />
+            <Podium />
           </main>
-          <footer className="pb-16 text-center text-xs text-white/30">
-            <p>
-              Prototype lap ·{" "}
-              <Link href="/" className="underline hover:text-white/60">
-                box, box — back to the classic site
-              </Link>
-            </p>
+          <footer className="pb-10 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-white/25">
+            <p>Joel Wong · Race Weekend prototype</p>
           </footer>
         </div>
       </LiveryProvider>

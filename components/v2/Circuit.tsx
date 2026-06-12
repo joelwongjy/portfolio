@@ -1,12 +1,13 @@
-import {
-  motion,
-  useMotionTemplate,
-  useMotionValue,
-  useScroll,
-} from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { organisationToLogo } from "@/constants/logos";
+import { Skills } from "@/constants/technologies";
 import { experience } from "@/data/experience";
+import { getSvgrFromSkill } from "@/utils/skillUtils";
+
+import { RaceCar } from "./RaceCar";
 
 const RAIL_WIDTH = 80;
 const LEFT_X = 18;
@@ -44,21 +45,64 @@ const buildTrack = (corners: Corner[], height: number) => {
   return d;
 };
 
+const TechChip = ({ skill }: { skill: Skills }) => {
+  const Svgr = getSvgrFromSkill(skill);
+  return (
+    <span className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 py-1 pl-1.5 pr-2.5 text-[11px] text-white/70">
+      <span className="flex h-4 w-4 items-center justify-center [&_svg]:h-full [&_svg]:w-full">
+        <Svgr />
+      </span>
+      {skill}
+    </span>
+  );
+};
+
+const OrganisationLogo = ({ organisation }: { organisation: string }) => {
+  const whiteLogo = organisationToLogo[`${organisation}White`];
+  const logo = organisationToLogo[organisation];
+  if (whiteLogo) {
+    return (
+      <Image
+        src={whiteLogo}
+        alt={organisation}
+        className="h-7 w-auto max-w-[7rem] object-contain"
+      />
+    );
+  }
+  if (logo) {
+    return (
+      <span className="inline-flex rounded-lg bg-white/95 px-2 py-1.5 shadow-card">
+        <Image
+          src={logo}
+          alt={organisation}
+          className="h-5 w-auto max-w-[6rem] object-contain"
+        />
+      </span>
+    );
+  }
+  return (
+    <span
+      className="text-sm font-bold uppercase tracking-wider"
+      style={{ color: "var(--livery)" }}
+    >
+      {organisation}
+    </span>
+  );
+};
+
 export const Circuit = () => {
-  const sectionRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLOListElement>(null);
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const pathRef = useRef<SVGPathElement>(null);
 
   const [track, setTrack] = useState<Track>();
   const [trackLength, setTrackLength] = useState(0);
-  const [cornerFractions, setCornerFractions] = useState<number[]>([]);
   const [passed, setPassed] = useState(0);
 
   const carX = useMotionValue(LEFT_X);
   const carY = useMotionValue(0);
   const carAngle = useMotionValue(90);
-  const carTransform = useMotionTemplate`translate(${carX}px, ${carY}px) rotate(${carAngle}deg)`;
+  const carTransform = useMotionTemplate`translate(${carX}px, ${carY}px) rotate(${carAngle}deg) scale(0.92)`;
   const dashOffset = useMotionValue(0);
 
   const items = experience.experiences.filter((e) => e.isShown !== false);
@@ -90,33 +134,38 @@ export const Circuit = () => {
     const total = path.getTotalLength();
     setTrackLength(total);
     dashOffset.set(total);
-    // The track only ever moves downwards, so the y coordinate is monotonic
-    // along the path and we can binary-search each corner's arc length.
-    setCornerFractions(
-      track.corners.map((corner) => {
-        let lo = 0;
-        let hi = total;
-        for (let i = 0; i < 24; i++) {
-          const mid = (lo + hi) / 2;
-          if (path.getPointAtLength(mid).y < corner.y) lo = mid;
-          else hi = mid;
-        }
-        return lo / total;
-      })
-    );
   }, [track, dashOffset]);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start 0.7", "end end"],
-  });
-
+  // The car sits wherever the track crosses the vertical middle of the
+  // viewport, so it always drives alongside whatever you're reading. The
+  // track's y is monotonic, so the arc length at a given y can be found by
+  // binary search.
   useEffect(() => {
     const path = pathRef.current;
-    if (!path || !trackLength) return;
-    const update = (progress: number) => {
-      const clamped = Math.min(Math.max(progress, 0), 1);
-      const at = clamped * trackLength;
+    const list = listRef.current;
+    if (!path || !list || !track || !trackLength) return;
+
+    const lengthAtY = (y: number) => {
+      let lo = 0;
+      let hi = trackLength;
+      for (let i = 0; i < 22; i++) {
+        const mid = (lo + hi) / 2;
+        if (path.getPointAtLength(mid).y < y) lo = mid;
+        else hi = mid;
+      }
+      return lo;
+    };
+
+    const update = () => {
+      const rect = list.getBoundingClientRect();
+      const centerY = window.innerHeight / 2 - rect.top;
+      const targetY = Math.min(Math.max(centerY, 0), track.height);
+      const at =
+        targetY <= 0
+          ? 0
+          : targetY >= track.height
+          ? trackLength
+          : lengthAtY(targetY);
       const point = path.getPointAtLength(at);
       const ahead = path.getPointAtLength(Math.min(at + 1, trackLength));
       const behind = path.getPointAtLength(Math.max(at - 1, 0));
@@ -126,26 +175,20 @@ export const Circuit = () => {
         (Math.atan2(ahead.y - behind.y, ahead.x - behind.x) * 180) / Math.PI
       );
       dashOffset.set(trackLength - at);
-      setPassed(cornerFractions.filter((f) => f <= clamped).length);
+      setPassed(track.corners.filter((c) => c.y <= targetY).length);
     };
-    update(scrollYProgress.get());
-    return scrollYProgress.on("change", update);
-  }, [
-    trackLength,
-    cornerFractions,
-    scrollYProgress,
-    carX,
-    carY,
-    carAngle,
-    dashOffset,
-  ]);
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [track, trackLength, carX, carY, carAngle, dashOffset]);
 
   return (
-    <section
-      ref={sectionRef}
-      id="circuit"
-      className="mx-auto max-w-2xl px-4 pb-28 pt-24 sm:px-6"
-    >
+    <section id="circuit" className="mx-auto max-w-2xl px-4 pb-12 pt-24 sm:px-6">
       <header className="mb-16">
         <p
           className="text-xs font-semibold uppercase tracking-[0.35em]"
@@ -245,9 +288,7 @@ export const Circuit = () => {
             {/* car */}
             {trackLength > 0 && (
               <motion.g style={{ transform: carTransform }}>
-                <circle r={11} fill="var(--livery)" opacity={0.25} />
-                <circle r={5.5} fill="var(--livery)" />
-                <path d="M 1 -2.5 L 5.5 0 L 1 2.5 Z" fill="#050505" />
+                <RaceCar />
               </motion.g>
             )}
           </svg>
@@ -265,21 +306,24 @@ export const Circuit = () => {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, ease: [0.21, 0.6, 0.35, 1] }}
             >
-              <p className="font-mono text-[11px] uppercase tracking-widest text-white/40">
-                T{i + 1} · {item.start} — {item.end}
-              </p>
-              <h3 className="mt-2 text-xl font-bold text-white">
-                {item.title}
-              </h3>
-              <a
-                href={item.organisationLink}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm font-semibold capitalize"
-                style={{ color: "var(--livery)" }}
-              >
-                {item.organisation}
-              </a>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="font-mono text-[11px] uppercase tracking-widest text-white/40">
+                    T{i + 1} · {item.start} — {item.end}
+                  </p>
+                  <h3 className="mt-2 text-xl font-bold text-white">
+                    {item.title}
+                  </h3>
+                </div>
+                <a
+                  href={item.organisationLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-1 shrink-0 transition-opacity hover:opacity-80"
+                >
+                  <OrganisationLogo organisation={item.organisation} />
+                </a>
+              </div>
               <p className="mt-2 text-sm text-white/50">{item.description}</p>
               <ul className="mt-3 space-y-1.5">
                 {item.points.map((point) => (
@@ -296,12 +340,7 @@ export const Circuit = () => {
                   {item.stacks
                     .flatMap((stack) => stack.skills)
                     .map((skill) => (
-                      <span
-                        key={skill}
-                        className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] text-white/60"
-                      >
-                        {skill}
-                      </span>
+                      <TechChip key={skill} skill={skill} />
                     ))}
                 </div>
               )}
