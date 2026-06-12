@@ -12,6 +12,7 @@ import {
   cityBlocks,
   kerbSlabs,
   ribbonGeometry,
+  skirtGeometry,
   TrackData,
   yachts,
 } from "./trackData";
@@ -192,12 +193,13 @@ const Rig = ({
   lineRef: MutableRefObject<THREE.BufferGeometry | null>;
 }) => {
   const { camera } = useThree();
-  const sm = useRef({ t: 0 });
+  const sm = useRef({ t: 0, roll: 0 });
   const look = useRef(new THREE.Vector3());
   const tmp = useMemo(
     () => ({
       pos: new THREE.Vector3(),
       tan: new THREE.Vector3(),
+      tan2: new THREE.Vector3(),
       cam: new THREE.Vector3(),
       target: new THREE.Vector3(),
     }),
@@ -217,6 +219,15 @@ const Rig = ({
       carRef.current.position.copy(tmp.pos);
       tmp.target.copy(tmp.pos).add(tmp.tan);
       carRef.current.lookAt(tmp.target);
+      // lean into the corner
+      track.curve.getTangentAt(Math.min(t + 0.004, 1), tmp.tan2);
+      const steer = Math.atan2(
+        tmp.tan.x * tmp.tan2.z - tmp.tan.z * tmp.tan2.x,
+        tmp.tan.x * tmp.tan2.x + tmp.tan.z * tmp.tan2.z
+      );
+      const targetRoll = THREE.MathUtils.clamp(steer * 5, -0.16, 0.16);
+      sm.current.roll += (targetRoll - sm.current.roll) * k;
+      carRef.current.rotateZ(sm.current.roll);
     }
     if (lineRef.current) {
       const segs = Math.floor(t * (track.samples.length - 2));
@@ -305,7 +316,7 @@ const City = ({ track }: { track: TrackData }) => {
     const o = new THREE.Object3D();
     const col = new THREE.Color();
     blocks.forEach((b, i) => {
-      o.position.set(b.x, b.h / 2, b.z);
+      o.position.set(b.x, b.base + b.h / 2, b.z);
       o.scale.set(b.w, b.h, b.d);
       o.rotation.set(0, 0, 0);
       o.updateMatrix();
@@ -335,6 +346,8 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
     () => ribbonGeometry(track, 0, 0, 0, 1, -4.2, 0.55),
     [track]
   );
+  const skirtL = useMemo(() => skirtGeometry(track, 3.65), [track]);
+  const skirtR = useMemo(() => skirtGeometry(track, -3.65), [track]);
   const [tun0, tun1] = track.tunnelFractions;
   const tunnelRoof = useMemo(
     () => ribbonGeometry(track, 10, 4.4, tun0, tun1),
@@ -401,6 +414,13 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
 
       <City track={track} />
 
+      {/* embankment under the road */}
+      <mesh geometry={skirtL}>
+        <meshStandardMaterial color="#AFA793" roughness={1} side={THREE.DoubleSide} />
+      </mesh>
+      <mesh geometry={skirtR}>
+        <meshStandardMaterial color="#AFA793" roughness={1} side={THREE.DoubleSide} />
+      </mesh>
       <mesh geometry={asphalt}>
         <meshStandardMaterial color="#5A5E66" roughness={0.95} />
       </mesh>
@@ -477,6 +497,47 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
           />
         );
       })}
+
+      {/* casino gardens + Beau Rivage greenery */}
+      {[
+        [58, 50],
+        [63, 47],
+        [55, 54],
+        [18, 36],
+        [26, 46],
+        [12, 30],
+        [70, -34],
+        [64, -39],
+        [44, -47],
+      ].map(([x, z], i) => (
+        <group key={`tree-${i}`} position={[x, 0, z]}>
+          <mesh position={[0, 1.1, 0]}>
+            <cylinderGeometry args={[0.12, 0.16, 2.2, 5]} />
+            <meshStandardMaterial color="#6B5A44" roughness={1} />
+          </mesh>
+          <mesh position={[0, 2.6, 0]}>
+            <icosahedronGeometry args={[1.4 + (i % 3) * 0.4, 0]} />
+            <meshStandardMaterial color="#4E7A45" roughness={1} flatShading />
+          </mesh>
+        </group>
+      ))}
+
+      {/* grandstands along the pit straight */}
+      {[
+        { x: -7, z: 0, len: 26 },
+        { x: 8, z: -2, len: 18 },
+      ].map((g, i) => (
+        <group key={`stand-${i}`} position={[g.x, 0, g.z]}>
+          <mesh position={[0, 1.4, 0]}>
+            <boxGeometry args={[4, 2.8, g.len]} />
+            <meshStandardMaterial color={i === 0 ? "#D8D2C2" : "#E5E0D5"} roughness={0.85} />
+          </mesh>
+          <mesh position={[i === 0 ? 0.6 : -0.6, 3.1, 0]} rotation={[0, 0, i === 0 ? -0.18 : 0.18]}>
+            <boxGeometry args={[4.6, 0.18, g.len + 1]} />
+            <meshStandardMaterial color="#F4F2EC" roughness={0.7} />
+          </mesh>
+        </group>
+      ))}
 
       {/* start gantry */}
       <group

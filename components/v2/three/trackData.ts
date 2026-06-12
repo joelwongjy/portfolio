@@ -26,14 +26,14 @@ const PLAN: P[] = [
   { x: 70, z: 47, y: 10.2 },
   { x: 66, z: 40, y: 8.8 }, // downhill
   { x: 64, z: 33, y: 7.6 }, // Mirabeau (right)
-  { x: 57, z: 30, y: 6.6 },
-  { x: 51, z: 27, y: 5.8 }, // toward the hairpin
-  { x: 46, z: 24, y: 5.4 }, // Fairmont hairpin (tight left)
-  { x: 44, z: 28, y: 5.2 },
-  { x: 47, z: 32, y: 5 },
-  { x: 53, z: 30.5, y: 4.4 }, // out of the hairpin
-  { x: 58, z: 25, y: 3.4 },
-  { x: 60, z: 19, y: 2.6 }, // Portier (right-right)
+  { x: 57, z: 31.5, y: 6.6 },
+  { x: 51, z: 29.5, y: 5.8 }, // toward the hairpin
+  { x: 45.5, z: 26, y: 5.4 }, // Fairmont hairpin (tight left)
+  { x: 43.5, z: 22.5, y: 5.2 },
+  { x: 47, z: 20, y: 4.8 },
+  { x: 52, z: 19.5, y: 4.2 }, // out of the hairpin, south of the approach
+  { x: 57, z: 18.5, y: 3.4 },
+  { x: 61, z: 16, y: 2.6 }, // Portier (right-right)
   { x: 64, z: 14, y: 2.2 },
   { x: 72, z: 10, y: 1.9 }, // tunnel entry
   { x: 81, z: 5, y: 1.6 }, // — under the hotel —
@@ -57,7 +57,7 @@ const PLAN: P[] = [
 ];
 
 // the seven career corners, in lap order
-const ANCHOR_PLAN_IDX = [3, 10, 13, 16, 21, 28, 33];
+const ANCHOR_PLAN_IDX = [3, 10, 13, 17, 21, 28, 33];
 
 // tunnel runs between these plan points
 const TUNNEL_RANGE: [number, number] = [23, 26];
@@ -164,6 +164,42 @@ export const ribbonGeometry = (
   return geo;
 };
 
+// Solid embankment connecting the road edge down to the ground, so the
+// elevated sections read as a causeway cut into the hill, not a floating
+// ribbon.
+export const skirtGeometry = (
+  track: TrackData,
+  lateral: number
+): THREE.BufferGeometry => {
+  const { samples, tangents } = track;
+  const n = samples.length;
+  const pos = new Float32Array(n * 2 * 3);
+  const up = new THREE.Vector3(0, 1, 0);
+  const side = new THREE.Vector3();
+  for (let i = 0; i < n; i++) {
+    side.crossVectors(up, tangents[i]).setY(0).normalize();
+    const p = samples[i];
+    const cx = p.x + side.x * lateral;
+    const cz = p.z + side.z * lateral;
+    pos[i * 6] = cx;
+    pos[i * 6 + 1] = p.y + 0.015;
+    pos[i * 6 + 2] = cz;
+    pos[i * 6 + 3] = cx;
+    pos[i * 6 + 4] = -0.12;
+    pos[i * 6 + 5] = cz;
+  }
+  const idx: number[] = [];
+  for (let i = 0; i < n - 1; i++) {
+    const a = i * 2;
+    idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
+};
+
 export interface KerbSlab {
   position: THREE.Vector3;
   rotationY: number;
@@ -207,6 +243,7 @@ export interface CityBlock {
   d: number;
   h: number;
   tone: number;
+  base: number;
 }
 
 const rand = (i: number, salt: number) => {
@@ -228,14 +265,23 @@ export const cityBlocks = (track: TrackData): CityBlock[] => {
       // the harbour basin stays clear
       if (x > 36 && x < 86 && z > -26 && z < 12) continue;
       let clear = true;
+      let nearestD = Infinity;
+      let nearestY = 0;
       for (let s = 0; s < track.samples.length; s += 10) {
         const p = track.samples[s];
-        if ((p.x - x) ** 2 + (p.z - z) ** 2 < 13 * 13) {
+        const d = (p.x - x) ** 2 + (p.z - z) ** 2;
+        if (d < nearestD) {
+          nearestD = d;
+          nearestY = p.y;
+        }
+        if (d < 13 * 13) {
           clear = false;
           break;
         }
       }
       if (!clear) continue;
+      // terrace into the hillside: blocks near the climb sit on the slope
+      const proximity = Math.max(0, 1 - Math.sqrt(nearestD) / 45);
       blocks.push({
         x,
         z,
@@ -243,6 +289,7 @@ export const cityBlocks = (track: TrackData): CityBlock[] => {
         d: 4.5 + rand(i, 5) * 5,
         h: 3 + rand(i, 6) * 10,
         tone: Math.floor(rand(i, 7) * 5),
+        base: Math.max(0, nearestY * proximity - 1),
       });
     }
   }
