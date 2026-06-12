@@ -108,7 +108,7 @@ export const Circuit = () => {
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start 0.7", "end 0.5"],
+    offset: ["start 0.7", "end end"],
   });
 
   useEffect(() => {
