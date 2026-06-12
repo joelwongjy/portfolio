@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useLivery } from "./LiveryContext";
@@ -91,27 +92,29 @@ export const ReactionGame = () => {
       tabIndex={0}
       aria-label="Reaction test — tap when the lights go out"
       onPointerDown={tap}
-      className="relative w-full max-w-[340px] cursor-pointer select-none rounded-3xl border border-white/10 bg-white/[0.04] px-6 pb-5 pt-4 backdrop-blur-sm transition-colors hover:border-white/25"
+      className="relative mx-auto flex w-full max-w-md cursor-pointer select-none flex-col items-center outline-none"
     >
-      <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.25em] text-white/40">
-        <span>Reaction test</span>
-        <span>{best !== null ? `PB ${best} ms` : "No PB yet"}</span>
+      <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.3em] text-white/40">
+        <span className="h-px w-10 bg-white/15" />
+        <span>Reaction test{best !== null ? ` · PB ${best} ms` : ""}</span>
+        <span className="h-px w-10 bg-white/15" />
       </div>
-      <div className="mt-4 flex justify-center gap-2">
+
+      <div className="mt-6 flex gap-2.5 sm:gap-3">
         {[1, 2, 3, 4, 5].map((column) => (
           <div
             key={column}
-            className="flex flex-col gap-1.5 rounded-full bg-black/60 p-1.5"
+            className="flex flex-col gap-2 rounded-full bg-zinc-900/90 p-2"
           >
             {[0, 1].map((row) => (
               <span
                 key={row}
-                className="block h-3.5 w-3.5 rounded-full transition-colors duration-100"
+                className="block h-7 w-7 rounded-full transition-colors duration-100 sm:h-9 sm:w-9"
                 style={
                   lit >= column
                     ? {
                         backgroundColor: "#FF1801",
-                        boxShadow: "0 0 10px 2px rgba(255, 24, 1, 0.5)",
+                        boxShadow: "0 0 18px 4px rgba(255, 24, 1, 0.55)",
                       }
                     : { backgroundColor: "#222226" }
                 }
@@ -120,20 +123,28 @@ export const ReactionGame = () => {
           </div>
         ))}
       </div>
-      <div className="mt-4 min-h-[48px] text-center">
+
+      <div className="mt-6 flex min-h-[84px] flex-col items-center">
         {phase === "idle" && (
-          <p className="text-sm leading-snug text-white/60">
-            Tap when the lights go out.
-            <br />
-            <span className="text-white/35">Tap to arm. Space works too.</span>
-          </p>
+          <>
+            <p className="text-base font-medium text-white/75">
+              Tap when the lights go out
+            </p>
+            <motion.p
+              className="mt-1.5 text-xs uppercase tracking-[0.25em] text-white/40"
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              Tap to arm · space works too
+            </motion.p>
+          </>
         )}
         {phase === "arming" && (
-          <p className="pt-2 text-sm text-white/60">Wait for it…</p>
+          <p className="pt-2 text-base text-white/60">Wait for it…</p>
         )}
         {phase === "go" && (
           <p
-            className="pt-1 text-lg font-extrabold uppercase tracking-wide"
+            className="text-3xl font-extrabold uppercase tracking-wide"
             style={{ color: "var(--livery)" }}
           >
             Go go go!
@@ -141,21 +152,24 @@ export const ReactionGame = () => {
         )}
         {phase === "result" && (
           <>
-            <p className="text-2xl font-extrabold leading-none text-white">
+            <p className="text-5xl font-extrabold leading-none tracking-tight text-white">
               {ms}
-              <span className="text-sm font-semibold text-white/50"> ms</span>
+              <span className="text-lg font-semibold text-white/50"> ms</span>
             </p>
-            <p className="mt-1.5 text-xs text-white/50">
-              {verdict(ms, team.name)} · tap to go again
+            <p className="mt-2 text-sm text-white/55">
+              {verdict(ms, team.name)}
+            </p>
+            <p className="mt-1 text-xs uppercase tracking-[0.25em] text-white/35">
+              Tap to go again
             </p>
           </>
         )}
         {phase === "jump" && (
           <>
-            <p className="pt-1 text-lg font-extrabold text-red-500">
+            <p className="text-3xl font-extrabold uppercase text-red-500">
               Jump start!
             </p>
-            <p className="mt-1 text-xs text-white/50">
+            <p className="mt-2 text-sm text-white/55">
               Drive-through penalty. Tap to retry.
             </p>
           </>

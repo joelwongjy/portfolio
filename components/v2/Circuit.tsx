@@ -25,86 +25,126 @@ interface Track {
   corners: Corner[];
 }
 
-// Each gap between two jobs is a corner complex borrowed from a real
-// circuit. Every motif starts at anchor (xa, ya) heading down and must end
-// at anchor (xb, yb) heading down. Anchors alternate sides so xa !== xb.
+// Each gap between two jobs is a corner complex traced from a real circuit:
+// the waypoints encode the genuine turn sequence, directions and relative
+// radii, rotated so the complex enters and exits vertically. The rounding
+// pass below turns the waypoint chain into tangent arcs — a racing line
+// never changes direction discontinuously.
 type Motif = (xa: number, ya: number, xb: number, yb: number) => string;
 
-const hairpin: Motif = (xa, ya, xb, yb) => {
-  const dir = Math.sign(xb - xa);
-  const mid = (ya + yb) / 2;
-  const y1 = mid + 8;
-  const x2 = xa + dir * 32;
-  const y2 = y1 - 34;
-  const x3 = x2 + dir * 24;
-  const yj = mid + 44;
-  return [
-    `L ${xa} ${y1}`,
-    `A 16 16 0 0 ${dir > 0 ? 0 : 1} ${x2} ${y1}`,
-    `L ${x2} ${y2}`,
-    `A 12 12 0 0 ${dir > 0 ? 1 : 0} ${x3} ${y2}`,
-    `L ${x3} ${yj - 6}`,
-    `Q ${x3} ${yj} ${x3 + dir * 6} ${yj}`,
-    `L ${xb - dir * 6} ${yj}`,
-    `Q ${xb} ${yj} ${xb} ${yj + 6}`,
-    `L ${xb} ${yb}`,
-  ].join(" ");
+interface Waypoint {
+  x: number;
+  y: number;
+  r?: number;
+}
+
+// Replace every interior waypoint with a circular arc of its radius,
+// trimming the adjoining straights to the tangent points.
+const roundedPath = (pts: Waypoint[]) => {
+  let d = "";
+  for (let i = 1; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const in1 = { x: p1.x - p0.x, y: p1.y - p0.y };
+    const in2 = { x: p2.x - p1.x, y: p2.y - p1.y };
+    const l1 = Math.hypot(in1.x, in1.y);
+    const l2 = Math.hypot(in2.x, in2.y);
+    const v1 = { x: in1.x / l1, y: in1.y / l1 };
+    const v2 = { x: in2.x / l2, y: in2.y / l2 };
+    const cross = v1.x * v2.y - v1.y * v2.x;
+    const dot = Math.min(Math.max(v1.x * v2.x + v1.y * v2.y, -1), 1);
+    const angle = Math.acos(dot);
+    if (angle < 0.03) continue;
+    const r = p1.r ?? 10;
+    const trim = Math.min(
+      r * Math.tan(angle / 2),
+      l1 / 2 - 0.5,
+      l2 / 2 - 0.5
+    );
+    const radius = trim / Math.tan(angle / 2);
+    const a = { x: p1.x - v1.x * trim, y: p1.y - v1.y * trim };
+    const b = { x: p1.x + v2.x * trim, y: p1.y + v2.y * trim };
+    d += ` L ${a.x.toFixed(1)} ${a.y.toFixed(1)}`;
+    d += ` A ${radius.toFixed(1)} ${radius.toFixed(1)} 0 0 ${
+      cross > 0 ? 1 : 0
+    } ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+  }
+  const last = pts[pts.length - 1];
+  d += ` L ${last.x} ${last.y}`;
+  return d;
 };
 
-const esses: Motif = (xa, ya, xb, yb) => {
-  const mid = (ya + yb) / 2;
-  return `C ${xa} ${mid} ${xb} ${mid} ${xb} ${yb}`;
-};
+// Canonical waypoints are written for a left anchor (x 24) flowing to a
+// right anchor (x 96) and mirrored when the gap runs the other way. The
+// vertical coordinate is normalised: g(0) sits just below the upper card's
+// marker, g(1) just above the lower card's.
+const motifFrom =
+  (canonical: (g: (t: number) => number) => Waypoint[]): Motif =>
+  (xa, ya, xb, yb) => {
+    const dir = Math.sign(xb - xa);
+    const g = (t: number) => ya + 40 + t * (yb - ya - 80);
+    const pts = [
+      { x: 24, y: ya },
+      ...canonical(g),
+      { x: 96, y: yb },
+    ].map((p) => ({ ...p, x: xa + dir * (p.x - 24) }));
+    return roundedPath(pts);
+  };
 
-const chicane: Motif = (xa, ya, xb, yb) => {
-  const dir = Math.sign(xb - xa);
-  const mid = (ya + yb) / 2;
-  const y1 = mid - 30;
-  const xm = xa + dir * 34;
-  const x2 = xa + dir * 12;
-  const yj = mid + 28;
-  return [
-    `L ${xa} ${y1}`,
-    `L ${xm} ${y1 + 13}`,
-    `L ${x2} ${y1 + 26}`,
-    `L ${x2} ${yj - 8}`,
-    `Q ${x2} ${yj} ${x2 + dir * 8} ${yj}`,
-    `L ${xb - dir * 8} ${yj}`,
-    `Q ${xb} ${yj} ${xb} ${yj + 8}`,
-    `L ${xb} ${yb}`,
-  ].join(" ");
-};
+// Mirabeau right, then the Fairmont/Loews 180 — the tightest corner in
+// F1 — doubling back before dropping to Portier and the tunnel.
+const loews = motifFrom((g) => [
+  { x: 48, y: g(0.14), r: 16 },
+  { x: 48, y: g(0.52), r: 13 },
+  { x: 74, y: g(0.52), r: 13 },
+  { x: 74, y: g(0.24), r: 11 },
+  { x: 96, y: g(0.24), r: 11 },
+]);
 
-const sweep: Motif = (xa, ya, xb, yb) => {
-  const dir = Math.sign(xb - xa);
-  return `Q ${xa - dir * 16} ${(ya + yb) / 2} ${xb} ${yb}`;
-};
+// Eau Rouge–Raidillon: the left-right-left compression, then the long
+// vertical run that is the Kemmel straight.
+const eauRouge = motifFrom((g) => [
+  { x: 14, y: g(0.1), r: 12 },
+  { x: 52, y: g(0.24), r: 14 },
+  { x: 96, y: g(0.44), r: 26 },
+]);
 
-const doubleEsses: Motif = (xa, ya, xb, yb) => {
-  const dir = Math.sign(xb - xa);
-  const h = yb - ya;
-  return [
-    `C ${xa} ${ya + h * 0.3} ${xb + dir * 12} ${ya + h * 0.25} ${xb} ${
-      ya + h * 0.5
-    }`,
-    `C ${xb - dir * 44} ${ya + h * 0.72} ${xb} ${ya + h * 0.8} ${xb} ${yb}`,
-  ].join(" ");
-};
+// Monza's Rettifilio after the long start straight: hard on the brakes,
+// tight right-left, then the Curva Grande sweep.
+const rettifilio = motifFrom((g) => [
+  { x: 58, y: g(0.5), r: 7 },
+  { x: 42, y: g(0.62), r: 7 },
+  { x: 96, y: g(0.78), r: 30 },
+]);
 
-const kink: Motif = (xa, ya, xb, yb) => {
-  const dir = Math.sign(xb - xa);
-  const mid = (ya + yb) / 2;
-  const y1 = mid - 22;
-  return [
-    `L ${xa} ${y1}`,
-    `L ${xa + dir * 36} ${y1 + 13}`,
-    `L ${xa + dir * 14} ${y1 + 27}`,
-    `L ${xb} ${y1 + 44}`,
-    `L ${xb} ${yb}`,
-  ].join(" ");
-};
+// Suzuka's 130R: one enormous-radius left taken flat, into the Casio
+// Triangle flick.
+const r130 = motifFrom((g) => [
+  { x: 6, y: g(0.38), r: 46 },
+  { x: 36, y: g(0.66), r: 34 },
+  { x: 78, y: g(0.78), r: 10 },
+  { x: 74, y: g(0.88), r: 6 },
+  { x: 96, y: g(0.95), r: 8 },
+]);
 
-const MOTIFS: Motif[] = [hairpin, esses, chicane, sweep, doubleEsses, kink];
+// Maggotts–Becketts–Chapel: the tightening snake onto Hangar straight.
+const becketts = motifFrom((g) => [
+  { x: 44, y: g(0.12), r: 20 },
+  { x: 12, y: g(0.32), r: 17 },
+  { x: 54, y: g(0.52), r: 14 },
+  { x: 96, y: g(0.68), r: 14 },
+]);
+
+// The old Singapore Sling: the notorious left-right-left kerb hop.
+const sling = motifFrom((g) => [
+  { x: 50, y: g(0.42), r: 6 },
+  { x: 32, y: g(0.56), r: 6 },
+  { x: 60, y: g(0.68), r: 7 },
+  { x: 96, y: g(0.82), r: 16 },
+]);
+
+const MOTIFS: Motif[] = [loews, eauRouge, rettifilio, r130, becketts, sling];
 
 // Card i sits at corner CORNER_META[i]; the motif leading into card i + 1 is
 // the corner complex it is named after.

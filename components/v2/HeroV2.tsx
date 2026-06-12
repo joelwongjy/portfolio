@@ -20,7 +20,7 @@ export const HeroV2 = () => {
   return (
     <section
       id="top"
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center"
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 pb-20 pt-28 text-center"
     >
       {/* technical grid backdrop */}
       <div
@@ -49,7 +49,7 @@ export const HeroV2 = () => {
         custom={0}
         initial="hidden"
         animate="visible"
-        className="absolute inset-x-0 top-20 flex items-center justify-between px-5 font-mono text-[10px] uppercase tracking-[0.25em] text-white/40 sm:top-24 sm:px-10"
+        className="absolute inset-x-0 top-16 flex items-center justify-between px-5 font-mono text-[10px] uppercase tracking-[0.25em] text-white/40 sm:top-20 sm:px-10"
       >
         <span>Rnd 26 · Marina Bay</span>
         <span className="flex items-center gap-2">
