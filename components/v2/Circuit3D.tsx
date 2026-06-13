@@ -82,11 +82,6 @@ export const Circuit3D = () => {
     };
   }, [update]);
 
-  // leaving a corner puts the card away
-  useEffect(() => {
-    setOpen(null);
-  }, [active]);
-
   const openItem = open !== null ? items[open] : null;
   const openMeta = open !== null ? CORNER_META[open % CORNER_META.length] : null;
   const pillItem = active >= 0 ? items[Math.min(active, items.length - 1)] : null;

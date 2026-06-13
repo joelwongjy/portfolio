@@ -480,6 +480,13 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
     () => ribbonGeometry(track, 0, 0, tun0, tun1, -3.7, 4.4),
     [track, tun0, tun1]
   );
+  // a solid floor spanning the full tunnel width — the road is only 5.6 wide
+  // but the walls sit at ±3.7, so without this the elevated tunnel left a slot
+  // either side of the asphalt that looked straight down onto the water
+  const tunnelFloor = useMemo(
+    () => ribbonGeometry(track, 8.2, -0.05, tun0, tun1),
+    [track, tun0, tun1]
+  );
   const boats = useMemo(yachts, []);
   const pool = useMemo(() => poolPlacement(track), [track]);
   const textures = useMemo(
@@ -590,6 +597,9 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
       </mesh>
 
       {/* the tunnel under the Fairmont */}
+      <mesh geometry={tunnelFloor} receiveShadow>
+        <meshStandardMaterial color="#4C5058" roughness={0.95} side={THREE.DoubleSide} />
+      </mesh>
       <mesh geometry={tunnelRoof}>
         <meshStandardMaterial color="#C2B8A4" roughness={0.9} side={THREE.DoubleSide} />
       </mesh>

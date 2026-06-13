@@ -387,9 +387,13 @@ export const cityBlocks = (track: TrackData): CityBlock[] => {
         }
       }
       if (!clear) continue;
-      // terrace into the hillside: blocks near the climb sit on the slope
+      // blocks near the elevated climb reach up toward the road height, but
+      // there is no hillside mesh under them — so build them up from the
+      // ground (base 0) to that height instead of floating them on a slope
+      // that does not exist.
       const near = Math.sqrt(nearestD);
       const proximity = Math.max(0, 1 - near / 45);
+      const lift = Math.max(0, nearestY * proximity - 1);
       // keep the skyline low next to the road so the chase camera never
       // dives through a tower
       const hMax = near < 26 ? 5.5 : 13;
@@ -398,9 +402,9 @@ export const cityBlocks = (track: TrackData): CityBlock[] => {
         z,
         w: 4.5 + rand(i, 4) * 5,
         d: 4.5 + rand(i, 5) * 5,
-        h: Math.min(3 + rand(i, 6) * 10, hMax),
+        h: lift + Math.min(3 + rand(i, 6) * 10, hMax),
         tone: Math.floor(rand(i, 7) * 5),
-        base: Math.max(0, nearestY * proximity - 1),
+        base: 0,
       });
     }
   }

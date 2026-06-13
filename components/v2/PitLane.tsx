@@ -5,7 +5,7 @@ import { project } from "@/data/projects";
 
 import { roundedPath, Waypoint } from "./Circuit";
 import { RaceCar } from "./RaceCar";
-import { Box3D, CrewDot, TunnelPortal, Windows } from "./Scenery";
+import { Box3D, TunnelPortal, Windows } from "./Scenery";
 import { TechChip } from "./TechChip";
 import {
   FollowInfo,
@@ -154,24 +154,6 @@ export const PitLane = () => {
             >
               H
             </text>
-            {/* the giant painted roof mark, Vegas pit-building style */}
-            <text
-              x={BUILDING.x + BUILDING.w / 2 + 9}
-              y={(track.corners[0].y + track.corners[track.corners.length - 1].y) / 2}
-              textAnchor="middle"
-              fontSize={30}
-              fontWeight={800}
-              fill="var(--livery)"
-              opacity={0.9}
-              transform={`rotate(90 ${BUILDING.x + BUILDING.w / 2 + 9} ${
-                (track.corners[0].y +
-                  track.corners[track.corners.length - 1].y) /
-                2
-              })`}
-              style={{ letterSpacing: 6 }}
-            >
-              JW RACING
-            </text>
             {/* glazed front along the lane + rooftop AC units */}
             {track.corners.map((c, i) => (
               <g key={`facade-${i}`}>
@@ -271,27 +253,6 @@ export const PitLane = () => {
                 >
                   P{i + 1}
                 </text>
-                {/* the crew at the door when the car boxes */}
-                {atStall === i &&
-                  [
-                    { x: DOOR_X - 9, y: c.y - 16 },
-                    { x: DOOR_X + 9, y: c.y - 16 },
-                    { x: DOOR_X - 9, y: c.y + 16 },
-                    { x: DOOR_X + 9, y: c.y + 16 },
-                  ].map((p, j) => (
-                    <motion.g
-                      key={j}
-                      transform={`translate(${p.x} ${p.y})`}
-                      animate={{ y: [0, -1.6, 0] }}
-                      transition={{
-                        duration: 0.4,
-                        repeat: Infinity,
-                        delay: j * 0.1,
-                      }}
-                    >
-                      <CrewDot />
-                    </motion.g>
-                  ))}
               </g>
             ))}
 
