@@ -28,11 +28,11 @@ const PLAN: P[] = [
   { x: 64, z: 33, y: 7.6 }, // Mirabeau (right)
   { x: 57, z: 31.5, y: 6.6 },
   { x: 51, z: 29.5, y: 5.8 }, // toward the hairpin
-  { x: 46, z: 26.5, y: 5.4 }, // Fairmont hairpin: tight left U
-  { x: 43.2, z: 23.5, y: 5.2 },
-  { x: 44.5, z: 20.8, y: 5 },
-  { x: 48.5, z: 19.8, y: 4.6 },
-  { x: 53, z: 19.2, y: 4.2 }, // down to Portier
+  { x: 47.5, z: 27, y: 5.4 }, // Fairmont hairpin: the slow 180
+  { x: 41.5, z: 24.5, y: 5.2 },
+  { x: 40.5, z: 19, y: 5 },
+  { x: 45, z: 16, y: 4.6 },
+  { x: 51, z: 16.5, y: 4.2 }, // down to Portier
   { x: 58, z: 18, y: 3.2 },
   { x: 61.5, z: 15.5, y: 2.4 }, // Portier (right-right)
   { x: 64.5, z: 13, y: 2.1 },
@@ -41,22 +41,22 @@ const PLAN: P[] = [
   { x: 83, z: 3, y: 1.45 },
   { x: 87.5, z: -3, y: 1.15 },
   { x: 89.5, z: -10, y: 0.8 }, // ——— tunnel exit ———
-  { x: 89.5, z: -17, y: 0.4 },
-  { x: 88.5, z: -21, y: 0.2 }, // Nouvelle Chicane: hard left-right
-  { x: 84.5, z: -22.5, y: 0 },
-  { x: 83.5, z: -26.5, y: 0 },
-  { x: 79, z: -29, y: 0 }, // Tabac (left kink)
-  { x: 73, z: -30.5, y: 0 },
-  { x: 67, z: -32, y: 0 }, // Piscine 1: left flick…
-  { x: 63.5, z: -36, y: 0 }, // …right
-  { x: 58, z: -37.5, y: 0 },
-  { x: 52, z: -39, y: 0 }, // Piscine 2: right…
-  { x: 48.5, z: -43.5, y: 0 }, // …left around the pool
-  { x: 43, z: -43, y: 0 },
-  { x: 38.5, z: -39.5, y: 0 }, // La Rascasse (tight right hook)
-  { x: 36, z: -34.5, y: 0 },
-  { x: 30, z: -30.5, y: 0.2 }, // Antony Noghès (right)
-  { x: 20, z: -27.5, y: 0.2 },
+  { x: 89, z: -16, y: 0.45 },
+  { x: 87, z: -20, y: 0.2 }, // Nouvelle Chicane: right…
+  { x: 82.5, z: -21.5, y: 0.05 }, // …flick left
+  { x: 79, z: -25, y: 0 },
+  { x: 74, z: -27.5, y: 0 }, // Tabac (left sweep)
+  { x: 68, z: -29.5, y: 0 },
+  { x: 62, z: -31.5, y: 0 }, // Piscine 1 (left)
+  { x: 56, z: -34, y: 0 },
+  { x: 50.5, z: -37, y: 0 },
+  { x: 45.5, z: -39.5, y: 0 }, // Piscine 2 (right-left)
+  { x: 40, z: -40.5, y: 0 },
+  { x: 36.5, z: -39.5, y: 0 }, // La Rascasse (right hook)
+  { x: 33.5, z: -36, y: 0 },
+  { x: 32, z: -31.5, y: 0.1 }, // Antony Noghès (right)
+  { x: 28, z: -28.5, y: 0.2 },
+  { x: 19, z: -27, y: 0.2 },
   { x: 9, z: -22.5, y: 0.1 },
   { x: 2, z: -15, y: 0 },
 ];
@@ -67,8 +67,8 @@ const ANCHOR_PLAN_IDX = [3, 10, 13, 17, 22, 31, 38];
 // tunnel runs between these plan points
 const TUNNEL_RANGE: [number, number] = [24, 28];
 
-// the Piscine pool sits inside its chicanes
-export const POOL = { x: 55.5, z: -42.5, w: 11, d: 5.5, rot: -0.25 };
+// the Piscine pool — placed by poolPlacement() into the clearest infield
+// spot near the swimming-pool chicanes so it never lands on the track.
 
 export interface TrackData {
   curve: THREE.CatmullRomCurve3;
@@ -124,8 +124,8 @@ export const buildTrack = (): TrackData => {
     side.crossVectors(up, tangents[i]).setY(0).normalize();
     const lat = THREE.MathUtils.clamp(
       acc.sub(samples[i]).dot(side),
-      -2.8,
-      2.8
+      -1.6,
+      1.6
     );
     racePts.push(samples[i].clone().addScaledVector(side, lat));
   }
@@ -257,40 +257,90 @@ export const skirtGeometry = (
   return geo;
 };
 
-export interface KerbSlab {
-  position: THREE.Vector3;
-  rotationY: number;
-  red: boolean;
-}
+// A repeating red/white stripe texture for the kerbs — bands run across the
+// kerb width and alternate along its length, like a real circuit kerb.
+export const kerbTexture = (): THREE.CanvasTexture => {
+  const c = document.createElement("canvas");
+  c.width = 8;
+  c.height = 16;
+  const ctx = c.getContext("2d")!;
+  ctx.fillStyle = "#D8302B";
+  ctx.fillRect(0, 0, 8, 8);
+  ctx.fillStyle = "#F2F2F0";
+  ctx.fillRect(0, 8, 8, 8);
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.magFilter = THREE.NearestFilter;
+  return tex;
+};
 
-export const kerbSlabs = (track: TrackData): KerbSlab[] => {
+// Continuous kerb ribbons hugging both road edges through the corners.
+// Returns one geometry whose V coordinate maps to arc length so the stripe
+// texture tiles neatly along the whole kerb instead of scattering boxes.
+const STRIPE_LENGTH = 1.4; // world length of one red+white pair
+const HALF_ROAD = 2.8; // narrow, like the real Monaco street
+const KERB_WIDTH = 1.1;
+
+export const kerbRibbon = (track: TrackData): THREE.BufferGeometry => {
   const { samples, tangents } = track;
-  const slabs: KerbSlab[] = [];
+  const n = samples.length;
   const up = new THREE.Vector3(0, 1, 0);
   const side = new THREE.Vector3();
-  let acc = 0;
-  let count = 0;
-  for (let i = 4; i < samples.length - 4; i += 2) {
-    const angle = tangents[i - 4].angleTo(tangents[i + 4]);
-    acc += samples[i].distanceTo(samples[i - 2]);
-    if (angle < 0.1 || acc < 1.4) continue;
-    acc = 0;
-    count++;
-    side.crossVectors(up, tangents[i]).setY(0).normalize();
-    const rotY = Math.atan2(tangents[i].x, tangents[i].z);
-    for (const s of [1, -1]) {
-      slabs.push({
-        position: new THREE.Vector3(
-          samples[i].x + side.x * s * 3.7,
-          samples[i].y + 0.03,
-          samples[i].z + side.z * s * 3.7
-        ),
-        rotationY: rotY,
-        red: count % 2 === 0,
-      });
+
+  // mark corner samples by curvature
+  const corner = new Array(n).fill(false);
+  for (let i = 6; i < n - 6; i++) {
+    if (tangents[i - 6].angleTo(tangents[i + 6]) > 0.05) corner[i] = true;
+  }
+  // dilate so kerbs start a touch before and end a touch after the apex
+  const mask = corner.slice();
+  for (let i = 0; i < n; i++) {
+    if (!corner[i]) continue;
+    for (let d = -10; d <= 10; d++) {
+      const j = i + d;
+      if (j >= 0 && j < n) mask[j] = true;
     }
   }
-  return slabs;
+
+  const pos: number[] = [];
+  const uv: number[] = [];
+  const idx: number[] = [];
+
+  for (const s of [1, -1]) {
+    let arc = 0;
+    let prevInStrip = false;
+    let base = 0;
+    for (let i = 0; i < n; i++) {
+      if (i > 0) arc += samples[i].distanceTo(samples[i - 1]);
+      if (!mask[i]) {
+        prevInStrip = false;
+        continue;
+      }
+      side.crossVectors(up, tangents[i]).setY(0).normalize();
+      const p = samples[i];
+      const inX = p.x + side.x * s * HALF_ROAD;
+      const inZ = p.z + side.z * s * HALF_ROAD;
+      const outX = p.x + side.x * s * (HALF_ROAD + KERB_WIDTH);
+      const outZ = p.z + side.z * s * (HALF_ROAD + KERB_WIDTH);
+      const y = p.y + 0.05;
+      const v = arc / STRIPE_LENGTH;
+      const row = pos.length / 3; // vertex index of this sample's inner edge
+      pos.push(inX, y, inZ, outX, y, outZ);
+      uv.push(0, v, 1, v);
+      if (prevInStrip) {
+        idx.push(base, base + 1, row, base + 1, row + 1, row);
+      }
+      base = row;
+      prevInStrip = true;
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+  geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
 };
 
 export interface CityBlock {
@@ -371,3 +421,32 @@ export const yachts = (): Yacht[] =>
     l: 2.5 + rand(i + 1, 13) * 4,
     rot: rand(i + 1, 14) * Math.PI,
   }));
+
+export interface PoolPlacement {
+  x: number;
+  z: number;
+  w: number;
+  d: number;
+  rot: number;
+}
+
+// Find the clearest spot in the swimming-pool region (the infield bounded by
+// the Piscine chicanes) and size the pool to fit, so it never overlaps the
+// racing surface.
+export const poolPlacement = (track: TrackData): PoolPlacement => {
+  let best = { x: 56, z: -45, clr: 0 };
+  for (let x = 44; x <= 68; x += 1) {
+    for (let z = -50; z <= -36; z += 1) {
+      let nearest = Infinity;
+      for (let s = 0; s < track.samples.length; s += 6) {
+        const p = track.samples[s];
+        const d = (p.x - x) ** 2 + (p.z - z) ** 2;
+        if (d < nearest) nearest = d;
+      }
+      const clr = Math.sqrt(nearest);
+      if (clr > best.clr) best = { x, z, clr };
+    }
+  }
+  const half = Math.max(2.2, best.clr - 1.2);
+  return { x: best.x, z: best.z, w: half * 2, d: half * 1.2, rot: 0 };
+};

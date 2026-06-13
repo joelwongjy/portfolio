@@ -10,8 +10,9 @@ import * as THREE from "three";
 import {
   buildTrack,
   cityBlocks,
-  kerbSlabs,
-  POOL,
+  kerbRibbon,
+  kerbTexture,
+  poolPlacement,
   ribbonGeometry,
   skirtGeometry,
   TrackData,
@@ -234,15 +235,15 @@ const Rig = ({
 }) => {
   const { camera } = useThree();
   const sm = useRef({ t: 0, roll: 0, speed: 0 });
-  const look = useRef(new THREE.Vector3());
+  const heading = useRef(new THREE.Vector3(0, 0, 1));
+  const aim = useRef(new THREE.Vector3());
   const tmp = useMemo(
     () => ({
       pos: new THREE.Vector3(),
       tan: new THREE.Vector3(),
       tan2: new THREE.Vector3(),
+      flat: new THREE.Vector3(),
       cam: new THREE.Vector3(),
-      camAnchor: new THREE.Vector3(),
-      camTan: new THREE.Vector3(),
       target: new THREE.Vector3(),
     }),
     []
@@ -259,9 +260,6 @@ const Rig = ({
 
     track.raceCurve.getPointAt(t, tmp.pos);
     track.raceCurve.getTangentAt(t, tmp.tan);
-    // the camera tracks the smoother centreline, slightly behind the car
-    track.curve.getPointAt(t, tmp.camAnchor);
-    track.curve.getTangentAt(t, tmp.camTan);
 
     if (carRef.current) {
       carRef.current.position.copy(tmp.pos);
@@ -282,18 +280,34 @@ const Rig = ({
       lineRef.current.setDrawRange(0, segs * 6);
     }
 
+    // The camera sits behind the car along a smoothed, flattened heading and
+    // always aims just ahead of it. Smoothing the heading (not the aim) keeps
+    // the framing calm through chicanes and elevation without ever pointing
+    // at the ground.
+    tmp.flat.set(tmp.tan.x, 0, tmp.tan.z).normalize();
+    const kHead = 1 - Math.exp(-4 * Math.min(dt, 0.05));
+    heading.current.lerp(tmp.flat, kHead).normalize();
+
+    // ramp the camera down into the tunnel and back up on exit so the lift
+    // never snaps (which clipped the roof and flashed empty ground)
     const [t0, t1] = track.tunnelFractions;
-    const inTunnel = t > t0 - 0.012 && t < t1 + 0.004;
-    const back = inTunnel ? -9 : -16;
-    const lift = inTunnel ? 2.4 : 12.5;
-    // heavier damping for the camera than the car keeps corners calm
-    const kCam = 1 - Math.exp(-3.2 * Math.min(dt, 0.05));
-    tmp.cam.copy(tmp.camAnchor).addScaledVector(tmp.camTan, back);
-    tmp.cam.y = tmp.camAnchor.y + lift;
-    camera.position.lerp(tmp.cam, kCam);
-    tmp.target.copy(tmp.pos).addScaledVector(tmp.tan, 8);
-    look.current.lerp(tmp.target, kCam);
-    camera.lookAt(look.current);
+    const ramp = 0.03;
+    let tf = 0;
+    if (t > t0 - ramp && t < t1 + ramp) {
+      if (t < t0) tf = (t - (t0 - ramp)) / ramp;
+      else if (t > t1) tf = 1 - (t - t1) / ramp;
+      else tf = 1;
+      tf = THREE.MathUtils.clamp(tf, 0, 1);
+    }
+    const back = 15 - tf * 6;
+    const lift = 8.5 - tf * 5.9;
+    tmp.cam.copy(tmp.pos).addScaledVector(heading.current, -back);
+    tmp.cam.y = tmp.pos.y + lift;
+    camera.position.lerp(tmp.cam, k);
+
+    aim.current.copy(tmp.pos).addScaledVector(heading.current, 7);
+    aim.current.y = tmp.pos.y + 1.2;
+    camera.lookAt(aim.current);
 
     // speed feel: widen the view and tremble slightly at pace
     const pace = THREE.MathUtils.clamp(sm.current.speed * 22, 0, 1);
@@ -311,41 +325,22 @@ const Rig = ({
 };
 
 const Kerbs = ({ track }: { track: TrackData }) => {
-  const slabs = useMemo(() => kerbSlabs(track), [track]);
-  const redRef = useRef<THREE.InstancedMesh>(null);
-  const whiteRef = useRef<THREE.InstancedMesh>(null);
-  const red = useMemo(() => slabs.filter((s) => s.red), [slabs]);
-  const white = useMemo(() => slabs.filter((s) => !s.red), [slabs]);
-
-  useLayoutEffect(() => {
-    const o = new THREE.Object3D();
-    [
-      [redRef.current, red],
-      [whiteRef.current, white],
-    ].forEach(([mesh, list]) => {
-      const m = mesh as THREE.InstancedMesh | null;
-      if (!m) return;
-      (list as typeof red).forEach((s, i) => {
-        o.position.copy(s.position);
-        o.rotation.set(0, s.rotationY, 0);
-        o.updateMatrix();
-        m.setMatrixAt(i, o.matrix);
-      });
-      m.instanceMatrix.needsUpdate = true;
-    });
-  }, [red, white]);
-
+  const geo = useMemo(() => kerbRibbon(track), [track]);
+  const tex = useMemo(() => {
+    const t = kerbTexture();
+    t.repeat.set(1, 1);
+    return t;
+  }, []);
   return (
-    <>
-      <instancedMesh ref={redRef} args={[undefined, undefined, red.length]} receiveShadow>
-        <boxGeometry args={[1.15, 0.08, 1.7]} />
-        <meshStandardMaterial color="#D33A35" roughness={0.7} />
-      </instancedMesh>
-      <instancedMesh ref={whiteRef} args={[undefined, undefined, white.length]} receiveShadow>
-        <boxGeometry args={[1.15, 0.08, 1.7]} />
-        <meshStandardMaterial color="#F4F4F2" roughness={0.7} />
-      </instancedMesh>
-    </>
+    <mesh geometry={geo} receiveShadow renderOrder={1}>
+      <meshStandardMaterial
+        map={tex}
+        roughness={0.65}
+        polygonOffset
+        polygonOffsetFactor={-2}
+        polygonOffsetUnits={-2}
+      />
+    </mesh>
   );
 };
 
@@ -441,15 +436,15 @@ const STANDS = [
 
 const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
   const track = useMemo(buildTrack, []);
-  const asphalt = useMemo(() => ribbonGeometry(track, 8.6, 0.02), [track]);
+  const asphalt = useMemo(() => ribbonGeometry(track, 5.6, 0.02), [track]);
   const line = useMemo(
     () => ribbonGeometry(track, 0.7, 0.07, 0, 1, 0, 0, true),
     [track]
   );
-  const armcoL = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, 4.9, 0.55), [track]);
-  const armcoR = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, -4.9, 0.55), [track]);
-  const skirtL = useMemo(() => skirtGeometry(track, 4.32), [track]);
-  const skirtR = useMemo(() => skirtGeometry(track, -4.32), [track]);
+  const armcoL = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, 4.1, 0.55), [track]);
+  const armcoR = useMemo(() => ribbonGeometry(track, 0, 0, 0, 1, -4.1, 0.55), [track]);
+  const skirtL = useMemo(() => skirtGeometry(track, 2.82), [track]);
+  const skirtR = useMemo(() => skirtGeometry(track, -2.82), [track]);
   // greenery only where it cannot touch the asphalt
   const trees = useMemo(() => {
     const spots = [
@@ -474,18 +469,19 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
   }, [track]);
   const [tun0, tun1] = track.tunnelFractions;
   const tunnelRoof = useMemo(
-    () => ribbonGeometry(track, 10, 4.4, tun0, tun1),
+    () => ribbonGeometry(track, 8, 4.4, tun0, tun1),
     [track, tun0, tun1]
   );
   const tunnelL = useMemo(
-    () => ribbonGeometry(track, 0, 0, tun0, tun1, 4.8, 4.4),
+    () => ribbonGeometry(track, 0, 0, tun0, tun1, 3.7, 4.4),
     [track, tun0, tun1]
   );
   const tunnelR = useMemo(
-    () => ribbonGeometry(track, 0, 0, tun0, tun1, -4.8, 4.4),
+    () => ribbonGeometry(track, 0, 0, tun0, tun1, -3.7, 4.4),
     [track, tun0, tun1]
   );
   const boats = useMemo(yachts, []);
+  const pool = useMemo(() => poolPlacement(track), [track]);
   const textures = useMemo(
     () => banners.map((b) => bannerTexture(b, livery)),
     [banners, livery]
@@ -554,15 +550,15 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
 
       <City track={track} />
 
-      {/* the Piscine pool */}
-      <group position={[POOL.x, 0, POOL.z]} rotation={[0, POOL.rot, 0]}>
-        <mesh position={[0, 0.04, 0]}>
-          <boxGeometry args={[POOL.w + 2.4, 0.12, POOL.d + 2.4]} />
+      {/* the Piscine pool, dropped into the clearest infield spot */}
+      <group position={[pool.x, 0, pool.z]} rotation={[0, pool.rot, 0]}>
+        <mesh position={[0, 0.05, 0]} receiveShadow>
+          <boxGeometry args={[pool.w + 2, 0.14, pool.d + 2]} />
           <meshStandardMaterial color="#E8E4D8" roughness={0.9} />
         </mesh>
-        <mesh position={[0, 0.12, 0]}>
-          <boxGeometry args={[POOL.w, 0.08, POOL.d]} />
-          <meshStandardMaterial color="#3EC1D6" roughness={0.2} />
+        <mesh position={[0, 0.13, 0]}>
+          <boxGeometry args={[pool.w, 0.1, pool.d]} />
+          <meshStandardMaterial color="#3EC1D6" roughness={0.2} metalness={0.1} />
         </mesh>
       </group>
 
