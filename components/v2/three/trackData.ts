@@ -46,14 +46,14 @@ const PLAN: P[] = [
   { x: 82.5, z: -21.5, y: 0.05 }, // …flick left
   { x: 79, z: -25, y: 0 },
   { x: 74, z: -27.5, y: 0 }, // Tabac (left sweep)
-  { x: 68, z: -29.5, y: 0 },
-  { x: 62, z: -31.5, y: 0 }, // Piscine 1 (left)
-  { x: 56, z: -34, y: 0 },
-  { x: 50.5, z: -37, y: 0 },
-  { x: 45.5, z: -39.5, y: 0 }, // Piscine 2 (right-left)
-  { x: 40, z: -40.5, y: 0 },
-  { x: 36.5, z: -39.5, y: 0 }, // La Rascasse (right hook)
-  { x: 33.5, z: -36, y: 0 },
+  { x: 69, z: -28.8, y: 0 }, // onto the harbour front
+  { x: 63.5, z: -29.4, y: 0 }, // Swimming Pool entry: hold by the water (left)…
+  { x: 58.5, z: -32.2, y: 0 }, // …then flick away (right) — Virage Louis Chiron
+  { x: 52.5, z: -34.6, y: 0 }, // along the pool
+  { x: 46.5, z: -36.8, y: 0 }, // Piscine 2
+  { x: 41.5, z: -38.4, y: 0 }, // Swimming Pool exit: right…
+  { x: 37, z: -38, y: 0 }, // …left into the hook
+  { x: 34, z: -34.5, y: 0 }, // La Rascasse (right hook)
   { x: 32, z: -31.5, y: 0.1 }, // Antony Noghès (right)
   { x: 28, z: -28.5, y: 0.2 },
   { x: 19, z: -27, y: 0.2 },
@@ -67,8 +67,8 @@ const ANCHOR_PLAN_IDX = [3, 10, 13, 17, 22, 31, 38];
 // tunnel runs between these plan points
 const TUNNEL_RANGE: [number, number] = [24, 28];
 
-// the Piscine pool — placed by poolPlacement() into the clearest infield
-// spot near the swimming-pool chicanes so it never lands on the track.
+// the Piscine pool — placed by poolPlacement() on the harbour side of the
+// swimming-pool complex, between the track and the marina, like the real one.
 
 export interface TrackData {
   curve: THREE.CatmullRomCurve3;
@@ -369,8 +369,8 @@ export const cityBlocks = (track: TrackData): CityBlock[] => {
       if (rand(i, 1) < 0.3) continue;
       const x = gx + rand(i, 2) * 6;
       const z = gz + rand(i, 3) * 6;
-      // the harbour basin stays clear
-      if (x > 36 && x < 86 && z > -26 && z < 12) continue;
+      // the harbour basin and the swimming-pool quay stay clear of buildings
+      if (x > 34 && x < 88 && z > -44 && z < 12) continue;
       let clear = true;
       let nearestD = Infinity;
       let nearestY = 0;
@@ -418,13 +418,23 @@ export interface Yacht {
   rot: number;
 }
 
-export const yachts = (): Yacht[] =>
-  Array.from({ length: 12 }).map((_, i) => ({
-    x: 46 + rand(i + 1, 11) * 32,
-    z: -20 + rand(i + 1, 12) * 26,
-    l: 2.5 + rand(i + 1, 13) * 4,
-    rot: rand(i + 1, 14) * Math.PI,
-  }));
+// Superyachts moored in two tidy rows along the harbour quay, kept in open
+// water clear of the track and the pool — not scattered at random.
+export const yachts = (): Yacht[] => {
+  const out: Yacht[] = [];
+  [-13, -7.5].forEach((z, r) => {
+    for (let c = 0; c < 5; c++) {
+      const i = r * 5 + c;
+      out.push({
+        x: 49 + c * 6.5 + r * 3,
+        z,
+        l: 4 + (i % 3),
+        rot: Math.PI / 2,
+      });
+    }
+  });
+  return out;
+};
 
 export interface PoolPlacement {
   x: number;
@@ -434,23 +444,35 @@ export interface PoolPlacement {
   rot: number;
 }
 
-// Find the clearest spot in the swimming-pool region (the infield bounded by
-// the Piscine chicanes) and size the pool to fit, so it never overlaps the
-// racing surface.
+// The Stade Nautique Rainier III pool sits on the harbour side of the
+// swimming-pool complex. Anchor it to the Piscine straight, align it to the
+// track and push it toward the water — so it reads like the real pool tucked
+// between the barriers and the marina, not floating in the infield.
 export const poolPlacement = (track: TrackData): PoolPlacement => {
-  let best = { x: 56, z: -45, clr: 0 };
-  for (let x = 44; x <= 68; x += 1) {
-    for (let z = -50; z <= -36; z += 1) {
-      let nearest = Infinity;
-      for (let s = 0; s < track.samples.length; s += 6) {
-        const p = track.samples[s];
-        const d = (p.x - x) ** 2 + (p.z - z) ** 2;
-        if (d < nearest) nearest = d;
-      }
-      const clr = Math.sqrt(nearest);
-      if (clr > best.clr) best = { x, z, clr };
+  const target = new THREE.Vector3(52, 0, -34);
+  let bi = 0;
+  let bd = Infinity;
+  track.samples.forEach((p, i) => {
+    const d = (p.x - target.x) ** 2 + (p.z - target.z) ** 2;
+    if (d < bd) {
+      bd = d;
+      bi = i;
     }
-  }
-  const half = Math.max(2.2, best.clr - 1.2);
-  return { x: best.x, z: best.z, w: half * 2, d: half * 1.2, rot: 0 };
+  });
+  const p = track.samples[bi];
+  const tan = track.tangents[bi];
+  const side = new THREE.Vector3()
+    .crossVectors(new THREE.Vector3(0, 1, 0), tan)
+    .setY(0)
+    .normalize();
+  // push toward the harbour (the +z side of the road)
+  const sign = side.z >= 0 ? 1 : -1;
+  const offset = 9;
+  return {
+    x: p.x + side.x * sign * offset,
+    z: p.z + side.z * sign * offset,
+    w: 5.5,
+    d: 13,
+    rot: Math.atan2(tan.x, tan.z),
+  };
 };
