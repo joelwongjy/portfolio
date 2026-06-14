@@ -309,16 +309,15 @@ const Rig = ({
     aim.current.y = tmp.pos.y + 1.2;
     camera.lookAt(aim.current);
 
-    // speed feel: widen the view and tremble slightly at pace
+    // speed feel: gently widen the view at pace — no camera shake, and the
+    // pace itself is heavily smoothed so bursty scroll input doesn't make the
+    // framing jitter
     const pace = THREE.MathUtils.clamp(sm.current.speed * 22, 0, 1);
     const cam = camera as THREE.PerspectiveCamera;
-    const fovTarget = 52 + pace * 9;
-    if (Math.abs(cam.fov - fovTarget) > 0.05) {
-      cam.fov += (fovTarget - cam.fov) * Math.min(1, dt * 5);
+    const fovTarget = 52 + pace * 5;
+    if (Math.abs(cam.fov - fovTarget) > 0.02) {
+      cam.fov += (fovTarget - cam.fov) * Math.min(1, dt * 2.5);
       cam.updateProjectionMatrix();
-    }
-    if (pace > 0.15) {
-      camera.position.y += Math.sin(state.clock.elapsedTime * 42) * 0.035 * pace;
     }
   });
   return null;
