@@ -22,7 +22,7 @@ export default function RaceWeekend() {
   return (
     <>
       <Head>
-        <title>Joel Wong — Race Weekend</title>
+        <title>Joel Wong</title>
         <meta
           name="description"
           content="Joel Wong. Frontend engineer, F1 fan. It's lights out and away we go."
