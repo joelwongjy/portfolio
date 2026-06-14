@@ -3,8 +3,7 @@ import {
   CSSProperties,
   ReactNode,
   useContext,
-  useEffect,
-  useState,
+  useMemo,
 } from "react";
 
 export interface Team {
@@ -12,60 +11,30 @@ export interface Team {
   name: string;
   color: string;
   glow: string;
+  driver: string;
+  code: string;
+  number: string;
 }
 
-export const teams: Team[] = [
-  {
-    id: "mclaren",
-    name: "McLaren",
-    color: "#FF8000",
-    glow: "rgba(255, 128, 0, 0.4)",
-  },
-  {
-    id: "ferrari",
-    name: "Ferrari",
-    color: "#E80020",
-    glow: "rgba(232, 0, 32, 0.4)",
-  },
-  {
-    id: "mercedes",
-    name: "Mercedes",
-    color: "#27F4D2",
-    glow: "rgba(39, 244, 210, 0.4)",
-  },
-  {
-    id: "redbull",
-    name: "Red Bull",
-    color: "#3671C6",
-    glow: "rgba(54, 113, 198, 0.4)",
-  },
-];
+// The site runs a fixed Red Bull / Max Verstappen livery — no switcher.
+export const team: Team = {
+  id: "redbull",
+  name: "Red Bull",
+  color: "#3671C6",
+  glow: "rgba(54, 113, 198, 0.45)",
+  driver: "Max Verstappen",
+  code: "VER",
+  number: "1",
+};
 
-const STORAGE_KEY = "livery";
-
-const LiveryContext = createContext<{
-  team: Team;
-  setTeam: (team: Team) => void;
-}>({ team: teams[0], setTeam: () => {} });
+const LiveryContext = createContext<{ team: Team }>({ team });
 
 export const useLivery = () => useContext(LiveryContext);
 
 export const LiveryProvider = ({ children }: { children: ReactNode }) => {
-  const [team, setTeam] = useState(teams[0]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    const match = teams.find((t) => t.id === saved);
-    if (match) setTeam(match);
-  }, []);
-
-  const pickTeam = (next: Team) => {
-    setTeam(next);
-    localStorage.setItem(STORAGE_KEY, next.id);
-  };
-
+  const value = useMemo(() => ({ team }), []);
   return (
-    <LiveryContext.Provider value={{ team, setTeam: pickTeam }}>
+    <LiveryContext.Provider value={value}>
       <div
         style={
           {

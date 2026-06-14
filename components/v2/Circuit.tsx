@@ -232,7 +232,12 @@ export const Circuit = () => {
   const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
   const pathRef = useRef<SVGPathElement>(null);
   const { setRace } = useRace();
-  const lastRace = useRef<RaceState>({ active: false, corner: 0, progress: 0 });
+  const lastRace = useRef<RaceState>({
+    active: false,
+    corner: 0,
+    progress: 0,
+    jobIndex: -1,
+  });
 
   const [track, setTrack] = useState<TrackGeometry>();
 
@@ -243,6 +248,7 @@ export const Circuit = () => {
         active: info.centerY > 0 && info.centerY < info.trackHeight,
         corner: Math.max(info.passed, 1),
         progress: Math.round((info.at / info.trackLength) * 100) / 100,
+        jobIndex: info.passed - 1,
       };
       const prev = lastRace.current;
       if (

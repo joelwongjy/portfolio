@@ -5,7 +5,7 @@ import { project } from "@/data/projects";
 
 import { roundedPath, Waypoint } from "./Circuit";
 import { RaceCar } from "./RaceCar";
-import { Box3D, CrewDot, TunnelPortal, Windows } from "./Scenery";
+import { Box3D, TunnelPortal, Windows } from "./Scenery";
 import { TechChip } from "./TechChip";
 import {
   FollowInfo,
@@ -109,12 +109,8 @@ export const PitLane = () => {
           Pit Lane
         </p>
         <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-          Box, box.
+          Projects
         </h2>
-        <p className="mt-4 text-white/50">
-          Out of the tunnel and into the garage — {projects.length} stops, one
-          per project. Speed limit 60.
-        </p>
       </header>
 
       <div className="relative">
@@ -153,24 +149,6 @@ export const PitLane = () => {
               fill="rgba(255,255,255,0.4)"
             >
               H
-            </text>
-            {/* the giant painted roof mark, Vegas pit-building style */}
-            <text
-              x={BUILDING.x + BUILDING.w / 2 + 9}
-              y={(track.corners[0].y + track.corners[track.corners.length - 1].y) / 2}
-              textAnchor="middle"
-              fontSize={30}
-              fontWeight={800}
-              fill="var(--livery)"
-              opacity={0.9}
-              transform={`rotate(90 ${BUILDING.x + BUILDING.w / 2 + 9} ${
-                (track.corners[0].y +
-                  track.corners[track.corners.length - 1].y) /
-                2
-              })`}
-              style={{ letterSpacing: 6 }}
-            >
-              JW RACING
             </text>
             {/* glazed front along the lane + rooftop AC units */}
             {track.corners.map((c, i) => (
@@ -271,27 +249,6 @@ export const PitLane = () => {
                 >
                   P{i + 1}
                 </text>
-                {/* the crew at the door when the car boxes */}
-                {atStall === i &&
-                  [
-                    { x: DOOR_X - 9, y: c.y - 16 },
-                    { x: DOOR_X + 9, y: c.y - 16 },
-                    { x: DOOR_X - 9, y: c.y + 16 },
-                    { x: DOOR_X + 9, y: c.y + 16 },
-                  ].map((p, j) => (
-                    <motion.g
-                      key={j}
-                      transform={`translate(${p.x} ${p.y})`}
-                      animate={{ y: [0, -1.6, 0] }}
-                      transition={{
-                        duration: 0.4,
-                        repeat: Infinity,
-                        delay: j * 0.1,
-                      }}
-                    >
-                      <CrewDot />
-                    </motion.g>
-                  ))}
               </g>
             ))}
 
@@ -333,7 +290,6 @@ export const PitLane = () => {
 
         <ol ref={listRef} className="relative space-y-16 pl-[132px] pt-20">
           {projects.map((item, i) => {
-            const compound = COMPOUNDS[i % COMPOUNDS.length];
             return (
               <motion.li
                 key={item.title}
@@ -346,19 +302,14 @@ export const PitLane = () => {
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, ease: [0.21, 0.6, 0.35, 1] }}
               >
-                <p className="font-mono text-[11px] uppercase tracking-widest text-white/40">
-                  Stop {i + 1} ·{" "}
-                  <span style={{ color: "var(--livery)" }}>
-                    {compound.time}s
-                  </span>{" "}
-                  · <span style={{ color: compound.color }}>{compound.name}</span>
-                  {i === WING_STOP && (
-                    <span className="text-white/55"> + front wing</span>
-                  )}
-                </p>
-                <h3 className="mt-2 text-xl font-bold text-white">
-                  {item.title}
-                </h3>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  loading="lazy"
+                  className="mb-4 max-h-56 w-auto max-w-full rounded-xl border border-white/10"
+                />
+                <h3 className="text-xl font-bold text-white">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   {item.description}
                 </p>

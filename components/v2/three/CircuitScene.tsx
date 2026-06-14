@@ -22,6 +22,7 @@ import {
 export interface BannerInfo {
   name: string;
   logo?: string;
+  year?: string;
 }
 
 interface SceneProps {
@@ -160,12 +161,18 @@ const bannerTexture = (info: BannerInfo, livery: string) => {
     ctx.fillStyle = livery;
     ctx.fillRect(0, 0, 14, 84);
     ctx.fillRect(0, 74, 512, 10);
-    // tap hint
-    ctx.fillStyle = "#9A958A";
-    ctx.font = "700 17px system-ui, sans-serif";
     ctx.textBaseline = "middle";
     ctx.textAlign = "right";
-    ctx.fillText("TAP FOR DETAILS ▸", 496, 40);
+    // the season(s) for this chapter
+    if (info.year) {
+      ctx.fillStyle = livery;
+      ctx.font = "800 22px system-ui, sans-serif";
+      ctx.fillText(info.year, 496, 27);
+    }
+    // tap hint
+    ctx.fillStyle = "#9A958A";
+    ctx.font = "700 15px system-ui, sans-serif";
+    ctx.fillText("TAP FOR DETAILS ▸", 496, 57);
     ctx.textAlign = "left";
   };
   chrome();
@@ -256,7 +263,9 @@ const Rig = ({
     sm.current.t += (target - sm.current.t) * k;
     const t = THREE.MathUtils.clamp(sm.current.t, 0.0001, 0.9999);
     const speed = Math.abs(sm.current.t - prevT) / Math.max(dt, 0.001);
-    sm.current.speed += (speed - sm.current.speed) * Math.min(1, dt * 3);
+    // heavily damp the pace so bursty scroll input can't make it jitter
+    sm.current.speed += (speed - sm.current.speed) * Math.min(1, dt * 1.5);
+    const pace = THREE.MathUtils.clamp(sm.current.speed * 22, 0, 1);
 
     track.raceCurve.getPointAt(t, tmp.pos);
     track.raceCurve.getTangentAt(t, tmp.tan);
@@ -299,8 +308,10 @@ const Rig = ({
       else tf = 1;
       tf = THREE.MathUtils.clamp(tf, 0, 1);
     }
-    const back = 15 - tf * 6;
-    const lift = 8.5 - tf * 5.9;
+    // subtle sense of speed: ease the camera back and drop it a touch at pace.
+    // It rides the smoothed position lerp, so it reads as momentum, not shake.
+    const back = 15 - tf * 6 + pace * 1.8;
+    const lift = 8.5 - tf * 5.9 - pace * 0.5;
     tmp.cam.copy(tmp.pos).addScaledVector(heading.current, -back);
     tmp.cam.y = tmp.pos.y + lift;
     camera.position.lerp(tmp.cam, k);
@@ -309,16 +320,12 @@ const Rig = ({
     aim.current.y = tmp.pos.y + 1.2;
     camera.lookAt(aim.current);
 
-    // speed feel: widen the view and tremble slightly at pace
-    const pace = THREE.MathUtils.clamp(sm.current.speed * 22, 0, 1);
+    // and gently widen the view at pace — no positional shake
     const cam = camera as THREE.PerspectiveCamera;
-    const fovTarget = 52 + pace * 9;
-    if (Math.abs(cam.fov - fovTarget) > 0.05) {
-      cam.fov += (fovTarget - cam.fov) * Math.min(1, dt * 5);
+    const fovTarget = 52 + pace * 7;
+    if (Math.abs(cam.fov - fovTarget) > 0.02) {
+      cam.fov += (fovTarget - cam.fov) * Math.min(1, dt * 2.5);
       cam.updateProjectionMatrix();
-    }
-    if (pace > 0.15) {
-      camera.position.y += Math.sin(state.clock.elapsedTime * 42) * 0.035 * pace;
     }
   });
   return null;
@@ -480,6 +487,13 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
     () => ribbonGeometry(track, 0, 0, tun0, tun1, -3.7, 4.4),
     [track, tun0, tun1]
   );
+  // a solid floor spanning the full tunnel width — the road is only 5.6 wide
+  // but the walls sit at ±3.7, so without this the elevated tunnel left a slot
+  // either side of the asphalt that looked straight down onto the water
+  const tunnelFloor = useMemo(
+    () => ribbonGeometry(track, 8.2, -0.05, tun0, tun1),
+    [track, tun0, tun1]
+  );
   const boats = useMemo(yachts, []);
   const pool = useMemo(() => poolPlacement(track), [track]);
   const textures = useMemo(
@@ -590,6 +604,9 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
       </mesh>
 
       {/* the tunnel under the Fairmont */}
+      <mesh geometry={tunnelFloor} receiveShadow>
+        <meshStandardMaterial color="#4C5058" roughness={0.95} side={THREE.DoubleSide} />
+      </mesh>
       <mesh geometry={tunnelRoof}>
         <meshStandardMaterial color="#C2B8A4" roughness={0.9} side={THREE.DoubleSide} />
       </mesh>
@@ -642,20 +659,6 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
           />
         );
       })}
-
-      {/* marshal posts at every career corner */}
-      {track.cornerPositions.map((c, i) => (
-        <group key={`marshal-${i}`} position={[c.x + 5.4, c.y, c.z + 2]}>
-          <mesh position={[0, 0.55, 0]} castShadow>
-            <boxGeometry args={[0.9, 1.1, 0.9]} />
-            <meshStandardMaterial color="#E8762C" roughness={0.8} />
-          </mesh>
-          <mesh position={[0, 1.15, 0]}>
-            <boxGeometry args={[0.95, 0.1, 0.95]} />
-            <meshStandardMaterial color="#F4F4F2" roughness={0.8} />
-          </mesh>
-        </group>
-      ))}
 
       {/* greenery */}
       {trees.map(([x, z], i) => (
