@@ -1,6 +1,15 @@
-import { Html, Head, Main, NextScript } from "next/document";
+import {
+  DocumentProps,
+  Head,
+  Html,
+  Main,
+  NextScript,
+} from "next/document";
 
-export default function Document() {
+export default function Document(props: DocumentProps) {
+  // Apply the full-bleed /v2 body class during SSR so the first paint isn't
+  // briefly squeezed into the classic site's narrow column.
+  const isV2 = props.__NEXT_DATA__?.page === "/v2";
   return (
     <Html lang="en">
       <Head>
@@ -9,7 +18,7 @@ export default function Document() {
           rel="stylesheet"
         />
       </Head>
-      <body>
+      <body className={isV2 ? "v2" : undefined}>
         <Main />
         <NextScript />
       </body>

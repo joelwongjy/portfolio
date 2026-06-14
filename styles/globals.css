@@ -7,6 +7,16 @@
     @apply m-auto box-border max-w-2xl border-white px-4 text-gray-900 dark:bg-[#111010] dark:text-white;
   }
 
+  /* /v2 race weekend prototype is full-bleed and always dark */
+  body.v2 {
+    @apply max-w-none bg-[#050505] px-0;
+  }
+
+  /* svgr icons carry white "empty space" fills meant for light pages */
+  body.v2 .empty-space {
+    fill: transparent;
+  }
+
   h2,
   p,
   span {
