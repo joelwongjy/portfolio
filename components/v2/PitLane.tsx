@@ -109,12 +109,8 @@ export const PitLane = () => {
           Pit Lane
         </p>
         <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-          Box, box.
+          Projects
         </h2>
-        <p className="mt-4 text-white/50">
-          Out of the tunnel and into the garage — {projects.length} stops, one
-          per project. Speed limit 60.
-        </p>
       </header>
 
       <div className="relative">
@@ -308,7 +304,6 @@ export const PitLane = () => {
                 transition={{ duration: 0.5, ease: [0.21, 0.6, 0.35, 1] }}
               >
                 <p className="font-mono text-[11px] uppercase tracking-widest text-white/40">
-                  Stop {i + 1} ·{" "}
                   <span style={{ color: "var(--livery)" }}>
                     {compound.time}s
                   </span>{" "}
@@ -317,9 +312,16 @@ export const PitLane = () => {
                     <span className="text-white/55"> + front wing</span>
                   )}
                 </p>
-                <h3 className="mt-2 text-xl font-bold text-white">
-                  {item.title}
-                </h3>
+                <div className="mt-2 flex items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    loading="lazy"
+                    className="h-11 w-11 shrink-0 rounded-xl border border-white/10 object-cover"
+                  />
+                  <h3 className="text-xl font-bold text-white">{item.title}</h3>
+                </div>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   {item.description}
                 </p>

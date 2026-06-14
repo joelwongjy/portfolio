@@ -41,7 +41,7 @@ export default function RaceWeekend() {
               <Podium />
             </main>
             <footer className="pb-10 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-white/25">
-              <p>Joel Wong · Race Weekend prototype</p>
+              <p>© {new Date().getFullYear()} Joel Wong</p>
             </footer>
           </div>
         </RaceProvider>
