@@ -5,6 +5,7 @@ import { organisationToLogo } from "@/constants/logos";
 import { experience } from "@/data/experience";
 
 import { useLivery } from "./LiveryContext";
+import { jobYears } from "./jobYears";
 import { RaceState, useRace } from "./RaceContext";
 import { buildTrack } from "./three/trackData";
 
@@ -23,6 +24,7 @@ const banners = items.map((i) => {
   return {
     name: i.organisation,
     logo: typeof logo === "string" ? logo : logo?.src,
+    year: jobYears(i.start, i.end),
   };
 });
 

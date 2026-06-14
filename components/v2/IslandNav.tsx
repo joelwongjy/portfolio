@@ -4,6 +4,7 @@ import { hero } from "@/data/hero";
 import { experience } from "@/data/experience";
 
 import { OrganisationLogo } from "./Circuit";
+import { jobYears } from "./jobYears";
 import { useRace } from "./RaceContext";
 import { TechChip } from "./TechChip";
 
@@ -93,8 +94,9 @@ export const IslandNav = () => {
                   <span className="block truncate text-[13px] font-bold leading-tight text-white">
                     {job.title}
                   </span>
-                  <span className="block truncate font-mono text-[9px] uppercase capitalize tracking-[0.18em] text-white/45">
-                    {job.organisation}
+                  <span className="block truncate font-mono text-[9px] uppercase tracking-[0.18em] text-white/45">
+                    <span className="capitalize">{job.organisation}</span> ·{" "}
+                    {jobYears(job.start, job.end)}
                   </span>
                 </span>
                 <svg

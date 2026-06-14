@@ -22,6 +22,7 @@ import {
 export interface BannerInfo {
   name: string;
   logo?: string;
+  year?: string;
 }
 
 interface SceneProps {
@@ -160,12 +161,18 @@ const bannerTexture = (info: BannerInfo, livery: string) => {
     ctx.fillStyle = livery;
     ctx.fillRect(0, 0, 14, 84);
     ctx.fillRect(0, 74, 512, 10);
-    // tap hint
-    ctx.fillStyle = "#9A958A";
-    ctx.font = "700 17px system-ui, sans-serif";
     ctx.textBaseline = "middle";
     ctx.textAlign = "right";
-    ctx.fillText("TAP FOR DETAILS ▸", 496, 40);
+    // the season(s) for this chapter
+    if (info.year) {
+      ctx.fillStyle = livery;
+      ctx.font = "800 22px system-ui, sans-serif";
+      ctx.fillText(info.year, 496, 27);
+    }
+    // tap hint
+    ctx.fillStyle = "#9A958A";
+    ctx.font = "700 15px system-ui, sans-serif";
+    ctx.fillText("TAP FOR DETAILS ▸", 496, 57);
     ctx.textAlign = "left";
   };
   chrome();
