@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { hero } from "@/data/hero";
 import { experience } from "@/data/experience";
 
-import { CORNER_META, OrganisationLogo } from "./Circuit";
+import { OrganisationLogo } from "./Circuit";
 import { useRace } from "./RaceContext";
 import { TechChip } from "./TechChip";
 
@@ -28,11 +28,8 @@ export const IslandNav = () => {
   const live = race.active && race.jobIndex >= 0;
   const jobIndex = race.jobIndex;
   const job = jobIndex >= 0 ? items[jobIndex] : null;
-  const meta = jobIndex >= 0 ? CORNER_META[jobIndex % CORNER_META.length] : null;
 
   const detail = openJob !== null ? items[openJob] : null;
-  const detailMeta =
-    openJob !== null ? CORNER_META[openJob % CORNER_META.length] : null;
 
   const mode = expanded ? "expanded" : live ? "live" : "idle";
 
@@ -81,7 +78,7 @@ export const IslandNav = () => {
               </motion.button>
             )}
 
-            {mode === "live" && job && meta && (
+            {mode === "live" && job && (
               <motion.button
                 key="live"
                 {...fade}
@@ -96,9 +93,8 @@ export const IslandNav = () => {
                   <span className="block truncate text-[13px] font-bold leading-tight text-white">
                     {job.title}
                   </span>
-                  <span className="block truncate font-mono text-[9px] uppercase tracking-[0.18em] text-white/45">
-                    <span className="capitalize">{job.organisation}</span> ·{" "}
-                    {meta.corner}
+                  <span className="block truncate font-mono text-[9px] uppercase capitalize tracking-[0.18em] text-white/45">
+                    {job.organisation}
                   </span>
                 </span>
                 <svg
@@ -121,7 +117,7 @@ export const IslandNav = () => {
               </motion.button>
             )}
 
-            {mode === "expanded" && detail && detailMeta && (
+            {mode === "expanded" && detail && (
               <motion.div
                 key="expanded"
                 {...fade}
@@ -136,9 +132,6 @@ export const IslandNav = () => {
                       className="font-mono text-[10px] uppercase tracking-[0.2em]"
                       style={{ color: "var(--livery)" }}
                     >
-                      {detailMeta.corner}
-                    </p>
-                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
                       {detail.start} — {detail.end}
                     </p>
                   </div>

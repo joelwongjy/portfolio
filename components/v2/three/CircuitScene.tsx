@@ -256,7 +256,9 @@ const Rig = ({
     sm.current.t += (target - sm.current.t) * k;
     const t = THREE.MathUtils.clamp(sm.current.t, 0.0001, 0.9999);
     const speed = Math.abs(sm.current.t - prevT) / Math.max(dt, 0.001);
-    sm.current.speed += (speed - sm.current.speed) * Math.min(1, dt * 3);
+    // heavily damp the pace so bursty scroll input can't make it jitter
+    sm.current.speed += (speed - sm.current.speed) * Math.min(1, dt * 1.5);
+    const pace = THREE.MathUtils.clamp(sm.current.speed * 22, 0, 1);
 
     track.raceCurve.getPointAt(t, tmp.pos);
     track.raceCurve.getTangentAt(t, tmp.tan);
@@ -299,8 +301,10 @@ const Rig = ({
       else tf = 1;
       tf = THREE.MathUtils.clamp(tf, 0, 1);
     }
-    const back = 15 - tf * 6;
-    const lift = 8.5 - tf * 5.9;
+    // subtle sense of speed: ease the camera back and drop it a touch at pace.
+    // It rides the smoothed position lerp, so it reads as momentum, not shake.
+    const back = 15 - tf * 6 + pace * 1.8;
+    const lift = 8.5 - tf * 5.9 - pace * 0.5;
     tmp.cam.copy(tmp.pos).addScaledVector(heading.current, -back);
     tmp.cam.y = tmp.pos.y + lift;
     camera.position.lerp(tmp.cam, k);
@@ -309,12 +313,9 @@ const Rig = ({
     aim.current.y = tmp.pos.y + 1.2;
     camera.lookAt(aim.current);
 
-    // speed feel: gently widen the view at pace — no camera shake, and the
-    // pace itself is heavily smoothed so bursty scroll input doesn't make the
-    // framing jitter
-    const pace = THREE.MathUtils.clamp(sm.current.speed * 22, 0, 1);
+    // and gently widen the view at pace — no positional shake
     const cam = camera as THREE.PerspectiveCamera;
-    const fovTarget = 52 + pace * 5;
+    const fovTarget = 52 + pace * 7;
     if (Math.abs(cam.fov - fovTarget) > 0.02) {
       cam.fov += (fovTarget - cam.fov) * Math.min(1, dt * 2.5);
       cam.updateProjectionMatrix();
@@ -651,20 +652,6 @@ const Scene = ({ progressRef, livery, banners, onSelect }: SceneProps) => {
           />
         );
       })}
-
-      {/* marshal posts at every career corner */}
-      {track.cornerPositions.map((c, i) => (
-        <group key={`marshal-${i}`} position={[c.x + 5.4, c.y, c.z + 2]}>
-          <mesh position={[0, 0.55, 0]} castShadow>
-            <boxGeometry args={[0.9, 1.1, 0.9]} />
-            <meshStandardMaterial color="#E8762C" roughness={0.8} />
-          </mesh>
-          <mesh position={[0, 1.15, 0]}>
-            <boxGeometry args={[0.95, 0.1, 0.95]} />
-            <meshStandardMaterial color="#F4F4F2" roughness={0.8} />
-          </mesh>
-        </group>
-      ))}
 
       {/* greenery */}
       {trees.map(([x, z], i) => (
