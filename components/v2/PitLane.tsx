@@ -302,15 +302,13 @@ export const PitLane = () => {
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, ease: [0.21, 0.6, 0.35, 1] }}
               >
-                <div className="mb-4 overflow-hidden rounded-2xl border border-white/10">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    loading="lazy"
-                    className="aspect-[16/10] w-full max-w-md object-cover"
-                  />
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  loading="lazy"
+                  className="mb-4 max-h-56 w-auto max-w-full rounded-xl border border-white/10"
+                />
                 <h3 className="text-xl font-bold text-white">{item.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-white/65">
                   {item.description}
