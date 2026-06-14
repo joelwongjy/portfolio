@@ -1,29 +1,30 @@
 import { AnimatePresence, motion } from "framer-motion";
 
+import { hero } from "@/data/hero";
 import { experience } from "@/data/experience";
 
 import { CORNER_META, OrganisationLogo } from "./Circuit";
-import { useLivery } from "./LiveryContext";
 import { useRace } from "./RaceContext";
 import { TechChip } from "./TechChip";
 
 const items = experience.experiences.filter((e) => e.isShown !== false);
 
-const spring = { type: "spring", stiffness: 360, damping: 32 } as const;
+const spring = { type: "spring", stiffness: 380, damping: 34 } as const;
 const fade = {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
-  transition: { duration: 0.16 },
+  transition: { duration: 0.14 },
 };
 
-// The Dynamic Island doubles as the live HUD: an identity pill at rest, the
-// job the car is currently passing while on the circuit, and the full dossier
-// for that job when tapped.
+// The Dynamic Island: an identity pill at rest, the chapter the car is
+// currently passing while on the circuit, and — when tapped — that chapter's
+// full dossier expanded in place, morphing like Apple's island rather than
+// popping a separate sheet.
 export const IslandNav = () => {
-  const { team } = useLivery();
   const { race, openJob, setOpenJob } = useRace();
 
+  const expanded = openJob !== null;
   const live = race.active && race.jobIndex >= 0;
   const jobIndex = race.jobIndex;
   const job = jobIndex >= 0 ? items[jobIndex] : null;
@@ -33,27 +34,60 @@ export const IslandNav = () => {
   const detailMeta =
     openJob !== null ? CORNER_META[openJob % CORNER_META.length] : null;
 
-  const onIslandTap = () => {
-    if (live) setOpenJob(jobIndex);
-    else window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const mode = expanded ? "expanded" : live ? "live" : "idle";
 
   return (
     <>
+      {expanded && (
+        <div
+          className="fixed inset-0 z-30"
+          onClick={() => setOpenJob(null)}
+          aria-hidden
+        />
+      )}
+
       <div className="pointer-events-none fixed inset-x-0 top-4 z-40 flex justify-center px-4">
-        <motion.button
+        <motion.div
           layout
-          onClick={onIslandTap}
           transition={spring}
-          aria-label={live && job ? `${job.title}, tap for details` : "Joel Wong"}
-          className="pointer-events-auto flex items-center overflow-hidden rounded-full border border-white/10 bg-black/75 text-left shadow-2xl backdrop-blur-xl"
+          style={{ borderRadius: expanded ? 26 : 9999 }}
+          className="pointer-events-auto overflow-hidden border border-white/10 bg-black/80 shadow-2xl backdrop-blur-2xl"
         >
           <AnimatePresence mode="popLayout" initial={false}>
-            {live && job && meta ? (
-              <motion.div
-                key="job"
+            {mode === "idle" && (
+              <motion.button
+                key="idle"
                 {...fade}
-                className="flex items-center gap-3 py-1.5 pl-2 pr-3.5"
+                onClick={() =>
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }
+                className="flex items-center gap-2.5 py-2 pl-3.5 pr-4"
+                aria-label="Joel Wong — back to top"
+              >
+                <span
+                  className="block h-2 w-2 rounded-full"
+                  style={{
+                    backgroundColor: "var(--livery)",
+                    boxShadow: "0 0 8px var(--livery-glow)",
+                  }}
+                />
+                <span className="text-[13px] font-extrabold tracking-tight text-white">
+                  Joel Wong
+                </span>
+                <span className="h-3.5 w-px bg-white/15" />
+                <span className="text-[11px] font-medium text-white/45">
+                  {hero.role}
+                </span>
+              </motion.button>
+            )}
+
+            {mode === "live" && job && meta && (
+              <motion.button
+                key="live"
+                {...fade}
+                onClick={() => setOpenJob(jobIndex)}
+                className="flex items-center gap-3 py-1.5 pl-2.5 pr-3.5 text-left"
+                aria-label={`${job.title} — tap for details`}
               >
                 <span className="flex h-7 shrink-0 items-center">
                   <OrganisationLogo organisation={job.organisation} />
@@ -68,12 +102,13 @@ export const IslandNav = () => {
                   </span>
                 </span>
                 <svg
-                  width="14"
-                  height="14"
+                  width="13"
+                  height="13"
                   viewBox="0 0 16 16"
                   fill="none"
                   className="ml-0.5 shrink-0"
                   style={{ color: "var(--livery)" }}
+                  aria-hidden
                 >
                   <path
                     d="M6 4l4 4-4 4"
@@ -83,118 +118,84 @@ export const IslandNav = () => {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </motion.div>
-            ) : (
+              </motion.button>
+            )}
+
+            {mode === "expanded" && detail && detailMeta && (
               <motion.div
-                key="id"
+                key="expanded"
                 {...fade}
-                className="flex items-center gap-2.5 py-2 pl-4 pr-4"
+                className="w-[21rem] max-w-[calc(100vw-2rem)] p-5"
               >
-                <span
-                  className="block h-2 w-2 rounded-full"
-                  style={{
-                    backgroundColor: "var(--livery)",
-                    boxShadow: "0 0 8px var(--livery-glow)",
-                  }}
-                />
-                <span className="text-[13px] font-extrabold tracking-tight text-white">
-                  Joel Wong
-                </span>
-                <span className="h-3.5 w-px bg-white/15" />
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">
-                  {team.code} · {team.number}
-                </span>
+                <div className="flex items-start gap-3">
+                  <span className="flex h-9 shrink-0 items-center">
+                    <OrganisationLogo organisation={detail.organisation} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className="font-mono text-[10px] uppercase tracking-[0.2em]"
+                      style={{ color: "var(--livery)" }}
+                    >
+                      {detailMeta.corner}
+                    </p>
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
+                      {detail.start} — {detail.end}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setOpenJob(null)}
+                    aria-label="Close"
+                    className="-mr-1 -mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/70 transition-colors hover:bg-white/20"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <h3 className="mt-4 text-xl font-extrabold tracking-tight text-white">
+                  {detail.title}
+                </h3>
+                <a
+                  href={detail.organisationLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-0.5 inline-block text-[13px] font-semibold capitalize text-white/55 transition-colors hover:text-white"
+                >
+                  {detail.organisation} ↗
+                </a>
+
+                <div className="mt-3 max-h-[46vh] overflow-y-auto pr-1">
+                  <p className="text-[13px] text-white/55">
+                    {detail.description}
+                  </p>
+                  <ul className="mt-3 space-y-2">
+                    {detail.points.map((point) => (
+                      <li
+                        key={point}
+                        className="flex gap-2.5 text-[13px] leading-relaxed text-white/80"
+                      >
+                        <span
+                          className="mt-1.5 block h-1 w-1 shrink-0 rounded-full"
+                          style={{ backgroundColor: "var(--livery)" }}
+                        />
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                  {detail.stacks.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-1.5">
+                      {detail.stacks
+                        .flatMap((stack) => stack.skills)
+                        .map((skill) => (
+                          <TechChip key={skill} skill={skill} />
+                        ))}
+                    </div>
+                  )}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.button>
+        </motion.div>
       </div>
-
-      {/* full dossier for the tapped corner */}
-      <AnimatePresence>
-        {detail && detailMeta && (
-          <motion.div
-            key="overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-3 backdrop-blur-sm sm:items-center"
-            onClick={() => setOpenJob(null)}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 28, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 24, scale: 0.98 }}
-              transition={{ duration: 0.28, ease: [0.21, 0.6, 0.35, 1] }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative max-h-[80dvh] w-full max-w-md overflow-y-auto rounded-3xl border border-white/10 bg-[#0B0B0D]/95 p-6 shadow-2xl"
-            >
-              <button
-                onClick={() => setOpenJob(null)}
-                aria-label="Close"
-                className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/70 transition-colors hover:bg-white/20"
-              >
-                ✕
-              </button>
-
-              <div className="flex items-center gap-3">
-                <span className="flex h-9 shrink-0 items-center">
-                  <OrganisationLogo organisation={detail.organisation} />
-                </span>
-                <div>
-                  <p
-                    className="font-mono text-[10px] uppercase tracking-[0.2em]"
-                    style={{ color: "var(--livery)" }}
-                  >
-                    {detailMeta.corner}
-                  </p>
-                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-white/40">
-                    {detail.start} — {detail.end}
-                  </p>
-                </div>
-              </div>
-
-              <h3 className="mt-5 text-2xl font-extrabold tracking-tight text-white">
-                {detail.title}
-              </h3>
-              <a
-                href={detail.organisationLink}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-1 inline-block text-sm font-semibold capitalize text-white/55 transition-colors hover:text-white"
-              >
-                {detail.organisation} ↗
-              </a>
-
-              <p className="mt-3 text-sm text-white/55">{detail.description}</p>
-              <ul className="mt-3 space-y-2">
-                {detail.points.map((point) => (
-                  <li
-                    key={point}
-                    className="flex gap-2.5 text-[13px] leading-relaxed text-white/80"
-                  >
-                    <span
-                      className="mt-1.5 block h-1 w-1 shrink-0 rounded-full"
-                      style={{ backgroundColor: "var(--livery)" }}
-                    />
-                    {point}
-                  </li>
-                ))}
-              </ul>
-              {detail.stacks.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {detail.stacks
-                    .flatMap((stack) => stack.skills)
-                    .map((skill) => (
-                      <TechChip key={skill} skill={skill} />
-                    ))}
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 };

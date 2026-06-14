@@ -290,7 +290,6 @@ export const PitLane = () => {
 
         <ol ref={listRef} className="relative space-y-16 pl-[132px] pt-20">
           {projects.map((item, i) => {
-            const compound = COMPOUNDS[i % COMPOUNDS.length];
             return (
               <motion.li
                 key={item.title}
@@ -303,16 +302,7 @@ export const PitLane = () => {
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ duration: 0.5, ease: [0.21, 0.6, 0.35, 1] }}
               >
-                <p className="font-mono text-[11px] uppercase tracking-widest text-white/40">
-                  <span style={{ color: "var(--livery)" }}>
-                    {compound.time}s
-                  </span>{" "}
-                  · <span style={{ color: compound.color }}>{compound.name}</span>
-                  {i === WING_STOP && (
-                    <span className="text-white/55"> + front wing</span>
-                  )}
-                </p>
-                <div className="mt-2 flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.image}
