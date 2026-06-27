@@ -22,7 +22,8 @@ struct ContentView: View {
                     }
 
                     if !model.busArrivals.isEmpty {
-                        BusArrivalsView(arrivals: model.busArrivals)
+                        BusArrivalsView(arrivals: model.busArrivals,
+                                        stopName: model.busStopName)
                     }
 
                     UpcomingList(events: model.events)
@@ -103,9 +104,11 @@ private struct UpcomingList: View {
 // Live Singapore bus arrivals (LTA DataMall) for the configured home stop.
 private struct BusArrivalsView: View {
     let arrivals: [BusArrival]
+    let stopName: String?
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Live buses at your stop", systemImage: "bus.fill")
+            Label(stopName.map { "Live buses · \($0)" } ?? "Live buses at your stop",
+                  systemImage: "bus.fill")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
             ForEach(arrivals) { bus in

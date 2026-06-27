@@ -22,9 +22,11 @@ to **leave the house** in time for the bus.
   - A **mock** provider is used automatically if Google is selected without a
     key, so the app is always usable.
 - **Singapore live buses (LTA DataMall):** enter a free DataMall **AccountKey**
-  and your **home bus stop code** (the 5-digit code on every SG bus stop sign) in
-  Settings to see real-time "next bus in N min" arrivals — the Singapore answer
-  to "how long until the next bus". Free key: https://datamall.lta.gov.sg
+  in Settings to see real-time "next bus in N min" arrivals — the Singapore
+  answer to "how long until the next bus". The boarding stop is **auto-detected
+  as the stop nearest your home address** (LTA's bus-stop catalogue is fetched
+  once and cached); optionally set a **home bus stop code** to override. Free
+  key: https://datamall.lta.gov.sg
 - **Alarms (local notifications):** schedules two `UNCalendarNotificationTrigger`
   notifications in advance, so they fire even when the app is closed. Marked
   `.timeSensitive`. For a loud ring that bypasses silent/DND, enable

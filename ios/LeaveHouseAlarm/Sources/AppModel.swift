@@ -15,8 +15,10 @@ final class AppModel: ObservableObject {
     @Published var plan: AlarmPlan?
     @Published var statusMessage: String?
     @Published var isWorking = false
-    /// Live Singapore bus arrivals at the configured home stop (LTA DataMall).
+    /// Live Singapore bus arrivals at the home/boarding stop (LTA DataMall).
     @Published var busArrivals: [BusArrival] = []
+    /// Description of the stop arrivals are shown for (auto-resolved or manual).
+    @Published var busStopName: String?
 
     let calendar = CalendarService()
     let alarms = AlarmScheduler()
@@ -87,18 +89,42 @@ final class AppModel: ObservableObject {
         await refreshBusArrivals()
     }
 
-    /// Pull live bus arrivals for the home stop, if configured (Singapore).
+    /// Pull live bus arrivals for the home/boarding stop (Singapore).
+    ///
+    /// Stop selection: a manually entered code wins; otherwise we auto-resolve
+    /// the stop nearest your home address from LTA's bus-stop catalogue.
     func refreshBusArrivals() async {
-        let code = prefs.homeBusStopCode.trimmingCharacters(in: .whitespaces)
-        guard !code.isEmpty, !prefs.ltaAccountKey.isEmpty else {
+        guard !prefs.ltaAccountKey.isEmpty else {
             busArrivals = []
+            busStopName = nil
             return
         }
+
+        var code = prefs.homeBusStopCode.trimmingCharacters(in: .whitespaces)
+        var name: String? = code.isEmpty ? nil : "Stop \(code)"
+
+        if code.isEmpty, !prefs.homeLocation.isEmpty,
+           let coord = try? await Geocode.resolve(prefs.homeLocation, coordinate: nil),
+           let stop = await BusStopCatalog.shared.nearestStop(
+               to: Coordinate(latitude: coord.latitude, longitude: coord.longitude),
+               accountKey: prefs.ltaAccountKey) {
+            code = stop.code
+            name = "\(stop.description) (\(stop.code))"
+        }
+
+        guard !code.isEmpty else {
+            busArrivals = []
+            busStopName = nil
+            return
+        }
+
         do {
             busArrivals = try await LTADataMall(accountKey: prefs.ltaAccountKey)
                 .nextBuses(busStopCode: code)
+            busStopName = name
         } catch {
             busArrivals = []
+            busStopName = nil
         }
     }
 }

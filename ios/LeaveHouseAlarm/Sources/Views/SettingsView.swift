@@ -43,13 +43,13 @@ struct SettingsView: View {
                         .font(.system(.body, design: .monospaced))
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.never)
-                    TextField("Home bus stop code (e.g. 83139)",
+                    TextField("Home bus stop code (optional, e.g. 83139)",
                               text: $model.prefs.homeBusStopCode)
                         .keyboardType(.numberPad)
                 } header: {
                     Text("Singapore — live buses")
                 } footer: {
-                    Text("Free AccountKey from datamall.lta.gov.sg. The 5-digit stop code is printed on every bus stop sign. Shows real-time arrivals for your boarding stop.")
+                    Text("Free AccountKey from datamall.lta.gov.sg. Leave the stop code blank to auto-detect the stop nearest your home address; or set the 5-digit code (on every bus stop sign) to override.")
                 }
 
                 Section {

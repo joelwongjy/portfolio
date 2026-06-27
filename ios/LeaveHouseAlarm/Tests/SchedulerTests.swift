@@ -66,6 +66,30 @@ final class SchedulerTests: XCTestCase {
         XCTAssertNotNil(plan.note)
     }
 
+    func testNearestBusStopPicksClosest() {
+        let stops = [
+            BusStop(code: "A", roadName: "Far Rd", description: "Far",
+                    lat: 1.40, lng: 103.90),
+            BusStop(code: "B", roadName: "Near Rd", description: "Near",
+                    lat: 1.3001, lng: 103.8001),
+            BusStop(code: "C", roadName: "Mid Rd", description: "Mid",
+                    lat: 1.31, lng: 103.81),
+        ]
+        let home = Coordinate(latitude: 1.30, longitude: 103.80)
+        XCTAssertEqual(BusStopCatalog.nearest(in: stops, to: home)?.code, "B")
+        XCTAssertNil(BusStopCatalog.nearest(in: [], to: home))
+    }
+
+    func testBusArrivalMinutesAway() {
+        let now = Date(timeIntervalSince1970: 1_000_000)
+        let bus = BusArrival(serviceNo: "15", arrivals: [
+            now.addingTimeInterval(180), now.addingTimeInterval(600),
+        ])
+        XCTAssertEqual(bus.minutesAway(from: now), 3)
+        let arriving = BusArrival(serviceNo: "2", arrivals: [now.addingTimeInterval(-10)])
+        XCTAssertEqual(arriving.minutesAway(from: now), 0)
+    }
+
     func testNextRelevantEventSkipsPastAndLocationless() {
         let now = Date(timeIntervalSince1970: 50_000)
         let past = CalEvent(id: "p", title: "Past", location: "X",
