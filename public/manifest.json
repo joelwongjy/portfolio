@@ -1,0 +1,25 @@
+{
+  "name": "Leave House Alarm",
+  "short_name": "Leave Alarm",
+  "description": "Calendar-aware alarm that tells you when to get ready and when to leave for the bus.",
+  "start_url": "/alarm",
+  "scope": "/alarm",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0b0d",
+  "theme_color": "#0b0b0d",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

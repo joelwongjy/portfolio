@@ -1,0 +1,51 @@
+# XcodeGen project spec. Generate the Xcode project with:
+#
+#   brew install xcodegen      # one-time
+#   cd ios/LeaveHouseAlarm
+#   xcodegen generate
+#   open LeaveHouseAlarm.xcodeproj
+#
+# Then set your own development team + bundle id signing in Xcode and run on a
+# device (transit/calendar/notifications need a real device, not the simulator,
+# for full behaviour).
+
+name: LeaveHouseAlarm
+options:
+  bundleIdPrefix: com.leavehouse
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.9"
+    GENERATE_INFOPLIST_FILE: NO
+
+targets:
+  LeaveHouseAlarm:
+    type: application
+    platform: iOS
+    sources:
+      - Sources
+    info:
+      path: Resources/Info.plist
+    entitlements:
+      path: Resources/LeaveHouseAlarm.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.leavehouse.alarm
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        TARGETED_DEVICE_FAMILY: "1"
+
+  LeaveHouseAlarmTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests
+    dependencies:
+      - target: LeaveHouseAlarm
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.leavehouse.alarm.tests

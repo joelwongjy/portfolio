@@ -12,6 +12,9 @@ export default function Document(props: DocumentProps) {
   // briefly squeezed into the classic site's narrow column.
   const page = props.__NEXT_DATA__?.page;
   const isV2 = page === "/" || page === "/v2";
+  // /alarm is the Leave House Alarm PWA — full-bleed, always-dark app shell.
+  const isApp = page === "/alarm";
+  const bodyClass = isApp ? "app-dark" : isV2 ? "v2" : undefined;
   return (
     <Html lang="en">
       <Head>
@@ -20,7 +23,7 @@ export default function Document(props: DocumentProps) {
           rel="stylesheet"
         />
       </Head>
-      <body className={isV2 ? "v2" : undefined}>
+      <body className={bodyClass}>
         <Main />
         <NextScript />
       </body>

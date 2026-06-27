@@ -12,6 +12,16 @@
     @apply max-w-none bg-[#050505] px-0;
   }
 
+  /* /alarm is a standalone PWA shell: full-bleed, always dark, app-like */
+  body.app-dark {
+    @apply max-w-none bg-[#0b0b0d] px-0 text-white;
+  }
+  body.app-dark h2,
+  body.app-dark p,
+  body.app-dark span {
+    color: inherit;
+  }
+
   /* svgr icons carry white "empty space" fills meant for light pages */
   body.v2 .empty-space {
     fill: transparent;
