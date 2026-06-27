@@ -15,6 +15,8 @@ final class AppModel: ObservableObject {
     @Published var plan: AlarmPlan?
     @Published var statusMessage: String?
     @Published var isWorking = false
+    /// Live Singapore bus arrivals at the configured home stop (LTA DataMall).
+    @Published var busArrivals: [BusArrival] = []
 
     let calendar = CalendarService()
     let alarms = AlarmScheduler()
@@ -81,6 +83,23 @@ final class AppModel: ObservableObject {
         }
 
         if let plan { await alarms.reschedule(for: plan) }
+
+        await refreshBusArrivals()
+    }
+
+    /// Pull live bus arrivals for the home stop, if configured (Singapore).
+    func refreshBusArrivals() async {
+        let code = prefs.homeBusStopCode.trimmingCharacters(in: .whitespaces)
+        guard !code.isEmpty, !prefs.ltaAccountKey.isEmpty else {
+            busArrivals = []
+            return
+        }
+        do {
+            busArrivals = try await LTADataMall(accountKey: prefs.ltaAccountKey)
+                .nextBuses(busStopCode: code)
+        } catch {
+            busArrivals = []
+        }
     }
 }
 

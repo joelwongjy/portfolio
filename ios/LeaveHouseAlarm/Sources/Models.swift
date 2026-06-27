@@ -68,6 +68,11 @@ struct Prefs: Codable, Equatable {
     var transitProvider: TransitProviderKind = .mapKit
     /// Optional Google Routes API key (only used when provider == .google).
     var googleApiKey: String = ""
+    /// Singapore LTA DataMall AccountKey for live bus arrivals (free).
+    var ltaAccountKey: String = ""
+    /// Your home/boarding bus stop code, e.g. "83139" — shown on every SG bus
+    /// stop sign. Enables the live "next bus" countdown.
+    var homeBusStopCode: String = ""
 }
 
 enum TransitProviderKind: String, Codable, CaseIterable, Identifiable {

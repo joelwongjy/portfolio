@@ -38,6 +38,21 @@ struct SettingsView: View {
                 }
 
                 Section {
+                    TextField("LTA DataMall AccountKey",
+                              text: $model.prefs.ltaAccountKey)
+                        .font(.system(.body, design: .monospaced))
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
+                    TextField("Home bus stop code (e.g. 83139)",
+                              text: $model.prefs.homeBusStopCode)
+                        .keyboardType(.numberPad)
+                } header: {
+                    Text("Singapore — live buses")
+                } footer: {
+                    Text("Free AccountKey from datamall.lta.gov.sg. The 5-digit stop code is printed on every bus stop sign. Shows real-time arrivals for your boarding stop.")
+                }
+
+                Section {
                     Label(model.calendar.authorized
                           ? "Calendar access granted"
                           : "Calendar access needed",

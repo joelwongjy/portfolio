@@ -3,11 +3,14 @@ import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 
 import { PlanCard } from "@/components/leaveHouse/PlanCard";
 import { primeAudio } from "@/lib/leaveHouse/alarmSound";
+import { BusArrival } from "@/lib/leaveHouse/lta";
 import { buildPlan, nextRelevantEvent } from "@/lib/leaveHouse/schedule";
 import {
+  loadBusStop,
   loadIcsUrl,
   loadManualEvents,
   loadPrefs,
+  saveBusStop,
   saveIcsUrl,
   saveManualEvents,
   savePrefs,
@@ -39,10 +42,16 @@ export default function LeaveHouseAlarm() {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [notifyEnabled, setNotifyEnabled] = useState(false);
 
+  // Singapore: live bus arrivals (LTA DataMall) for the home stop.
+  const [busStop, setBusStop] = useState("");
+  const [busArrivals, setBusArrivals] = useState<BusArrival[]>([]);
+  const [busError, setBusError] = useState("");
+
   useEffect(() => {
     setPrefs(loadPrefs());
     setManualEvents(loadManualEvents());
     setIcsUrl(loadIcsUrl());
+    setBusStop(loadBusStop());
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register("/leave-house-sw.js", { scope: "/alarm" })
@@ -104,6 +113,37 @@ export default function LeaveHouseAlarm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lookupKey]);
 
+  // --- live bus arrivals: fetch now + every 30s while a stop is set --------
+  useEffect(() => {
+    const code = busStop.trim();
+    if (!code) {
+      setBusArrivals([]);
+      setBusError("");
+      return;
+    }
+    let cancelled = false;
+    const load = () => {
+      fetch(`/api/lta?stop=${encodeURIComponent(code)}`)
+        .then((r) => r.json())
+        .then((data: { arrivals: BusArrival[] } | { error: string }) => {
+          if (cancelled) return;
+          if ("error" in data) {
+            setBusError(data.error);
+          } else {
+            setBusArrivals(data.arrivals);
+            setBusError("");
+          }
+        })
+        .catch((e) => !cancelled && setBusError(String(e)));
+    };
+    load();
+    const id = window.setInterval(load, 30_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [busStop]);
+
   // --- handlers -------------------------------------------------------------
   const updatePrefs = useCallback((patch: Partial<Prefs>) => {
     setPrefs((prev) => {
@@ -151,6 +191,11 @@ export default function LeaveHouseAlarm() {
     } catch (err) {
       setIcsStatus(`Error: ${String(err)}`);
     }
+  }, []);
+
+  const updateBusStop = useCallback((code: string) => {
+    setBusStop(code);
+    saveBusStop(code);
   }, []);
 
   const enableSound = useCallback(() => {
@@ -205,6 +250,14 @@ export default function LeaveHouseAlarm() {
             Transit lookup failed: {journeyError}
           </p>
         )}
+
+        <LiveBuses
+          busStop={busStop}
+          arrivals={busArrivals}
+          error={busError}
+          now={now}
+          onChange={updateBusStop}
+        />
 
         <EnableBar
           soundEnabled={soundEnabled}
@@ -290,6 +343,68 @@ function EnableBar({
         {notifyEnabled ? "🔔 Notifications on" : "🔕 Enable notifications"}
       </button>
     </div>
+  );
+}
+
+// Singapore live bus arrivals (LTA DataMall).
+function LiveBuses({
+  busStop,
+  arrivals,
+  error,
+  now,
+  onChange,
+}: {
+  busStop: string;
+  arrivals: BusArrival[];
+  error: string;
+  now: string;
+  onChange: (code: string) => void;
+}) {
+  const minsAway = (iso: string) => {
+    const m = Math.max(
+      0,
+      Math.round((new Date(iso).getTime() - new Date(now).getTime()) / 60000)
+    );
+    return m === 0 ? "Arr" : `${m} min`;
+  };
+  return (
+    <section className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-sm font-semibold text-white/80">
+          🚌 Live buses (Singapore)
+        </h3>
+        <input
+          inputMode="numeric"
+          className="w-28 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-right text-sm text-white placeholder-white/30 outline-none focus:border-white/30"
+          placeholder="Stop code"
+          value={busStop}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      </div>
+      {error && <p className="mt-2 text-xs text-rose-300">{error}</p>}
+      {!error && busStop.trim() && arrivals.length === 0 && (
+        <p className="mt-2 text-xs text-white/40">No arrivals reported.</p>
+      )}
+      {arrivals.length > 0 && (
+        <ul className="mt-2 divide-y divide-white/5">
+          {arrivals.map((b) => (
+            <li
+              key={b.serviceNo}
+              className="flex items-center justify-between py-1.5 text-sm"
+            >
+              <span className="font-semibold text-white/90">{b.serviceNo}</span>
+              <span className="text-emerald-300">
+                {b.arrivals.slice(0, 3).map(minsAway).join(" · ")}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="mt-2 text-[11px] text-white/30">
+        Needs LTA_ACCOUNT_KEY on the server (free at datamall.lta.gov.sg). Stop
+        code is on every bus stop sign.
+      </p>
+    </section>
   );
 }
 
@@ -516,8 +631,9 @@ function Disclaimer() {
       </p>
       <p>
         Transit uses Google Routes when a server API key is configured,
-        otherwise a built-in demo schedule. Citymapper’s public API was
-        discontinued in 2023, so it can’t be used here.
+        otherwise a built-in demo schedule. In Singapore, set a free LTA
+        DataMall key (server-side) for real-time bus arrivals above.
+        Citymapper’s public API was discontinued in 2023, so it can’t be used.
       </p>
     </footer>
   );

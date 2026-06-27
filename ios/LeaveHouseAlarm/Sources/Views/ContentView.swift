@@ -21,6 +21,10 @@ struct ContentView: View {
                             .foregroundStyle(.orange)
                     }
 
+                    if !model.busArrivals.isEmpty {
+                        BusArrivalsView(arrivals: model.busArrivals)
+                    }
+
                     UpcomingList(events: model.events)
 
                     DisclaimerView()
@@ -93,6 +97,41 @@ private struct UpcomingList: View {
                 }
             }
         }
+    }
+}
+
+// Live Singapore bus arrivals (LTA DataMall) for the configured home stop.
+private struct BusArrivalsView: View {
+    let arrivals: [BusArrival]
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Live buses at your stop", systemImage: "bus.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+            ForEach(arrivals) { bus in
+                HStack {
+                    Text(bus.serviceNo)
+                        .font(.callout.weight(.bold))
+                        .frame(minWidth: 44, alignment: .leading)
+                    Spacer()
+                    Text(waitText(bus))
+                        .font(.callout)
+                        .foregroundStyle(.green)
+                }
+                .padding(.vertical, 2)
+            }
+        }
+        .padding()
+        .background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func waitText(_ bus: BusArrival) -> String {
+        let now = Date()
+        let mins = bus.arrivals.prefix(3).map { arrival -> String in
+            let m = max(0, Int(arrival.timeIntervalSince(now) / 60))
+            return m == 0 ? "Arr" : "\(m) min"
+        }
+        return mins.joined(separator: " · ")
     }
 }
 

@@ -7,6 +7,7 @@ import { CalEvent, DEFAULT_PREFS, Prefs } from "./types";
 const PREFS_KEY = "lha.prefs.v1";
 const EVENTS_KEY = "lha.events.v1";
 const ICS_KEY = "lha.icsUrl.v1";
+const BUSSTOP_KEY = "lha.busStop.v1";
 
 function canUseStorage(): boolean {
   return typeof window !== "undefined" && !!window.localStorage;
@@ -53,4 +54,12 @@ export function loadIcsUrl(): string {
 
 export function saveIcsUrl(url: string): void {
   write(ICS_KEY, url);
+}
+
+export function loadBusStop(): string {
+  return read<string>(BUSSTOP_KEY, "");
+}
+
+export function saveBusStop(code: string): void {
+  write(BUSSTOP_KEY, code);
 }

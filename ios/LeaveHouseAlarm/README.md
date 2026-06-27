@@ -16,11 +16,15 @@ to **leave the house** in time for the bus.
 - **Transit (pluggable):**
   - **Apple Maps (default, no API key)** — `MKDirections.calculateETA` with
     `.transit` gives expected departure/arrival/duration anchored to your
-    arrive-by time.
+    arrive-by time. Has Singapore transit coverage.
   - **Google Routes (optional)** — set an API key in Settings for line-level
     detail ("Bus 12 towards …").
   - A **mock** provider is used automatically if Google is selected without a
     key, so the app is always usable.
+- **Singapore live buses (LTA DataMall):** enter a free DataMall **AccountKey**
+  and your **home bus stop code** (the 5-digit code on every SG bus stop sign) in
+  Settings to see real-time "next bus in N min" arrivals — the Singapore answer
+  to "how long until the next bus". Free key: https://datamall.lta.gov.sg
 - **Alarms (local notifications):** schedules two `UNCalendarNotificationTrigger`
   notifications in advance, so they fire even when the app is closed. Marked
   `.timeSensitive`. For a loud ring that bypasses silent/DND, enable
