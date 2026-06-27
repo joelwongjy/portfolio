@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDisplayName</key>
+  <string>Leave Alarm</string>
+  <key>UILaunchScreen</key>
+  <dict/>
+
+  <!-- Calendar access (iOS 17+ full-access string, plus legacy string) -->
+  <key>NSCalendarsFullAccessUsageDescription</key>
+  <string>Leave House Alarm reads your upcoming events and their locations to work out when to leave.</string>
+  <key>NSCalendarsUsageDescription</key>
+  <string>Leave House Alarm reads your upcoming events and their locations to work out when to leave.</string>
+
+  <!-- Geocoding event/home addresses for transit routing -->
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>Used to look up transit routes from your home to your next event.</string>
+
+  <!-- Background refresh so departure times and alarms stay current -->
+  <key>UIBackgroundModes</key>
+  <array>
+    <string>fetch</string>
+    <string>processing</string>
+  </array>
+  <key>BGTaskSchedulerPermittedIdentifiers</key>
+  <array>
+    <string>com.leavehouse.alarm.refresh</string>
+  </array>
+
+  <key>UISupportedInterfaceOrientations</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+  </array>
+</dict>
+</plist>
