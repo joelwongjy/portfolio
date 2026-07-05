@@ -5,5 +5,5 @@ const yearOf = (s: string) => s.match(/\d{4}/)?.[0] ?? s;
 export const jobYears = (start: string, end: string) => {
   const a = yearOf(start);
   const b = yearOf(end);
-  return a === b ? a : `${a} — ${b}`;
+  return a === b ? a : `${a} - ${b}`;
 };

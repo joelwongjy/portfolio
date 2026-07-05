@@ -1,3 +1,4 @@
+import { MotionConfig } from "framer-motion";
 import Head from "next/head";
 import { useEffect } from "react";
 
@@ -33,18 +34,20 @@ export const RaceWeekend = () => {
       </Head>
       <LiveryProvider>
         <RaceProvider>
-          <div className="min-h-screen overflow-x-clip bg-[#050505] text-white">
-            <IslandNav />
-            <main>
-              <HeroV2 />
-              <Circuit3D />
-              <PitLane />
-              <Podium />
-            </main>
-            <footer className="pb-10 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-white/25">
-              <p>© {new Date().getFullYear()} Joel Wong</p>
-            </footer>
-          </div>
+          <MotionConfig reducedMotion="user">
+            <div className="min-h-screen overflow-x-clip bg-[#050505] text-white">
+              <IslandNav />
+              <main>
+                <HeroV2 />
+                <Circuit3D />
+                <PitLane />
+                <Podium />
+              </main>
+              <footer className="pb-10 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-white/25">
+                <p>© {new Date().getFullYear()} Joel Wong</p>
+              </footer>
+            </div>
+          </MotionConfig>
         </RaceProvider>
       </LiveryProvider>
     </>

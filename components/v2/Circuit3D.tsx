@@ -1,3 +1,4 @@
+import { useScroll } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
@@ -76,15 +77,19 @@ export const Circuit3D = () => {
     }
   }, [fractions, setRace]);
 
+  // Framer Motion's shared scroll listener drives the flyover; resize still
+  // needs its own handler since the section height depends on the viewport.
+  const { scrollY } = useScroll();
+
   useEffect(() => {
     update();
-    window.addEventListener("scroll", update, { passive: true });
+    const unsubscribe = scrollY.on("change", update);
     window.addEventListener("resize", update);
     return () => {
-      window.removeEventListener("scroll", update);
+      unsubscribe();
       window.removeEventListener("resize", update);
     };
-  }, [update]);
+  }, [update, scrollY]);
 
   return (
     <section

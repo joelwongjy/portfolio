@@ -127,7 +127,7 @@ export const ReactionGame = () => {
     <div
       role="button"
       tabIndex={0}
-      aria-label="Reaction test — tap when the lights go out"
+      aria-label="Reaction test, tap when the lights go out"
       onPointerDown={onPointerDown}
       onClick={onClick}
       className="relative mx-auto flex w-full max-w-md cursor-pointer select-none flex-col items-center outline-none"

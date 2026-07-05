@@ -23,18 +23,23 @@ export const Podium = () => (
       <p className="mt-5 max-w-sm text-white/55">
         Frontend engineer open to new opportunities and good problems.
       </p>
-      <div className="mt-9">
+      <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
         <a
           href={hero.resumeLink}
           target="_blank"
           rel="noreferrer"
-          className="rounded-full px-7 py-3 text-sm font-bold text-black transition-transform hover:scale-[1.03]"
-          style={{
-            backgroundColor: "var(--livery)",
-            boxShadow: "0 0 24px var(--livery-glow)",
-          }}
+          className="rounded-full px-7 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.03] active:scale-[0.98]"
+          style={{ backgroundColor: "var(--livery)" }}
         >
           View résumé
+        </a>
+        <a
+          href="https://github.com/joelwongjy"
+          target="_blank"
+          rel="noreferrer"
+          className="rounded-full border border-white/15 px-7 py-3 text-sm font-semibold text-white/75 transition-colors hover:border-white/35 hover:text-white active:scale-[0.98]"
+        >
+          GitHub
         </a>
       </div>
     </motion.div>
