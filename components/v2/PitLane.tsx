@@ -319,7 +319,7 @@ export const PitLane = () => {
                       href={item.primaryLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-full px-3.5 py-1.5 text-xs font-bold text-black transition-transform hover:scale-105"
+                      className="rounded-full px-3.5 py-1.5 text-xs font-bold text-white transition-transform hover:scale-105 active:scale-[0.97]"
                       style={{ backgroundColor: "var(--livery)" }}
                     >
                       {item.primaryMessage}
@@ -330,7 +330,7 @@ export const PitLane = () => {
                       href={item.secondaryLink}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-full border border-white/15 px-3.5 py-1.5 text-xs font-semibold text-white/70 transition-colors hover:border-white/30 hover:text-white"
+                      className="rounded-full border border-white/15 px-3.5 py-1.5 text-xs font-semibold text-white/70 transition-colors hover:border-white/30 hover:text-white active:scale-[0.97]"
                     >
                       {item.secondaryMessage}
                     </a>

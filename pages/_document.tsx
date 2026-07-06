@@ -14,12 +14,7 @@ export default function Document(props: DocumentProps) {
   const isV2 = page === "/" || page === "/v2";
   return (
     <Html lang="en">
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
+      <Head />
       <body className={isV2 ? "v2" : undefined}>
         <Main />
         <NextScript />

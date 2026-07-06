@@ -1,4 +1,4 @@
-import { useMotionTemplate, useMotionValue } from "framer-motion";
+import { useMotionTemplate, useMotionValue, useScroll } from "framer-motion";
 import { RefObject, useEffect, useState } from "react";
 
 export interface TrackGeometry {
@@ -31,6 +31,7 @@ export const useTrackFollower = (
   const [trackLength, setTrackLength] = useState(0);
   const [anchorLengths, setAnchorLengths] = useState<number[]>([]);
   const [passed, setPassed] = useState(0);
+  const { scrollY } = useScroll();
 
   const carX = useMotionValue(0);
   const carY = useMotionValue(0);
@@ -109,10 +110,10 @@ export const useTrackFollower = (
     };
 
     update();
-    window.addEventListener("scroll", update, { passive: true });
+    const unsubscribe = scrollY.on("change", update);
     window.addEventListener("resize", update);
     return () => {
-      window.removeEventListener("scroll", update);
+      unsubscribe();
       window.removeEventListener("resize", update);
     };
   }, [
@@ -126,6 +127,7 @@ export const useTrackFollower = (
     carY,
     carAngle,
     dashOffset,
+    scrollY,
   ]);
 
   return { trackLength, passed, carTransform, dashOffset };

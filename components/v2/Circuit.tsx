@@ -498,7 +498,7 @@ export const Circuit = () => {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="font-mono text-[10px] uppercase tracking-widest text-white/40">
-                      T{i + 1} · {item.start} — {item.end}
+                      T{i + 1} · {item.start} - {item.end}
                     </p>
                     <p
                       className="mt-1 font-mono text-[10px] uppercase tracking-widest opacity-90"

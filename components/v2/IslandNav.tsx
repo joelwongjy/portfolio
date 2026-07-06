@@ -59,16 +59,9 @@ export const IslandNav = () => {
                 onClick={() =>
                   window.scrollTo({ top: 0, behavior: "smooth" })
                 }
-                className="flex items-center gap-2.5 py-2 pl-3.5 pr-4"
-                aria-label="Joel Wong — back to top"
+                className="flex items-center gap-2.5 px-4 py-2"
+                aria-label="Joel Wong, back to top"
               >
-                <span
-                  className="block h-2 w-2 rounded-full"
-                  style={{
-                    backgroundColor: "var(--livery)",
-                    boxShadow: "0 0 8px var(--livery-glow)",
-                  }}
-                />
                 <span className="text-[13px] font-extrabold tracking-tight text-white">
                   Joel Wong
                 </span>
@@ -85,7 +78,7 @@ export const IslandNav = () => {
                 {...fade}
                 onClick={() => setOpenJob(jobIndex)}
                 className="flex items-center gap-3 py-1.5 pl-2.5 pr-3.5 text-left"
-                aria-label={`${job.title} — tap for details`}
+                aria-label={`${job.title}, tap for details`}
               >
                 <span className="flex h-7 shrink-0 items-center">
                   <OrganisationLogo organisation={job.organisation} />
@@ -134,7 +127,7 @@ export const IslandNav = () => {
                       className="font-mono text-[10px] uppercase tracking-[0.2em]"
                       style={{ color: "var(--livery)" }}
                     >
-                      {detail.start} — {detail.end}
+                      {detail.start} - {detail.end}
                     </p>
                   </div>
                   <button
