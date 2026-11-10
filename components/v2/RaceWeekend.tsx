@@ -1,24 +1,17 @@
-import { MotionConfig } from "framer-motion";
 import Head from "next/head";
 import { useEffect } from "react";
 
-import { Circuit3D } from "@/components/v2/Circuit3D";
-import { HeroV2 } from "@/components/v2/HeroV2";
-import { IslandNav } from "@/components/v2/IslandNav";
+import { BroadcastApp } from "@/components/v2/broadcast/BroadcastApp";
 import { LiveryProvider } from "@/components/v2/LiveryContext";
-import { PitLane } from "@/components/v2/PitLane";
-import { Podium } from "@/components/v2/Podium";
-import { RaceProvider } from "@/components/v2/RaceContext";
 
-// The race-weekend experience, served at both `/` (default) and `/v2`.
+// The site as a race broadcast over a lap of Monaco built from real map
+// data: the grid introduces me, Max Verstappen's 2023 pole lap carries my
+// experience (one job per corner, on the trackside boards) and the pit
+// garages hold my side projects.
 export const RaceWeekend = () => {
   useEffect(() => {
-    document.body.classList.add("v2");
-    document.documentElement.classList.add("scroll-smooth");
-    return () => {
-      document.body.classList.remove("v2");
-      document.documentElement.classList.remove("scroll-smooth");
-    };
+    document.body.classList.add("map-app");
+    return () => document.body.classList.remove("map-app");
   }, []);
 
   return (
@@ -27,28 +20,14 @@ export const RaceWeekend = () => {
         <title>Joel Wong</title>
         <meta
           name="description"
-          content="Joel Wong. Frontend engineer, F1 fan. It's lights out and away we go."
+          content="Joel Wong is a frontend engineer at TikTok. Previously at Kisi, Propel and Shopee."
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#050505" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#DCE6EC" />
+        <link rel="preload" href="/monaco/scene.json" as="fetch" crossOrigin="anonymous" />
       </Head>
       <LiveryProvider>
-        <RaceProvider>
-          <MotionConfig reducedMotion="user">
-            <div className="min-h-screen overflow-x-clip bg-[#050505] text-white">
-              <IslandNav />
-              <main>
-                <HeroV2 />
-                <Circuit3D />
-                <PitLane />
-                <Podium />
-              </main>
-              <footer className="pb-10 text-center font-mono text-[10px] uppercase tracking-[0.25em] text-white/25">
-                <p>© {new Date().getFullYear()} Joel Wong</p>
-              </footer>
-            </div>
-          </MotionConfig>
-        </RaceProvider>
+        <BroadcastApp />
       </LiveryProvider>
     </>
   );

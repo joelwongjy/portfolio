@@ -14,7 +14,7 @@ export const hero: {
   lastName: "Wong",
   role: "Frontend Engineer",
   team: "TikTok",
-  previously: ["Kisi", "Shopee", "Propel"],
+  previously: ["Kisi", "Propel", "Shopee"],
   number: "01",
   title: "Frontend Engineer",
   body: "Frontend Engineer at TikTok",

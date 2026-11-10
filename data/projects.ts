@@ -9,6 +9,12 @@ export interface Project {
   secondaryLink?: string;
   skills: Skills[];
   image: string;
+  /** the garage's team colour */
+  color: string;
+  /** glyph for the garage fascia and lists, see components/v2/projectIcons */
+  icon: "code" | "countdown" | "supper" | "play";
+  /** one line for lists */
+  tagline: string;
 }
 
 export interface ProjectSection {
@@ -25,8 +31,11 @@ export const project: {
     projects: [
       {
         title: "PeerPrep",
+        color: "#7C5CFF",
+        icon: "code",
+        tagline: "Mock interviews in a shared code editor",
         description:
-          "Mock-coding interview platform that scrapes questions from Leetcode to start collaborative coding sessions. Built for CS3219 Software Engineering Principles and Patterns.",
+          "Practice for technical interviews: PeerPrep pulls questions from LeetCode and pairs you with someone in a live, shared code editor. Built for CS3219, Software Engineering Principles and Patterns.",
         skills: [
           Skills.REACT,
           Skills.REACT_QUERY,
@@ -40,7 +49,7 @@ export const project: {
           Skills.DOCKER,
           Skills.AWS,
         ],
-        secondaryMessage: "View Source Code",
+        secondaryMessage: "Source code",
         secondaryLink:
           "https://github.com/CS3219-AY2324S1/ay2324s1-course-assessment-g03",
         image:
@@ -48,13 +57,16 @@ export const project: {
       },
       {
         title: "Wadio",
+        color: "#E8352B",
+        icon: "countdown",
+        tagline: "iOS countdown to the end of National Service",
         description:
-          "An iOS app to help National Servicemen countdown to the end of their service. This was my first time coding and I built it from zero experience in 4 months. It has since received over 10,000 downloads.",
+          "An iOS countdown to the end of National Service. It's the first thing I ever coded, built from scratch in four months, and it has been downloaded more than 10,000 times.",
         skills: [Skills.SWIFT],
-        primaryMessage: "View on the App Store",
+        primaryMessage: "App Store",
         primaryLink:
           "https://apps.apple.com/sg/app/wadio-an-ord-countdown-app/id1509665634",
-        secondaryMessage: "View source code on GitHub",
+        secondaryMessage: "Source code",
         secondaryLink: "https://github.com/joelwongjy/wadio",
         image:
           "https://res.cloudinary.com/dsk6p2wwo/image/upload/v1648219441/Screen_Shot_2022-03-25_at_10.43.41_PM_uklic2.png",
@@ -66,8 +78,11 @@ export const project: {
     projects: [
       {
         title: "OpenJio",
+        color: "#F2A31B",
+        icon: "supper",
+        tagline: "Open invites for supper orders",
         description:
-          "Create OpenJios and join supper orders with your friends! A Progressive Web App built for NUS Orbital Project.",
+          "Start an open invite for a late-night supper order and let friends join in. A progressive web app built for NUS Orbital.",
         skills: [
           Skills.REACT,
           Skills.NODE_JS,
@@ -76,19 +91,22 @@ export const project: {
           Skills.TYPESCRIPT,
           Skills.TAILWIND,
         ],
-        primaryMessage: "View the web app",
+        primaryMessage: "Open the app",
         primaryLink: "https://openjio.netlify.app",
-        secondaryMessage: "View source code on GitHub",
+        secondaryMessage: "Source code",
         secondaryLink: "https://github.com/joelwongjy/openjio",
         image:
           "https://res.cloudinary.com/dsk6p2wwo/image/upload/v1648220920/OpenJio_px91gk.png",
       },
       {
         title: "YouTube Channel",
+        color: "#FF2D2D",
+        icon: "play",
+        tagline: "Vlogs about NUS and after",
         description:
-          "I make vlogs about my life in NUS and beyond to document my life and memories. Over 5100 subscribers.",
+          "Vlogs about student life at NUS and what came after. More than 5,100 subscribers.",
         skills: [Skills.FINALCUTPRO],
-        primaryMessage: "Subscribe to my channel",
+        primaryMessage: "Watch on YouTube",
         primaryLink: "https://youtube.com/joelwongjy",
         image:
           "https://res.cloudinary.com/dsk6p2wwo/image/upload/v1648219974/Untitled_design_shqob4.png",
