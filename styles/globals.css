@@ -1,3 +1,20 @@
+/* the broadcast face, only for visitors who have Formula1 Display installed */
+@font-face {
+  font-family: "F1 Broadcast";
+  font-weight: 100 500;
+  src: local("Formula1 Display Regular"), local("Formula1-Display-Regular");
+}
+@font-face {
+  font-family: "F1 Broadcast";
+  font-weight: 600 800;
+  src: local("Formula1 Display Bold"), local("Formula1-Display-Bold");
+}
+@font-face {
+  font-family: "F1 Broadcast";
+  font-weight: 900;
+  src: local("Formula1 Display Black"), local("Formula1-Display-Black");
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,20 +24,21 @@
     @apply m-auto box-border max-w-2xl border-white px-4 text-gray-900 dark:bg-[#111010] dark:text-white;
   }
 
-  /* /v2 race weekend prototype is full-bleed and always dark */
-  body.v2 {
-    @apply max-w-none bg-[#050505] px-0;
+  /* the map app is full-bleed, light, and never scrolls the page */
+  body.map-app {
+    @apply max-w-none overflow-hidden bg-[#DCE6EC] px-0 text-zinc-900;
+    overscroll-behavior: none;
   }
 
-  /* svgr icons carry white "empty space" fills meant for light pages */
-  body.v2 .empty-space {
-    fill: transparent;
+  /* broadcast buttons take their panel's lettering */
+  body.map-app button {
+    text-transform: inherit;
+    letter-spacing: inherit;
   }
 
-  /* keyboard focus is visible against the dark race-weekend theme */
-  body.v2 :focus-visible {
+  body.map-app :focus-visible {
     outline: 2px solid var(--livery, #3671c6);
-    outline-offset: 3px;
+    outline-offset: 2px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -29,17 +47,18 @@
     }
   }
 
-  h2,
-  p,
-  span {
+  /* the classic page's type; the map app styles its own */
+  body:not(.map-app) h2,
+  body:not(.map-app) p,
+  body:not(.map-app) span {
     @apply dark:text-slate-300;
   }
 
-  h2 {
+  body:not(.map-app) h2 {
     @apply text-xl font-semibold md:text-2xl;
   }
 
-  h1 {
+  body:not(.map-app) h1 {
     @apply text-2xl font-bold md:text-3xl;
   }
 }

@@ -27,8 +27,8 @@ export const experience: {
       title: "Frontend Engineer",
       organisation: "tiktok",
       organisationLink: "https://www.tiktok.com/about?lang=en",
-      description: "Social media platform for sharing short-form videos",
-      points: ["Working on TikTok Shop"],
+      description: "Short-form video and social commerce",
+      points: ["Frontend engineer on TikTok Shop"],
       stacks: [
         {
           title: "Tech Stack",
@@ -42,8 +42,8 @@ export const experience: {
       title: "Full Stack Developer",
       organisation: "kisi",
       organisationLink: "https://www.getkisi.com/",
-      description: "Cloud-based door-access software",
-      points: ["Built new integrations linking third-party APIs to Kisi locks"],
+      description: "Cloud-based access control",
+      points: ["Built integrations that connect third-party APIs to Kisi locks"],
       stacks: [
         {
           title: "Tech Stack",
@@ -57,11 +57,11 @@ export const experience: {
       title: "Software Engineer Intern",
       organisation: "propel",
       organisationLink: "https://www.propelsoftware.com/",
-      description: "Product Lifecycle Management (PLM) Software",
+      description: "Product lifecycle management (PLM) software",
       points: [
-        "Built the new Product Information Management (PIM) platform in Salesforce Lightning Web Components (LWC) and Apex",
-        "Built lazy-rendering components to allow faster page load speeds in PLM app",
-        "Migrated from React and Redux to LWC",
+        "Built the new Product Information Management (PIM) platform with Salesforce Lightning Web Components (LWC) and Apex",
+        "Built lazily rendered components that made pages in the PLM app load faster",
+        "Migrated views from React and Redux to LWC",
       ],
       stacks: [
         {
@@ -76,10 +76,10 @@ export const experience: {
       title: "Software Engineer Intern",
       organisation: "shopee",
       organisationLink: "https://shopee.sg/",
-      description: "Largest e-commerce platform in Southeast Asia",
+      description: "Southeast Asia's largest e-commerce platform",
       points: [
-        "Frontend Engineer in the Orders Team building features for the Product Detail Page in the core Shopee web app",
-        "Migrated monolithic repository to micro frontend architecture",
+        "Built features for the product detail page of the core Shopee web app, on the Orders team",
+        "Migrated a monolithic repository to a micro-frontend architecture",
       ],
       stacks: [
         {
@@ -94,10 +94,10 @@ export const experience: {
       title: "Frontend Engineer Intern",
       organisation: "bantu",
       organisationLink: "https://bantu.life/",
-      description: "Volunteer Management System for Social Enterprises",
+      description: "Volunteer management for social enterprises",
       points: [
-        "Initiated an overhaul of the Volunteer Management Platform bantu.life",
-        "Singlehandedly redesigned user interface and coded new website within one month",
+        "Started an overhaul of bantu.life, the volunteer management platform",
+        "Redesigned the interface and rebuilt the website on my own in a month",
       ],
       stacks: [
         {
@@ -113,10 +113,10 @@ export const experience: {
       organisation: "gdsc",
       organisationLink:
         "https://gdsc.community.dev/national-university-of-singapore/",
-      description: "A #TechForGood club supported by Google Developers",
+      description: "A tech-for-good student club supported by Google Developers",
       points: [
-        "Led a team of 74 members to start 3 new software development projects for Non-Profit Organizations in Singapore",
-        "Spearheaded technology workshops and a hackathon to build generative skills in tech in students",
+        "Led a 74-member club that started three software projects for non-profits in Singapore",
+        "Ran technical workshops and a hackathon for students",
       ],
       stacks: [],
     },
@@ -127,10 +127,10 @@ export const experience: {
       organisation: "gdsc",
       organisationLink:
         "https://gdsc.community.dev/national-university-of-singapore/",
-      description: "Building apps for Non-Profits in Singapore",
+      description: "Building apps for non-profits in Singapore",
       points: [
-        "Developed a web application with five web developers for CampusImpact, non-profit organization targeting youths",
-        "Year-long project to create a questionnaire and analytics module for teachers to build feedback loops",
+        "Built a web app with five other developers for CampusImpact, a non-profit for young people",
+        "A year-long project: a questionnaire and analytics module that gives teachers a feedback loop",
       ],
       stacks: [
         {
